@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plan1-comparison"
+version = "0.1.0"
+description = "Assembles the penguin ↔ DeformSplat baseline comparison from archived run records under pre-registered rules"
+requires-python = ">=3.11"   # tomllib
+# The assembler and the saturation rule are pure stdlib on purpose: the whole
+# decision surface is testable with no third-party runtime at all.
+dependencies = []
+
+[project.optional-dependencies]
+# numpy and torch are needed only by the conformance test, which drives the two
+# rigidity rules against each other. arap-deform-3dgs supplies the reference rule
+# and is installed editable so the binding stays live:
+#     pip install -e ../arap-deform-3dgs
+test = ["pytest", "numpy", "torch"]
+
+[tool.setuptools]
+packages = ["plan1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

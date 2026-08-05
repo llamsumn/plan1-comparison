@@ -1,0 +1,112 @@
+# The penguin ↔ DeformSplat comparison — row binding.
+#
+# Every published number traces to a row here. Rows are bound to sources
+# explicitly and never inferred from directory names or from the numbers
+# themselves: `penguin_vanilla` (19.277395…) and `penguin_rho1b` (19.277315…)
+# differ by less than 0.0001 dB, carry different roles, and are separable only on
+# the secondary metrics. Any heuristic binding will eventually swap them, and the
+# resulting table would be wrong in a way that looks entirely plausible.
+#
+# `information` is the frame of the comparison, not a footnote: the baseline has
+# seen the object move. It is a column so it travels with the table.
+#
+# Adding a run is an edit here. No number is ever retyped into a chapter.
+
+asset = "penguin_0217_0239"
+eval_step = 501
+
+[roots]
+# Resolved relative to this file. The archive holds the fetched run evidence.
+archive = "../../3D"
+
+# ── the no-rigidity row ─────────────────────────────────────────────────────
+# The mechanism-off run alone (plan1_prereg.md §4). Denominator base for every
+# reported fraction.
+[[row]]
+key = "vanilla"
+label = "none (grouping off, unit rigidity)"
+role = "null"
+information = "—"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_vanilla"
+
+# ── the two unit-rigidity replicates ────────────────────────────────────────
+# Same configuration as `vanilla` by code inspection — the scaling helper
+# early-returns its input at rho = 1. Reported together beneath the table, and
+# the source of the derived replicate band. NOT fed to the saturation rule: they
+# would duplicate rho = 1 in the sweep, and choosing between them is exactly the
+# arbitrary decision the manifest exists to prevent.
+[[row]]
+key = "rho1a"
+label = "unit rigidity (replicate a)"
+role = "null_replicate"
+rigidity = 1.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho1a"
+
+[[row]]
+key = "rho1b"
+label = "unit rigidity (replicate b)"
+role = "null_replicate"
+rigidity = 1.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho1b"
+
+# ── the imposed-rigidity sweep ──────────────────────────────────────────────
+[[row]]
+key = "rho025"
+label = "imposed, ρ = 0.25"
+role = "imposed"
+rigidity = 0.25
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho025"
+
+[[row]]
+key = "rho4"
+label = "imposed, ρ = 4"
+role = "imposed"
+rigidity = 4.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho4"
+
+[[row]]
+key = "rho16"
+label = "imposed, ρ = 16"
+role = "imposed"
+rigidity = 16.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho16"
+
+# The rho = 32 and rho = 64 saturation runs are appended here once they land.
+# The saturation rule currently reports NOT SATURATED, so no row may be
+# published until they do (plan1_prereg.md §3.1).
+
+# ── the baseline ────────────────────────────────────────────────────────────
+# The authors' unmodified pipeline, 2026-07-22 spike. Recorded only as a console
+# line, at display precision (3 / 4 / 3 decimals), so every fraction derived from
+# it carries a rounding interval.
+#
+# If preflight recovers THIS RUN's stats/val_step0501.json from the cluster,
+# change `kind` to "stats_json" and `path` to the run directory; the table then
+# regenerates at full precision. plan1_prereg.md §7 governs what qualifies: the
+# local ~/results/diva360_finetune/penguin_0217_0239/ (2026-06-24, 25.0107) is a
+# DIFFERENT run and is disqualified.
+[[row]]
+key = "baseline"
+label = "inferred groups (baseline, as published)"
+role = "baseline"
+information = "observed before/after motion"
+kind = "console_log"
+root = "archive"
+path = "cluster/spike_logs/phase3_run_console.log"
