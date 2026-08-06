@@ -1,0 +1,47 @@
+# The whole of this project's change to `util/helper.py`.
+#
+# Upstream:  github.com/vision3d-lab/deformsplat @ 60955d67d066a8b26e1ed8a92f1c51c902a9ccab
+# Licence:   Apache-2.0 — see THIRD_PARTY.md and the upstream LICENSE
+# Deployed:  evidence/cluster/sources_20260729/helper.py
+#            sha256 e83bb80d99e725b7be2831a250890f3f5b4af863d05639f0974f110588dc3220
+#
+# One hunk, appended at the end of the file: **19 added lines**, two new functions,
+# nothing upstream touched. The `-`/`+` pair on `return int(covered_count)` is the
+# file gaining a trailing newline, not an edit to it.
+#
+# This diff is what makes "the ARAP math, the LBS, the solver and the optimiser are
+# untouched" a checkable statement rather than an assurance. Neither function is
+# called from anywhere in this file; `deform_splat.py` imports both at the single
+# call site shown in the diff beside this one.
+#
+# `tests/test_upstream_diff.py` asserts that every `+` line below appears verbatim in
+# the deployed file and every `-` line does not, so the diff cannot drift away from
+# the source it describes.
+--- a/util/helper.py  (deformsplat @ 60955d67d066a8b26e1ed8a92f1c51c902a9ccab)
++++ b/evidence/cluster/sources_20260729/helper.py  (as deployed, 2026-07-29)
+@@ -615,4 +615,23 @@
+     patch_coords = torch.stack([row_idx, col_idx], dim=1)  # (N, 2)
+     covered_count = torch.unique(patch_coords, dim=0).size(0)
+ 
+-    return int(covered_count)
+\ No newline at end of file
++    return int(covered_count)
++
++# ---- Phase B rho-probe helpers (imposed per-region rigidity; item-2 Path A) ----
++def partition_anchors_by_handle(anchor, handle_xyz, rho_frac):
++    """D = nearest rho_frac to the handle (label 0); R = far remainder (label 1)."""
++    d = (anchor - handle_xyz[None]).norm(dim=1)
++    n_D = max(1, int(rho_frac * anchor.shape[0]))
++    label = torch.ones(anchor.shape[0], dtype=torch.long, device=anchor.device)
++    label[torch.argsort(d)[:n_D]] = 0
++    return label
++
++
++def rho_scale_weights(weight, indices_knn, region_label, rho, rigid_id=1):
++    """Post-scale row-normalised rbf weights by rho on R-R interior edges only.
++    rho==1 -> exact no-op. Do NOT renormalise (would cancel rho on interior-R rows)."""
++    if rho == 1.0:
++        return weight
++    i_R = (region_label == rigid_id)
++    rr = i_R[:, None] & i_R[indices_knn]
++    return weight * torch.where(rr, weight.new_tensor(float(rho)), weight.new_tensor(1.0))

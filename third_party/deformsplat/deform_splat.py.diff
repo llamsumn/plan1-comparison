@@ -1,0 +1,55 @@
+# The whole of this project's change to `deform_splat.py` — and one line that is not
+# this project's change at all.
+#
+# Upstream:  github.com/vision3d-lab/deformsplat @ 60955d67d066a8b26e1ed8a92f1c51c902a9ccab
+# Licence:   Apache-2.0 — see THIRD_PARTY.md and the upstream LICENSE
+# Deployed:  evidence/cluster/sources_20260805_patched/deform_splat.py
+#            sha256 e2ca10cf4ef7ae00b36cdc9a0baa30518ce028aef0ec37ce75a6c112919ed397
+#
+# TWO HUNKS, AND ONLY THE FIRST IS OURS.
+#
+# Hunk 1 (@@ -172) — **11 added lines**: the rho injection at the `weight` tensor,
+# guarded by `cfg.rho_enabled` so an unset config is bit-exactly upstream, plus the
+# T0.1a/b/c in-run assertion block. This is the entire call site. It sits after
+# `rbf_weight` and before the drag loop, so every line below it — the LBS, the ARAP
+# solve, the optimiser — runs upstream code on a scaled weight tensor.
+#
+# Hunk 2 (@@ -265) — `{"step": step}` -> `{"step": drag_iterations}`. **NOT ours.**
+# `deform_splat.py.prebak`, taken before the rho patch was applied, already carries
+# it, so it arrived with the clone rather than with this work. It writes checkpoint
+# metadata and nothing else: no published number reads `ckpt_finetune.pt` — the table
+# reads `stats/val_step*.json`. Recorded here rather than quietly dropped, because a
+# diff that omits a real difference is not a diff.
+#
+# `tests/test_upstream_diff.py` asserts that every `+` line below appears verbatim in
+# the deployed file and every `-` line does not, so the diff cannot drift away from
+# the source it describes.
+--- a/deform_splat.py  (deformsplat @ 60955d67d066a8b26e1ed8a92f1c51c902a9ccab)
++++ b/evidence/cluster/sources_20260805_patched/deform_splat.py  (as deployed, 2026-08-05)
+@@ -172,6 +172,17 @@
+         with torch.no_grad():
+             distances, indices_knn = knn(anchor, anchor, k=anchor_k)
+             weight = rbf_weight(distances, gamma=rbf_gamma)
++            if getattr(self.cfg, 'rho_enabled', False):
++                from util.helper import partition_anchors_by_handle, rho_scale_weights
++                _rl = partition_anchors_by_handle(anchor, points_3d_filtered.mean(0), getattr(self.cfg, 'rho_frac', 0.3))
++                _R = (_rl == 1)
++                _rr = _R[:, None] & _R[indices_knn]
++                assert _rr.any(), "T0.1a: partition produced no R-R interior edge"
++                _probe = rho_scale_weights(weight, indices_knn, _rl, 2.0)
++                assert torch.equal(_probe[~_rr], weight[~_rr]), "T0.1b: non-R-R edges perturbed"
++                assert torch.allclose(_probe[_rr], 2.0 * weight[_rr]), \
++                    "T0.1c: R-R scale wrong (renormalised? bad indices_knn gather? label frame?)"
++                weight = rho_scale_weights(weight, indices_knn, _rl, getattr(self.cfg, 'rho', 1.0))
+ 
+         for i in tqdm(range(drag_iterations + 1)):
+             
+@@ -265,7 +276,7 @@
+         self.splats["quats"] = quaternion_multiply(quat_residual, self.splats["quats"])
+         
+         # save checkpoint
+-        data = {"step": step, "splats": (torch.nn.ParameterDict(self.splats).state_dict()), "group_id_all": group_id_all, "group_id_all_init": group_id_all_init}
++        data = {"step": drag_iterations, "splats": (torch.nn.ParameterDict(self.splats).state_dict()), "group_id_all": group_id_all, "group_id_all_init": group_id_all_init}
+         torch.save(data, f"{self.cfg.result_dir}/ckpt_finetune.pt")
+         print("save checkpoint to ", f"{self.cfg.result_dir}/ckpt_finetune.pt")
+ 

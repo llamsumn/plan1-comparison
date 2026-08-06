@@ -44,6 +44,14 @@ regenerated into something different without saying so. `evidence/PROVENANCE.tom
 the source path and sha256 of all 45 copied files, and asserts them in both directions:
 a file that changed fails, and so does one that arrived with no row.
 
+**The run logs carry the cluster account's identifiers** — a username, a hostname and
+home-directory paths — and they are left in deliberately. `_logs/plan1_preflight_20260805.txt`
+is the record of the preflight that recovered the baseline run and compared 6/6 source
+hashes, and the file is pinned by sha256 like everything else under `evidence/`. Redacting
+it would change those bytes and break the hash that makes the 6/6 checkable, which is the
+only reason the file is worth shipping. No credentials, keys or tokens appear anywhere in
+this repository.
+
 ## The ported method
 
 `arap_core/` (10 modules, 1,709 lines) and `box_b/edge_weights.py` (116 lines) come from
@@ -159,6 +167,9 @@ missing `torch` makes the suite **error**, not shrink.
 | `evidence/` | the vendored run records, cluster sources and run logs — everything the table resolves |
 | `evidence/characterisation/` | the characterisation study's outputs: the grids, the CSVs, the §6.2 figures and the three verdicts that certify them |
 | `evidence/PROVENANCE.toml` | where every copied file came from, what it hashes to, and what deliberately did not travel |
+| `LICENSE` | MIT, and what it does **not** cover |
+| `THIRD_PARTY.md` | the third-party material, its terms, and how the two modified files were changed |
+| `third_party/deformsplat/` | the upstream Apache-2.0 text, and the complete diff of this project's 30 lines against it |
 | `out/comparison_table.md` | the published table. Regenerates byte-identically; `tests/test_build_table.py` asserts it |
 | `tests/test_conformance.py` | does the **deployed** rigidity rule match the **tested** reference? |
 | `tests/test_wiring_assertion.py` | is the in-run assertion's **silence** evidence? Drives it against broken rules |
@@ -205,3 +216,25 @@ rule, firing on five injected faults, with each fault attributed to the arm that
 The one thing it cannot catch is a label-frame mismatch, and no harness can make it: the
 caller derives its rigid-interior mask from the same label array it passes to the rule. That
 is recorded rather than hidden, and closed by construction in the archive's verdict.
+
+## Licence and attribution
+
+This repository is **MIT** — see `LICENSE`. That covers the work authored here and nothing
+else, because two things here are not this project's.
+
+**The two cluster sources under `evidence/cluster/` are DeformSplat's**
+(`github.com/vision3d-lab/deformsplat` @ `60955d67`, Apache-2.0), 1,581 lines, and both
+carry a local modification. Apache-2.0 asks that a modified file say so, and neither can:
+both are pinned by sha256, the manifest cites one of the hashes, and two suites parse them
+by AST — a licence header in either would break all of that and stop the copy being what
+actually ran. So the notice sits beside the file instead, and goes further than the licence
+asks: `third_party/deformsplat/` commits the **complete diff**, 30 lines across the two,
+applying cleanly to the pinned commit. That diff is also the evidence for the strongest
+claim this project makes about its own footprint — **the ARAP formulation, the LBS, the
+solver and the optimiser are untouched.** `tests/test_upstream_diff.py` keeps the diffs from
+drifting away from the files they describe.
+
+**The sample asset derives from DiVa360** (`github.com/brown-ivl/DiVa360`, CVPR 2024, MIT).
+`data/penguin_original.ply` is a 3DGS export of a checkpoint trained on its `penguin`
+sequence — and that checkpoint came with the cluster image rather than being trained here.
+`THIRD_PARTY.md` carries both attributions in full.

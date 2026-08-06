@@ -170,18 +170,44 @@ why = "the preflight that recovered the baseline record and compared 6/6 source 
 # ── the archived cluster sources ────────────────────────────────────────────
 # Both gate modules load these by AST out of the source *text*, so the binding is
 # to the bytes below and not to a transcription of them. Copied, never edited.
+#
+# THESE TWO ARE THE ONLY THIRD-PARTY FILES IN THE EVIDENCE BASE. They are
+# DeformSplat's, Apache-2.0, and both carry a local modification — so each row
+# below adds `upstream_repo`, `upstream_commit`, `upstream_licence` and
+# `modification` to the four fields every other row has.
+#
+# The licence asks that a modified file carry a notice saying it was modified, and
+# these two cannot: `source` is hash-pinned above, the manifest cites the second
+# hash directly, and `test_conformance.py` and `test_wiring_assertion.py` both
+# parse the source text by AST. A licence header inserted into either file would
+# break all four at once, and would also make the vendored copy stop being what
+# ran on the cluster — which is the single property that makes it evidence.
+#
+# So the notice is carried beside the file rather than inside it: `THIRD_PARTY.md`
+# states the modification, and `third_party/deformsplat/*.diff` commits the
+# complete diff against the pinned upstream commit — 30 lines across the two,
+# applying cleanly, guarded by `tests/test_upstream_diff.py`. A reader gets more
+# than the licence asks for, and the copied bytes stay exactly as deployed.
 
 [[file]]
 path = "cluster/sources_20260729/helper.py"
 source = "~/3D/cluster/sources_20260729/helper.py"
 sha256 = "e83bb80d99e725b7be2831a250890f3f5b4af863d05639f0974f110588dc3220"
 why = "the deployed rigidity rule the conformance suite drives against the reference"
+upstream_repo = "github.com/vision3d-lab/deformsplat"
+upstream_commit = "60955d67d066a8b26e1ed8a92f1c51c902a9ccab"
+upstream_licence = "Apache-2.0 — full text at third_party/deformsplat/LICENSE"
+modification = "MODIFIED from upstream `util/helper.py`: +19 lines appended, adding `partition_anchors_by_handle` and `rho_scale_weights`. Nothing upstream is touched. Complete diff: third_party/deformsplat/helper.py.diff"
 
 [[file]]
 path = "cluster/sources_20260805_patched/deform_splat.py"
 source = "~/3D/cluster/sources_20260805_patched/deform_splat.py"
 sha256 = "e2ca10cf4ef7ae00b36cdc9a0baa30518ce028aef0ec37ce75a6c112919ed397"
 why = "the rho = 32/64 call site the wiring harness parses; the manifest cites this hash"
+upstream_repo = "github.com/vision3d-lab/deformsplat"
+upstream_commit = "60955d67d066a8b26e1ed8a92f1c51c902a9ccab"
+upstream_licence = "Apache-2.0 — full text at third_party/deformsplat/LICENSE"
+modification = "MODIFIED from upstream `deform_splat.py`: +11 lines at the `weight` tensor — the rho injection and the T0.1a/b/c assertion block. The ARAP math, LBS, solver and optimiser are untouched, which the diff is what proves. A second hunk (`{\"step\": step}` -> `{\"step\": drag_iterations}`) is NOT this project's edit — it predates the patch in `deform_splat.py.prebak`, is clone drift, and touches checkpoint metadata that no published number reads. Complete diff: third_party/deformsplat/deform_splat.py.diff"
 
 [[file]]
 path = "cluster/spike_logs/phase3_run_console.log"
@@ -542,12 +568,20 @@ source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
 sha256 = "41a75906fe68c369096fd299af64cc1ade93ce10931351e6316ecd74cc6ad056"
 why = "the runnable demonstration, carrying an identity assertion and an inline energy-monotonicity assertion. NOT byte-identical to source — one corrected print, reasoned above"
 
+# THE ONE ROW THAT IS NOT CODE, AND NOT THIS PROJECT'S TO GIVE. `source_repo`
+# says where the copy was taken from; it does not say whom the underlying data is
+# owed to, and for a captured dataset those are different questions. The 3DGS was
+# trained on DiVa360's `penguin` sequence — which is why the vendored run logs
+# name `data/diva360_processed/penguin_0239/` and `results/diva360/penguin_0217/`
+# — and it was trained by the cluster image rather than by this project. DiVa360
+# is MIT, so redistribution is permitted and attribution is what is owed.
 [[ported]]
 path = "data/penguin_original.ply"
 source_repo = "arap-deform-3dgs"
 source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
 sha256 = "9a13235506da2a16e973242183abefff8f021d6cd4e74120051c85f8450aaf20"
 why = "the sample asset, 23,548 Gaussians, 5.6 MB. Tracked by exception against the *.ply ignore — see .gitignore, where the reason is recorded"
+attribution = "Derived from DiVa360 (github.com/brown-ivl/DiVa360, CVPR 2024 Highlight), MIT. A 3D Gaussian Splatting export of a checkpoint trained on the `penguin` sequence (penguin_0217, evaluated at penguin_0239) — not a DiVa360 file itself. The checkpoint was reused from the cluster image, not trained here. See THIRD_PARTY.md."
 
 [[ported]]
 path = "tests/method/test_edges.py"

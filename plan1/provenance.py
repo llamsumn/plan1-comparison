@@ -112,6 +112,16 @@ class VendoredFile:
     predate them and genuinely have no generating command — see
     ``tests/test_vendored_evidence.py``, which requires all three of everything
     under ``characterisation/``.
+
+    ``upstream_repo``, ``upstream_commit``, ``upstream_licence`` and ``modification``
+    are the four a **third-party** file needs and a file of this project's own does
+    not. Two rows carry them: the DeformSplat sources under ``cluster/``, which are
+    Apache-2.0 and both locally modified. The licence asks that modified files carry a
+    notice saying so, and they cannot — every byte under ``evidence/`` is hash-pinned
+    and two suites parse these two files by AST, so a header inserted into either
+    would break the manifest citation and the wiring harness at once. The notice is
+    therefore carried *beside* the file: here, in ``THIRD_PARTY.md``, and as the
+    complete diff under ``third_party/``.
     """
 
     path: str
@@ -121,6 +131,10 @@ class VendoredFile:
     command: str | None = None
     generated: str | None = None
     certified_by: str | None = None
+    upstream_repo: str | None = None
+    upstream_commit: str | None = None
+    upstream_licence: str | None = None
+    modification: str | None = None
 
 
 @dataclass(frozen=True)
@@ -131,6 +145,11 @@ class PortedFile:
     executable code that lives at the repository root and is imported, not read.
     The two need different homes on disk and the same discipline about identity:
     source repository, source commit, and a hash.
+
+    ``attribution`` is for the one row that is not code and not this project's to
+    give: ``data/penguin_original.ply`` is a 3DGS export of a checkpoint trained on
+    a third-party dataset, so the port record says where it came from but not whom
+    it is owed to. One field, naming the dataset and its licence, closes that.
     """
 
     path: str
@@ -138,6 +157,7 @@ class PortedFile:
     source_commit: str
     sha256: str
     why: str
+    attribution: str | None = None
 
 
 @dataclass(frozen=True)
@@ -219,6 +239,10 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
                 command=entry.get("command"),
                 generated=entry.get("generated"),
                 certified_by=entry.get("certified_by"),
+                upstream_repo=entry.get("upstream_repo"),
+                upstream_commit=entry.get("upstream_commit"),
+                upstream_licence=entry.get("upstream_licence"),
+                modification=entry.get("modification"),
             )
             for entry in blob.get("file", ())
         ),
@@ -243,6 +267,7 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
                 source_commit=entry["source_commit"],
                 sha256=entry["sha256"],
                 why=entry["why"],
+                attribution=entry.get("attribution"),
             )
             for entry in blob.get("ported", ())
         ),

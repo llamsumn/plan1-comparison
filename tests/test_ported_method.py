@@ -82,6 +82,50 @@ def test_every_ported_row_names_its_repository_commit_and_reason(entry):
     assert entry.why
 
 
+# ── the one row that is data, and owed to someone else ──────────────────────
+#: Every other ported row is code this project wrote, copied between this project's
+#: own repositories. `data/penguin_original.ply` is not: it is a 3DGS export of a
+#: checkpoint trained on a third-party capture, so `source_repo` answers *where the
+#: copy came from* while leaving *whom it is owed to* unrecorded. Those are different
+#: questions and the port record only ever answered the first.
+ATTRIBUTED = "data/penguin_original.ply"
+
+
+def test_the_sample_asset_names_the_dataset_it_derives_from():
+    """MIT permits redistributing it. Attribution is the condition, not a courtesy.
+
+    Asserted on content rather than on the field merely existing, because "there is
+    an attribution string" is satisfied by an empty gesture: the dataset has to be
+    named, its licence has to be named, and the fact that this project did not train
+    the checkpoint has to be there too — that last one is the claim a reader would
+    otherwise reasonably infer in this repository's favour.
+    """
+    entry = RECORD.ported_file(ATTRIBUTED)
+    assert entry.attribution, f"{ATTRIBUTED} has no dataset attribution"
+    for owed in ("DiVa360", "MIT", "brown-ivl", "not trained here"):
+        assert owed in entry.attribution, owed
+
+
+def test_third_party_md_carries_the_same_attribution_where_a_reader_lands():
+    """A field in a TOML file nobody opens is not attribution.
+
+    `THIRD_PARTY.md` is where the licence question is answered for the whole
+    repository, so the asset has to appear there as well — and both places are
+    asserted so neither can be updated alone.
+    """
+    text = (REPO_ROOT / "THIRD_PARTY.md").read_text()
+    assert "DiVa360" in text
+    assert ATTRIBUTED in text
+    assert "MIT" in text
+
+
+def test_no_other_ported_row_claims_a_third_party_dataset():
+    """One asset is owed to someone else. The rest are this project's own work, and
+    saying so keeps the field meaningful rather than boilerplate on every row."""
+    attributed = {e.path for e in RECORD.ported if e.attribution is not None}
+    assert attributed == {ATTRIBUTED}
+
+
 # ── and what is there is described ──────────────────────────────────────────
 def test_every_ported_file_has_a_provenance_row():
     """The direction that is easy to omit and does all the work."""
