@@ -1,0 +1,1122 @@
+{
+  "scale": [
+    0.0,
+    0.6
+  ],
+  "k_order": [
+    4,
+    6,
+    8,
+    12,
+    16,
+    32
+  ],
+  "gamma_order": [
+    1.0,
+    2.0,
+    3.0,
+    5.0,
+    20.0,
+    50.0
+  ],
+  "gamma_breadth": {
+    "1.0": 0.5218524852761892,
+    "2.0": 0.3075872124260328,
+    "3.0": 0.19966951912107825,
+    "5.0": 0.10368488925550352,
+    "20.0": 0.013749253384187468,
+    "50.0": 0.0034400884137720787
+  },
+  "k_sensitive_cells": [],
+  "na_tile": {
+    "geometry": "blob",
+    "edit": "bar_bend"
+  },
+  "caveat_cell": {
+    "edit": "static_far",
+    "gamma": 5.0,
+    "K": 32
+  },
+  "cells": [
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 1.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 1.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 1.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 1.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 1.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 1.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 2.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 2.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 2.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 2.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 2.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 2.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 3.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 3.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 3.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 3.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 3.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 3.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 5.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 5.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 5.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 5.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 5.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 5.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 20.0,
+      "regime": "global",
+      "support_norm": 0.508804444447799,
+      "mixed": true,
+      "n_contained": 1
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 20.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 20.0,
+      "regime": "global",
+      "support_norm": 0.5089370917347918,
+      "mixed": true,
+      "n_contained": 1
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 20.0,
+      "regime": "global",
+      "support_norm": 0.5080965430998082,
+      "mixed": true,
+      "n_contained": 1
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 20.0,
+      "regime": "global",
+      "support_norm": 0.5078883328884944,
+      "mixed": true,
+      "n_contained": 1
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 20.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 50.0,
+      "regime": "global",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "bar_bend",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.21442849426239594,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.21471346445112718,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.21511584050958868,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.21520685964281325,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.21519387080151184,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.21537770033343337,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.2142672480544341,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.21461097666589238,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.21491710004681133,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.21507881292692774,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.21509808768813646,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.2152502998591238,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.21413159107048718,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.21452331159597648,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.21475345445110838,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.21492891958684482,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.21496069457198388,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.21508048258659504,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.21399207890026095,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.21442688891225203,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.21454336441534094,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.2146822699714911,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.21471282146611984,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.21476484633530832,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.218748159440326,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.21918032281774733,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.2191887476229378,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.21920850075611842,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.21921555731341122,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 20.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 4,
+      "gamma": 50.0,
+      "regime": "contained",
+      "support_norm": 0.2182384027081973,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 6,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 8,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 12,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 16,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "bar",
+      "K": 32,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 4,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.1834997182918611,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 6,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.18478823283565715,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 8,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.184558570517121,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 12,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.1845229258735114,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 16,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.1844676306317317,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 32,
+      "gamma": 1.0,
+      "regime": "contained",
+      "support_norm": 0.18444989430603398,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 4,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.18360931512353673,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 6,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.18483485573438993,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 8,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.18470244387261237,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 12,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.1847283383318261,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 16,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.18475941495263368,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 32,
+      "gamma": 2.0,
+      "regime": "contained",
+      "support_norm": 0.1850293821807343,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 4,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.18370372356202022,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 6,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.18485950309957908,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 8,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.184806819795128,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 12,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.18485838495259863,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 16,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.18491596480132355,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 32,
+      "gamma": 3.0,
+      "regime": "contained",
+      "support_norm": 0.1851780041142598,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 4,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.18384135903522547,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 6,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.18483088484209012,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 8,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.18489934602755162,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 12,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.18496222834831264,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 16,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.1850056543511763,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 32,
+      "gamma": 5.0,
+      "regime": "contained",
+      "support_norm": 0.18511365131656068,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 4,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.18444602753437347,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 6,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.18466955069685786,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 8,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.18473807890931382,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 12,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.18474156166075795,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 16,
+      "gamma": 20.0,
+      "regime": "contained",
+      "support_norm": 0.18474097666517653,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 32,
+      "gamma": 20.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 4,
+      "gamma": 50.0,
+      "regime": "contained",
+      "support_norm": 0.18332341533655447,
+      "mixed": false,
+      "n_contained": 3
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 6,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 8,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 12,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 16,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    },
+    {
+      "edit": "static_far",
+      "geometry": "blob",
+      "K": 32,
+      "gamma": 50.0,
+      "regime": "degenerate",
+      "support_norm": null,
+      "mixed": false,
+      "n_contained": 0
+    }
+  ]
+}

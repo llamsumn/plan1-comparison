@@ -1,0 +1,49 @@
+geometry,edit,sweep_type,fixed_var,fixed_value,swept_values,support_norm_means,seed_spreads,ratio,classification,n_cells_used,notes
+bar,bar_bend,K@gamma,gamma_norm,1.0,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,bar_bend,K@gamma,gamma_norm,2.0,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,bar_bend,K@gamma,gamma_norm,3.0,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,bar_bend,K@gamma,gamma_norm,5.0,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,bar_bend,K@gamma,gamma_norm,20.0,4|8|12|16,0.5088|0.5089|0.5081|0.5079,0.0000|0.0000|0.0000|0.0000,nan,insufficient,4,zero seed spread (single seed?) — spread unusable as arbiter; non-finite ratio / unusable seed spread (Fix A) -> insufficient
+bar,bar_bend,K@gamma,gamma_norm,50.0,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,bar_bend,gamma@K,K,4,20,0.5088,0.0000,nan,insufficient,1,need >=2 non-degenerate swept values
+bar,bar_bend,gamma@K,K,6,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,bar_bend,gamma@K,K,8,20,0.5089,0.0000,nan,insufficient,1,need >=2 non-degenerate swept values
+bar,bar_bend,gamma@K,K,12,20,0.5081,0.0000,nan,insufficient,1,need >=2 non-degenerate swept values
+bar,bar_bend,gamma@K,K,16,20,0.5079,0.0000,nan,insufficient,1,need >=2 non-degenerate swept values
+bar,bar_bend,gamma@K,K,32,,,,nan,insufficient,0,need >=2 non-degenerate swept values
+bar,static_far,K@gamma,gamma_norm,1.0,4|6|8|12|16|32,0.2144|0.2147|0.2151|0.2152|0.2152|0.2154,0.0014|0.0012|0.0012|0.0012|0.0011|0.0011,0.7779,flat,18,
+bar,static_far,K@gamma,gamma_norm,2.0,4|6|8|12|16|32,0.2143|0.2146|0.2149|0.2151|0.2151|0.2153,0.0014|0.0011|0.0011|0.0011|0.0011|0.0010,0.8633,flat,18,
+bar,static_far,K@gamma,gamma_norm,3.0,4|6|8|12|16|32,0.2141|0.2145|0.2148|0.2149|0.2150|0.2151,0.0013|0.0011|0.0011|0.0011|0.0010|0.0010,0.8778,flat,18,
+bar,static_far,K@gamma,gamma_norm,5.0,4|6|8|12|16|32,0.2140|0.2144|0.2145|0.2147|0.2147|0.2148,0.0011|0.0009|0.0010|0.0010|0.0010|0.0010,0.7763,flat,18,incl γ5/K32 sub-gate-floored(1.3%) tail cell
+bar,static_far,K@gamma,gamma_norm,20.0,4|6|8|12|16,0.2187|0.2192|0.2192|0.2192|0.2192,0.0038|0.0037|0.0037|0.0036|0.0036,0.1270,flat,15,
+bar,static_far,K@gamma,gamma_norm,50.0,4,0.2182,0.0026,nan,insufficient,3,need >=2 non-degenerate swept values
+bar,static_far,gamma@K,K,4,1|2|3|5|20|50,0.2144|0.2143|0.2141|0.2140|0.2187|0.2182,0.0014|0.0014|0.0013|0.0011|0.0038|0.0026,2.1861,responds,18,
+bar,static_far,gamma@K,K,6,1|2|3|5|20,0.2147|0.2146|0.2145|0.2144|0.2192,0.0012|0.0011|0.0011|0.0009|0.0037,2.4775,responds,15,
+bar,static_far,gamma@K,K,8,1|2|3|5|20,0.2151|0.2149|0.2148|0.2145|0.2192,0.0012|0.0011|0.0011|0.0010|0.0037,2.4368,responds,15,
+bar,static_far,gamma@K,K,12,1|2|3|5|20,0.2152|0.2151|0.2149|0.2147|0.2192,0.0012|0.0011|0.0011|0.0010|0.0036,2.3903,responds,15,
+bar,static_far,gamma@K,K,16,1|2|3|5|20,0.2152|0.2151|0.2150|0.2147|0.2192,0.0011|0.0011|0.0010|0.0010|0.0036,2.4180,responds,15,
+bar,static_far,gamma@K,K,32,1|2|3|5,0.2154|0.2153|0.2151|0.2148,0.0011|0.0010|0.0010|0.0010,0.6163,flat,12,incl γ5/K32 sub-gate-floored(1.3%) tail cell
+bar,static_far,gamma_live@K,K,4,1|2|3|5,0.2144|0.2143|0.2141|0.2140,0.0014|0.0014|0.0013|0.0011,0.3332,flat,12,
+bar,static_far,gamma_live@K,K,6,1|2|3|5,0.2147|0.2146|0.2145|0.2144,0.0012|0.0011|0.0011|0.0009,0.2616,flat,12,
+bar,static_far,gamma_live@K,K,8,1|2|3|5,0.2151|0.2149|0.2148|0.2145,0.0012|0.0011|0.0011|0.0010,0.5227,flat,12,
+bar,static_far,gamma_live@K,K,12,1|2|3|5,0.2152|0.2151|0.2149|0.2147,0.0012|0.0011|0.0011|0.0010,0.4765,flat,12,
+bar,static_far,gamma_live@K,K,16,1|2|3|5,0.2152|0.2151|0.2150|0.2147,0.0011|0.0011|0.0010|0.0010,0.4583,flat,12,
+bar,static_far,gamma_live@K,K,32,1|2|3|5,0.2154|0.2153|0.2151|0.2148,0.0011|0.0010|0.0010|0.0010,0.6163,flat,12,incl γ5/K32 sub-gate-floored(1.3%) tail cell
+blob,static_far,K@gamma,gamma_norm,1.0,4|6|8|12|16|32,0.1835|0.1848|0.1846|0.1845|0.1845|0.1844,0.0026|0.0026|0.0029|0.0027|0.0027|0.0025,0.4813,flat,18,
+blob,static_far,K@gamma,gamma_norm,2.0,4|6|8|12|16|32,0.1836|0.1848|0.1847|0.1847|0.1848|0.1850,0.0025|0.0026|0.0028|0.0027|0.0027|0.0026,0.5339,flat,18,
+blob,static_far,K@gamma,gamma_norm,3.0,4|6|8|12|16|32,0.1837|0.1849|0.1848|0.1849|0.1849|0.1852,0.0025|0.0026|0.0027|0.0026|0.0027|0.0026,0.5611,flat,18,
+blob,static_far,K@gamma,gamma_norm,5.0,4|6|8|12|16|32,0.1838|0.1848|0.1849|0.1850|0.1850|0.1851,0.0024|0.0025|0.0026|0.0025|0.0026|0.0026,0.5021,flat,18,incl γ5/K32 sub-gate-floored(1.3%) tail cell
+blob,static_far,K@gamma,gamma_norm,20.0,4|6|8|12|16,0.1844|0.1847|0.1847|0.1847|0.1847,0.0021|0.0023|0.0024|0.0024|0.0024,0.1281,flat,15,
+blob,static_far,K@gamma,gamma_norm,50.0,4,0.1833,0.0034,nan,insufficient,3,need >=2 non-degenerate swept values
+blob,static_far,gamma@K,K,4,1|2|3|5|20|50,0.1835|0.1836|0.1837|0.1838|0.1844|0.1833,0.0026|0.0025|0.0025|0.0024|0.0021|0.0034,0.4297,flat,18,
+blob,static_far,gamma@K,K,6,1|2|3|5|20,0.1848|0.1848|0.1849|0.1848|0.1847,0.0026|0.0026|0.0026|0.0025|0.0023,0.0755,flat,15,
+blob,static_far,gamma@K,K,8,1|2|3|5|20,0.1846|0.1847|0.1848|0.1849|0.1847,0.0029|0.0028|0.0027|0.0026|0.0024,0.1269,flat,15,
+blob,static_far,gamma@K,K,12,1|2|3|5|20,0.1845|0.1847|0.1849|0.1850|0.1847,0.0027|0.0027|0.0026|0.0025|0.0024,0.1702,flat,15,
+blob,static_far,gamma@K,K,16,1|2|3|5|20,0.1845|0.1848|0.1849|0.1850|0.1847,0.0027|0.0027|0.0027|0.0026|0.0024,0.2040,flat,15,
+blob,static_far,gamma@K,K,32,1|2|3|5,0.1844|0.1850|0.1852|0.1851,0.0025|0.0026|0.0026|0.0026,0.2819,flat,12,incl γ5/K32 sub-gate-floored(1.3%) tail cell
+blob,static_far,gamma_live@K,K,4,1|2|3|5,0.1835|0.1836|0.1837|0.1838,0.0026|0.0025|0.0025|0.0024,0.1359,flat,12,
+blob,static_far,gamma_live@K,K,6,1|2|3|5,0.1848|0.1848|0.1849|0.1848,0.0026|0.0026|0.0026|0.0025,0.0278,flat,12,
+blob,static_far,gamma_live@K,K,8,1|2|3|5,0.1846|0.1847|0.1848|0.1849,0.0029|0.0028|0.0027|0.0026,0.1235,flat,12,
+blob,static_far,gamma_live@K,K,12,1|2|3|5,0.1845|0.1847|0.1849|0.1850,0.0027|0.0027|0.0026|0.0025,0.1671,flat,12,
+blob,static_far,gamma_live@K,K,16,1|2|3|5,0.1845|0.1848|0.1849|0.1850,0.0027|0.0027|0.0027|0.0026,0.1994,flat,12,
+blob,static_far,gamma_live@K,K,32,1|2|3|5,0.1844|0.1850|0.1852|0.1851,0.0025|0.0026|0.0026|0.0026,0.2819,flat,12,incl γ5/K32 sub-gate-floored(1.3%) tail cell

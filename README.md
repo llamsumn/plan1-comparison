@@ -19,11 +19,32 @@ evidence/             the run records and archived cluster sources, vendored
 `evidence/`, which used to be a sibling `~/3D` checkout. While it was, three test modules
 skipped silently on any other machine — 80 of 140 tests — and the published table
 regenerated into something different without saying so. `evidence/PROVENANCE.toml` records
-the source path and sha256 of all 24 copied files, and asserts them in both directions:
+the source path and sha256 of all 45 copied files, and asserts them in both directions:
 a file that changed fails, and so does one that arrived with no row.
 
 The reference edge-weight rule is still resolved from `../arap-deform-3dgs`; porting it is
 the one remaining external dependency.
+
+## The characterisation evidence
+
+`evidence/characterisation/` holds the study that motivated a *predicted* rigidity field
+rather than a hand-tuned one: the K × γ grid, the ρ × δ mask grid, the R-swing diagnostic,
+and the two §6.2 figures. Results travel; the study code stays in `~/3D` and is cited —
+every vendored file records the command that wrote it, the date, and the verdict certifying
+it.
+
+Three verdicts certify the set, and **none of it is regenerated** — they assert against
+these exact bytes:
+
+| verdict | result | what it checks |
+|---|---|---|
+| `item1_kgamma/KGAMMA_VERDICT.md` | **11/11 pass** | K is inert and γ flat in the live band — scope is not reliably hand-tunable through the KNN graph |
+| `item2_mask/MASK_VERDICT.md` | **17/17 pass** | ρ responds on both panels; box B therefore predicts a *per-region* field. The pin reading is split across panels, so the mechanism claim is earned only where it holds |
+| `reporting/FIGURE_CHECK.md` | **9/9 pass, 0 misrepresentations over 100 aggregate cells** | every plotted value re-derived from its source CSV |
+
+`tests/test_vendored_evidence.py` reads those three counts back out of the verdict files, so
+this table cannot drift away from what it describes, and pins the five cited CSVs at their
+row counts — a truncated copy is caught as a wrong number rather than shipped as a right one.
 
 ## Why the table is not just typed out
 
@@ -66,6 +87,7 @@ pip install -e ../arap-deform-3dgs
 | `plan1/render.py` | Markdown. Above the seam; decides nothing |
 | `manifests/penguin_deformsplat.toml` | which run is which row, and what information each arm had |
 | `evidence/` | the vendored run records, cluster sources and run logs — everything the table resolves |
+| `evidence/characterisation/` | the characterisation study's outputs: the grids, the CSVs, the §6.2 figures and the three verdicts that certify them |
 | `evidence/PROVENANCE.toml` | where every copied file came from, what it hashes to, and what deliberately did not travel |
 | `out/comparison_table.md` | the published table. Regenerates byte-identically; `tests/test_build_table.py` asserts it |
 | `tests/test_conformance.py` | does the **deployed** rigidity rule match the **tested** reference? |

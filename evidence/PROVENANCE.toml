@@ -3,8 +3,9 @@
 # `plan1-comparison` used to resolve its evidence out of a sibling `~/3D`
 # checkout. That made the published table reproducible only inside one person's
 # directory layout, and made three test modules skip silently everywhere else.
-# The evidence is 224 KB; it now lives here, and `~/3D` is out of the runtime
-# graph entirely.
+# The evidence is 1.7 MB — 236 KB of run records and cluster sources (#15) plus
+# 1.5 MB of characterisation outputs (#19) — and it now lives here, with `~/3D`
+# out of the runtime graph entirely.
 #
 # Vendoring trades away divergence detection: a copy cannot notice that its
 # original changed. That trade is deliberate — Plan 1 is frozen (archived runs,
@@ -22,7 +23,10 @@
 [origin]
 archive = "~/3D"
 vendored = "2026-08-06"
-issue = "https://github.com/llamsumn/3D-arap/issues/15"
+issues = [
+  "https://github.com/llamsumn/3D-arap/issues/15",  # run records, cluster sources, logs
+  "https://github.com/llamsumn/3D-arap/issues/19",  # characterisation outputs
+]
 
 # ── the nine run directories the manifest binds ─────────────────────────────
 # Every row of the published table resolves to a pair of these. `ckpts/`,
@@ -183,6 +187,228 @@ source = "~/3D/cluster/spike_logs/phase3_run_console.log"
 sha256 = "070cb58a2e6e472d3f6fdbe457db3566c2dd3a0309eefea813a375094c802284"
 why = "the superseded 2026-07-22 console baseline; the only real file the console-log reader is exercised against"
 
+# ── the characterisation outputs ────────────────────────────────────────────
+# The study that motivated the rigidity field: what a scope knob does, whether it
+# is hand-tunable, and where the regime boundary sits. Its *code* stays in `~/3D`
+# — results travel, code is cited — but every figure and every number the results
+# chapter cites has to be under version control with the artifact that publishes
+# it, which is what these 21 files are.
+#
+# **Nothing here was regenerated.** The three verdicts assert against these exact
+# bytes, at these exact row counts; re-running the generators would invalidate the
+# assertions and force re-verification of work that is already green. Each row
+# therefore carries `command` (how it was made), `generated` (when) and
+# `certified_by` (which verdict checked it) instead of an invitation to rebuild.
+#
+# Three verdicts certify the set, and they are quoted where a reader lands
+# (`README.md`) as well as here:
+#   KGAMMA_VERDICT.md  11/11 checks pass
+#   MASK_VERDICT.md    17/17 checks pass
+#   FIGURE_CHECK.md     9/9  checks pass, 0 misrepresentations over 100 aggregate cells
+#
+# **Departure from #19, under "measurement beats ticket".** The ticket names 17
+# files. The directory holds 21 (plus a macOS `.DS_Store`). The four it does not
+# name are not strays — each is the input a document that *is* named asserts
+# against, so vendoring the document without it would ship an uncheckable claim:
+#   _shared/rbf_weight_distribution.csv  — KGAMMA check S2 recomputes γ1 med=0.498,
+#                                          γ5 med=0.031, ratio 16.3× out of it
+#   item2_mask/mask_grid.json            — MASK check A7 is *defined* as CSV vs this
+#                                          file over 100 aggregate cells
+#   item1_kgamma/kgamma_grid.json        — the per-cell display values kgamma_grid.png
+#                                          draws, written beside it by the same run
+#   _shared/.preflight_refs.json         — the smoke references to 17 digits that
+#                                          PREFLIGHT_REPORT.md quotes to 4
+# All 21 are byte-identical to their source, verified by `cmp` at vendoring time.
+
+[[file]]
+path = "characterisation/_shared/PREFLIGHT_REPORT.md"
+source = "~/3D/characterisation/artifacts/_shared/PREFLIGHT_REPORT.md"
+sha256 = "12b3bc105167681d7fd0500fe6ef0d3ff1b95d2531b10a1687e0728c9b078f4e"
+command = "python -m characterisation._shared.preflight"
+generated = "2026-07-19"
+certified_by = "self — 11/11 HARD checks PASS (+1 WARN), 324 valid cells licensed to run"
+why = "the gate that licensed the Phase-3 grid: imports, seam symbols, locked constants, single degeneracy routing, determinism at 0.00e+00"
+
+[[file]]
+path = "characterisation/_shared/.preflight_refs.json"
+source = "~/3D/characterisation/artifacts/_shared/.preflight_refs.json"
+sha256 = "7b3b50a93099ffd923d4ed64a065b3a438746a025ec3ec8fdafcb8d0d69bec22"
+command = "python -m characterisation._shared.preflight"
+generated = "2026-07-19"
+certified_by = "PREFLIGHT_REPORT.md — P5 and P8, smoke reproduction and determinism"
+why = "the three smoke references at full precision; PREFLIGHT_REPORT.md quotes them rounded, so without this the report's P5 cannot be rechecked"
+
+[[file]]
+path = "characterisation/_shared/rbf_weight_distribution.csv"
+source = "~/3D/characterisation/artifacts/_shared/rbf_weight_distribution.csv"
+sha256 = "e158451182f23280e7680cfe7a838ffa3e3a58c57b2b99d9149697d278d19790"
+command = "python -m characterisation._shared.instrument_a"
+generated = "2026-07-16"
+certified_by = "KGAMMA_VERDICT.md 11/11 — check S2 recomputes from this file"
+why = "the edge-weight quantiles behind the kernel-structure claim: median 0.498 → 0.031 across γ=1→5, 16.3×, no high-band squash"
+
+[[file]]
+path = "characterisation/item1_kgamma/kgamma_summary.csv"
+source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_summary.csv"
+sha256 = "5b688f402970659c0a13c095066ab07267db961c5f555c83b27b0a1c02c120d7"
+command = "python -m characterisation.item1_kgamma.run_grid"
+generated = "2026-07-16"
+certified_by = "KGAMMA_VERDICT.md 11/11; FIGURE_CHECK.md check 1 re-derives 60/60 plotted points from it"
+why = "433 lines — the item-1 K × γ grid. The source of record for 'K is inert and γ is flat in the live band'"
+
+[[file]]
+path = "characterisation/item1_kgamma/kgamma_controllability.csv"
+source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_controllability.csv"
+sha256 = "7fe57167c49ec8b610ee6ca78d7c307e8c6578fcacd210190975ed76c10f9dc6"
+command = "python -m characterisation.item1_kgamma.run_grid"
+generated = "2026-07-19"
+certified_by = "KGAMMA_VERDICT.md 11/11"
+why = "49 lines — the per-sweep responds/flat classification. The five `responds` verdicts, and their dissolution when the live band is isolated"
+
+[[file]]
+path = "characterisation/item1_kgamma/kgamma_grid.png"
+source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_grid.png"
+sha256 = "9d46b2e27b110a173b8b993c7c06f1e3c4abcb18cbf05517f206455991843f69"
+command = "python -m characterisation.item1_kgamma.make_figure"
+generated = "2026-07-19"
+certified_by = "KGAMMA_VERDICT.md 11/11, via the grid CSV it draws"
+why = "the 2×2 item-1 figure — support against K and γ on both geometries"
+
+[[file]]
+path = "characterisation/item1_kgamma/kgamma_grid.json"
+source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_grid.json"
+sha256 = "00f45f59b537759189f8ff8adb3ea9112144b3726ea6a9a97a7e4104375d2b4d"
+command = "python -m characterisation.item1_kgamma.make_figure"
+generated = "2026-07-19"
+certified_by = "KGAMMA_VERDICT.md 11/11, via the grid CSV it derives from"
+why = "the per-cell display values kgamma_grid.png was drawn from, written beside it by the same run — what makes the figure checkable against the CSV rather than eyeballed"
+
+[[file]]
+path = "characterisation/item1_kgamma/KGAMMA_VERDICT.md"
+source = "~/3D/characterisation/artifacts/item1_kgamma/KGAMMA_VERDICT.md"
+sha256 = "f38fd29bba4b9bc32821adf7daec3cd2394ef2142891bbfea12601b0b9cec55b"
+command = "python -m characterisation.item1_kgamma.make_verdict"
+generated = "2026-07-19"
+certified_by = "self — 11/11 checks PASS, recomputed from kgamma_summary.csv and rbf_weight_distribution.csv"
+why = "the item-1 GREEN gate. Its finding — edit scope is not reliably hand-tunable via the KNN graph — is what motivates a predicted scope field over hand-tuned hyperparameters"
+
+[[file]]
+path = "characterisation/item2_mask/mask_grid.csv"
+source = "~/3D/characterisation/artifacts/item2_mask/mask_grid.csv"
+sha256 = "f01b6bef1d68bbfc40ee789da87be521a29df640cee7dda9f7fe657534885a3c"
+command = "python -m characterisation.item2_mask.mask_sweep"
+generated = "2026-07-17"
+certified_by = "MASK_VERDICT.md 17/17, which is recomputed from it; FIGURE_CHECK.md check 1"
+why = "393 lines — the item-2 ρ × δ mask grid. Every published item-2 number is re-derived from this file"
+
+[[file]]
+path = "characterisation/item2_mask/mask_grid.json"
+source = "~/3D/characterisation/artifacts/item2_mask/mask_grid.json"
+sha256 = "d9edcfc0737762151929965c1e6fb68bc7f830171db23d9910c133691e0e5fb5"
+command = "python -m characterisation.item2_mask.mask_sweep"
+generated = "2026-07-17"
+certified_by = "MASK_VERDICT.md 17/17 — check A7 is the comparison against this file"
+why = "the aggregated cells the figures draw. MASK check A7 (0 misrepresentations over 100 aggregate cells) is *defined* as CSV vs this file, so the check is unrecheckable without it"
+
+[[file]]
+path = "characterisation/item2_mask/mask_grid.png"
+source = "~/3D/characterisation/artifacts/item2_mask/mask_grid.png"
+sha256 = "bfe5c0fec2aebe70d7ea69b7e795d96501cfb63c36db7fd42c0367f16cf9c8a7"
+command = "python -m characterisation.item2_mask.make_mask_figure"
+generated = "2026-07-19"
+certified_by = "MASK_VERDICT.md 17/17 check A7 — 0 misrepresentations over 100 aggregate cells"
+why = "the ρ × δ grid figure"
+
+[[file]]
+path = "characterisation/item2_mask/mask_curves.png"
+source = "~/3D/characterisation/artifacts/item2_mask/mask_curves.png"
+sha256 = "54626c16a8d4a2325592c372c4f2f5de058b764e6170b31b26770ec8b876ad61"
+command = "python -m characterisation.item2_mask.make_mask_figure"
+generated = "2026-07-19"
+certified_by = "MASK_VERDICT.md 17/17 check A7 — 0 misrepresentations over 100 aggregate cells"
+why = "the ρ response curves at δ=0 — the headline axis, bar 14.61× and blob 4.44×"
+
+[[file]]
+path = "characterisation/item2_mask/rswing.png"
+source = "~/3D/characterisation/artifacts/item2_mask/rswing.png"
+sha256 = "c8b84d1296db17bf80e20c338a6abd075f74512940b0d0ed0776f1934888cded"
+command = "python -m characterisation.item2_mask.rswing_diagnostic"
+generated = "2026-07-17"
+certified_by = "MASK_VERDICT.md 17/17, via the two rswing CSVs it draws"
+why = "the R-swing diagnostic figure — the annulus partition's effect on realised support"
+
+[[file]]
+path = "characterisation/item2_mask/rswing_geometry.csv"
+source = "~/3D/characterisation/artifacts/item2_mask/rswing_geometry.csv"
+sha256 = "898306a727925eb164fa3271d0137882aff0faedf4e7bda5b1fcdf536bb2ab90"
+command = "python -m characterisation.item2_mask.rswing_diagnostic"
+generated = "2026-07-17"
+certified_by = "MASK_VERDICT.md 17/17"
+why = "288 lines — per-panel R and D fractions and the degeneracy flag, by partition"
+
+[[file]]
+path = "characterisation/item2_mask/rswing_support.csv"
+source = "~/3D/characterisation/artifacts/item2_mask/rswing_support.csv"
+sha256 = "cfecc967c936a3eb4f80f854564be6b457578de98f7efa037e5d80858995c06d"
+command = "python -m characterisation.item2_mask.rswing_diagnostic"
+generated = "2026-07-17"
+certified_by = "MASK_VERDICT.md 17/17"
+why = "41 lines — realised support per partition and stage, the R-swing's measured output"
+
+[[file]]
+path = "characterisation/item2_mask/MASK_VERDICT.md"
+source = "~/3D/characterisation/artifacts/item2_mask/MASK_VERDICT.md"
+sha256 = "a1764d75b2c5e65244be65ec789b3fe40e7aeb13a7b9bdbe6cba331fcdff112f"
+command = "python -m characterisation.item2_mask.verify_mask"
+generated = "2026-07-19"
+certified_by = "self — 17/17 checks PASS, recomputed from mask_grid.csv and cross-checked against mask_grid.json"
+why = "the item-2 GREEN gate, and the reason box B predicts a *per-region* rigidity field. It also records the honest limit: the pin reading is split across panels, so the mechanism claim is earned only where DIFFERS holds"
+
+[[file]]
+path = "characterisation/reporting/fig_62_dead_vs_live.png"
+source = "~/3D/characterisation/artifacts/reporting/fig_62_dead_vs_live.png"
+sha256 = "91ee8fa6d58f474bd6ec4a59fb38ad41cd8465ea5e2d7b01358b59387b0c8860"
+command = "python -m characterisation.reporting.make_62_figures"
+generated = "2026-07-22"
+certified_by = "FIGURE_CHECK.md 9/9 — 60/60 plotted points re-derived from source CSV"
+why = "§6.2 figure A. Shared y-limits are asserted in the generator, not left to convention"
+
+[[file]]
+path = "characterisation/reporting/fig_62_dead_vs_live.pdf"
+source = "~/3D/characterisation/artifacts/reporting/fig_62_dead_vs_live.pdf"
+sha256 = "cd42d681732b79afa0cb205e3ff7254a1c240647326b47df761349a995bd5344"
+command = "python -m characterisation.reporting.make_62_figures"
+generated = "2026-07-22"
+certified_by = "FIGURE_CHECK.md 9/9"
+why = "§6.2 figure A, vector form — the one the chapter includes"
+
+[[file]]
+path = "characterisation/reporting/fig_62_regime_u.png"
+source = "~/3D/characterisation/artifacts/reporting/fig_62_regime_u.png"
+sha256 = "c2d12a796bddd1ab6f676a97313d70542bb1c6462aa31be8dbb05862be915554"
+command = "python -m characterisation.reporting.make_62_figures"
+generated = "2026-07-22"
+certified_by = "FIGURE_CHECK.md 9/9 — checks 2f and 4, regime counts 41 contained / 49 global over 90 cells"
+why = "§6.2 figure B — the regime-U finding, the global→contained transition"
+
+[[file]]
+path = "characterisation/reporting/fig_62_regime_u.pdf"
+source = "~/3D/characterisation/artifacts/reporting/fig_62_regime_u.pdf"
+sha256 = "c97ac9c4869314a62ba9b17d3e9991e94756deeda6e80f58cab09f0ae90795f2"
+command = "python -m characterisation.reporting.make_62_figures"
+generated = "2026-07-22"
+certified_by = "FIGURE_CHECK.md 9/9"
+why = "§6.2 figure B, vector form — the one the chapter includes"
+
+[[file]]
+path = "characterisation/reporting/FIGURE_CHECK.md"
+source = "~/3D/characterisation/artifacts/reporting/FIGURE_CHECK.md"
+sha256 = "c442fce53cb02aa326afa63308846f8981341ba0157ddfb898ae0b308a559990"
+command = "python -m characterisation.reporting.verify_62_figures"
+generated = "2026-07-22"
+certified_by = "self — 9/9 checks PASS, 0 misrepresentations, every plotted value re-derived from source CSV"
+why = "the figure↔CSV cross-check. It is what makes the two §6.2 figures citable: the numbers in the picture are the numbers in the grid, asserted rather than assumed"
+
 # ── provenance inputs that are NOT vendored here ────────────────────────────
 # The published table's footer names four artefacts. Two are the vendored cluster
 # sources above and are hashed from this directory. The other two identify the
@@ -234,3 +460,13 @@ reason = "the 2026-07-29 cluster container listing. Its launch lines are the tre
 path = "cluster/rho_probe_evidence/*/{ckpts,renders,tb}/"
 size = "empty"
 reason = "present as empty directories beside every stats/ in the archive."
+
+[[excluded]]
+path = "characterisation/artifacts/.DS_Store"
+size = "10 KB"
+reason = "macOS Finder window metadata. Not evidence, not generated by any command, and the only file under characterisation/artifacts/ that did not travel."
+
+[[excluded]]
+path = "characterisation/**/*.py — the study code itself"
+size = "not measured; ~/3D/characterisation/"
+reason = "results travel, code is cited. The generating command for every vendored output is recorded on its row, so the code is locatable; copying it would fork a living study into a frozen artifact and give a reader two versions to reconcile."

@@ -1,0 +1,16 @@
+{
+  "smoke": {
+    "bar/bar_bend": {
+      "regime": "global",
+      "residual_fraction": 1.5684043843974025
+    },
+    "bar/static_far": {
+      "regime": "contained",
+      "support_norm": 0.21549731455675133
+    },
+    "blob/static_far": {
+      "regime": "contained",
+      "support_norm": 0.18815710592863463
+    }
+  }
+}

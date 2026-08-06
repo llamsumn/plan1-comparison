@@ -18,7 +18,12 @@ from pathlib import Path
 
 import pytest
 
-from plan1.provenance import EVIDENCE_ROOT, load_evidence, sha256_file
+from plan1.provenance import (
+    EVIDENCE_ROOT,
+    VendoredFile,
+    load_evidence,
+    sha256_file,
+)
 
 RECORD = load_evidence()
 
@@ -66,8 +71,80 @@ def test_every_file_under_evidence_has_a_provenance_row():
 
 
 def test_the_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
-    """Both checks above pass trivially against an empty directory."""
-    assert len(RECORD.files) == len(vendored_files()) == 24
+    """Both checks above pass trivially against an empty directory.
+
+    45 = 24 (#15) + 21 (#19). The 24: nine run directories × two stats files = 18,
+    three run logs, two archived cluster sources, one spike console. The 21: every
+    file under `~/3D/characterisation/artifacts/` except its `.DS_Store` — #19's
+    body names 17, and the four it omits are each the input a named document
+    asserts against, so they travelled too. Both departures are on the record in
+    `PROVENANCE.toml`.
+    """
+    assert len(RECORD.files) == len(vendored_files()) == 45
+
+
+# ── the characterisation outputs carry what a derived artefact needs ────────
+#: Every CSV the results chapter cites, and the line count it must have. A copy
+#: truncated in transit still parses, still hashes to *something*, and still draws
+#: a figure — it just draws a different one. Counting lines is the cheap check that
+#: catches it as a wrong number rather than as a missing file. Counts are
+#: `wc -l`: one header plus the data rows.
+CHARACTERISATION_ROWS = {
+    "characterisation/item2_mask/mask_grid.csv": 393,
+    "characterisation/item1_kgamma/kgamma_summary.csv": 433,
+    "characterisation/item2_mask/rswing_geometry.csv": 288,
+    "characterisation/item1_kgamma/kgamma_controllability.csv": 49,
+    "characterisation/item2_mask/rswing_support.csv": 41,
+}
+
+
+def characterisation_files() -> list[VendoredFile]:
+    return [e for e in RECORD.files if e.path.startswith("characterisation/")]
+
+
+@pytest.mark.parametrize(
+    "entry", characterisation_files(), ids=lambda e: e.path
+)
+def test_every_characterisation_output_names_its_command_date_and_verdict(entry):
+    """A run record is its own evidence; a derived artefact is not.
+
+    `val_step0501.json` came off the cluster and means what it says. A figure or a
+    summary CSV is the output of a program, and a reader who cannot see which
+    program, when it ran, and which verdict checked the result has no way to tell
+    whether the file still supports the sentence citing it. #19's requirement, as
+    three fields rather than three sentences of prose.
+    """
+    assert entry.command, f"{entry.path} has no generating command"
+    assert entry.generated, f"{entry.path} has no generation date"
+    assert entry.certified_by, f"{entry.path} names no certifying verdict"
+
+
+@pytest.mark.parametrize(
+    "path,expected", sorted(CHARACTERISATION_ROWS.items()), ids=lambda v: str(v)
+)
+def test_the_cited_csvs_have_the_row_counts_their_verdicts_recomputed_from(
+    path, expected
+):
+    """A truncated copy is caught as a wrong number, not shipped as a right one."""
+    actual = len(RECORD.resolve(path).read_text().splitlines())
+    assert actual == expected
+
+
+def test_the_three_verdict_counts_are_what_the_verdicts_actually_say():
+    """`README.md` publishes 11/11, 17/17 and 9/9 where a reader lands.
+
+    Quoting a count into a second document is how a count goes stale. This reads
+    the number back out of the file it describes, so the published claim and the
+    vendored bytes cannot drift apart silently.
+    """
+    for path, expected in (
+        ("characterisation/item1_kgamma/KGAMMA_VERDICT.md", 11),
+        ("characterisation/item2_mask/MASK_VERDICT.md", 17),
+        ("characterisation/reporting/FIGURE_CHECK.md", 9),
+    ):
+        text = RECORD.resolve(path).read_text()
+        assert text.count("| PASS") == expected, path
+        assert f"{expected}/{expected}" in text, path
 
 
 # ── the published citation, checked against the copy ────────────────────────

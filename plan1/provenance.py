@@ -100,12 +100,26 @@ def display_path(path: Path | str) -> str:
 # ── the vendored evidence base ──────────────────────────────────────────────
 @dataclass(frozen=True)
 class VendoredFile:
-    """One copied file: where it came from, what it hashes to, why it travelled."""
+    """One copied file: where it came from, what it hashes to, why it travelled.
+
+    ``command``, ``generated`` and ``certified_by`` are the three extra facts a
+    *derived* artefact needs and a raw run record does not. A ``val_step0501.json``
+    came off the cluster and is its own evidence; a figure or a summary CSV is the
+    output of a program, and without the program, the date it ran and the verdict
+    that checked the result, a reader cannot tell whether the file still means what
+    the chapter citing it says. They are optional because the nine run directories
+    predate them and genuinely have no generating command — see
+    ``tests/test_vendored_evidence.py``, which requires all three of everything
+    under ``characterisation/``.
+    """
 
     path: str
     source: str
     sha256: str
     why: str
+    command: str | None = None
+    generated: str | None = None
+    certified_by: str | None = None
 
 
 @dataclass(frozen=True)
@@ -166,6 +180,9 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
                 source=entry["source"],
                 sha256=entry["sha256"],
                 why=entry["why"],
+                command=entry.get("command"),
+                generated=entry.get("generated"),
+                certified_by=entry.get("certified_by"),
             )
             for entry in blob.get("file", ())
         ),
