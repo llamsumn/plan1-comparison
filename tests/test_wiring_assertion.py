@@ -46,9 +46,9 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from plan1.provenance import EVIDENCE_ROOT, sha256_file
+import torch
 
-torch = pytest.importorskip("torch", reason="the assertion block is written in torch")
+from plan1.provenance import EVIDENCE_ROOT, require_vendored, sha256_file
 
 #: The vendored evidence base. This used to be a sibling `~/3D` checkout, which
 #: made this whole module skip on any machine that did not have one.
@@ -64,10 +64,8 @@ PATCHED_SHA256 = "e2ca10cf4ef7ae00b36cdc9a0baa30518ce028aef0ec37ce75a6c112919ed3
 #: archived 2026-07-29 copy *is* the rule that ran on 2026-08-05.
 CLUSTER_HELPER = ARCHIVE / "cluster" / "sources_20260729" / "helper.py"
 
-pytestmark = pytest.mark.skipif(
-    not (PATCHED_CALL_SITE.is_file() and CLUSTER_HELPER.is_file()),
-    reason=f"archived cluster sources not present under {ARCHIVE}",
-)
+require_vendored(PATCHED_CALL_SITE, "the patched rho = 32/64 call site")
+require_vendored(CLUSTER_HELPER, "the deployed rigidity rule")
 
 
 def load_cluster_function(path: Path, name: str):

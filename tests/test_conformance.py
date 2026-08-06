@@ -48,21 +48,23 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from plan1.provenance import EVIDENCE_ROOT, load_evidence, sha256_file
+import torch
 
-torch = pytest.importorskip("torch", reason="the deployed rule is written in torch")
-
-from box_b.edge_weights import scale_interior_edges  # noqa: E402  (after importorskip)
+from box_b.edge_weights import scale_interior_edges
+from plan1.provenance import (
+    EVIDENCE_ROOT,
+    load_evidence,
+    require_vendored,
+    sha256_file,
+)
 
 #: The archived cluster source — the code that produced the runs under
 #: `evidence/cluster/rho_probe_evidence/`. Vendored into this repository rather
 #: than resolved from a sibling archive, so this suite runs on a bare clone; see
 #: `evidence/PROVENANCE.toml` for where it came from and what it hashes to.
-CLUSTER_HELPER = EVIDENCE_ROOT / "cluster" / "sources_20260729" / "helper.py"
-
-pytestmark = pytest.mark.skipif(
-    not CLUSTER_HELPER.is_file(),
-    reason=f"archived cluster source not present at {CLUSTER_HELPER}",
+CLUSTER_HELPER = require_vendored(
+    EVIDENCE_ROOT / "cluster" / "sources_20260729" / "helper.py",
+    "the deployed rigidity rule",
 )
 
 

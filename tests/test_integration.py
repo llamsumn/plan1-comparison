@@ -39,10 +39,13 @@ ARCHIVE = EVIDENCE_ROOT
 #: can still be assembled from a parsed file.
 SUPERSEDED_CONSOLE_LOG = "cluster/spike_logs/phase3_run_console.log"
 
-pytestmark = pytest.mark.skipif(
-    not (ARCHIVE / "cluster" / "rho_probe_evidence").is_dir(),
-    reason=f"archive run evidence not present under {ARCHIVE}",
-)
+if not (ARCHIVE / "cluster" / "rho_probe_evidence").is_dir():
+    raise FileNotFoundError(
+        f"the nine archived run directories are missing under {ARCHIVE}. This is "
+        f"a bug, not a reason to skip — they are vendored here and recorded in "
+        f"evidence/PROVENANCE.toml. This guard used to be a skipif, and it was "
+        f"quietly removing all 18 of these tests on every machine but one."
+    )
 
 
 @pytest.fixture(scope="module")

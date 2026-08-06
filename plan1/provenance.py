@@ -49,6 +49,32 @@ def sha256_file(path: Path) -> str:
 # claimed: there is no longer any code here that could resolve a sibling.
 
 
+def require_vendored(path: Path, what: str) -> Path:
+    """Assert a vendored input is present, or raise naming it.
+
+    Called at module scope by the three suites that read the evidence base. Each
+    of them used to carry ``pytestmark = pytest.mark.skipif(not path.is_file())``
+    instead, from the era when the evidence lived in a sibling ``~/3D`` checkout
+    and its absence was the normal case. Since #15 it is not: the file is in the
+    repository, and its absence means the repository is broken.
+
+    The distinction is the whole of #18. A skip subtracts from the total and
+    leaves the summary line green, so the suite reports a smaller number that
+    looks exactly like the larger one — 60 passed where 140 should have run, with
+    nothing in the output saying so. Raising here turns that into a collection
+    error naming the missing file, which is loud, immediate, and impossible to
+    read as success.
+    """
+    if not path.is_file():
+        raise FileNotFoundError(
+            f"{what} is missing at {path}. This is a bug, not a reason to skip: "
+            f"it is vendored into this repository and recorded in "
+            f"evidence/PROVENANCE.toml. Restore it from the record rather than "
+            f"running a suite that silently omits what depends on it."
+        )
+    return path
+
+
 def display_path(path: Path | str) -> str:
     """A path as a published artefact should print it: relative to the repository.
 
