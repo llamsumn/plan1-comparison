@@ -24,6 +24,14 @@ pre-registered wiring gate rests on locally (plan1_prereg.md §6):
 The two rules differ in data layout — the reference takes an edge list, the cluster
 a K-nearest-neighbour adjacency — which is exactly why agreement edge-for-edge is
 worth asserting rather than assuming.
+
+**Deliberately outside this suite: the cluster-side pass-through wrapper**
+(`sweep_rho.py`, and the `deform_splat.py` call site that hands `weight` to the
+rule). It loads and passes through, and nothing else. It cannot be exercised by a
+local suite — it needs the node, the container image and a GPU — so keeping it
+logic-free is the mitigation rather than a test. What *is* checkable locally is the
+rule it calls, which is what this file does. A reader should not read a green run
+here as evidence about the wrapper.
 """
 
 from __future__ import annotations

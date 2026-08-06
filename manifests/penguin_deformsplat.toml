@@ -88,25 +88,57 @@ kind = "stats_json"
 root = "archive"
 path = "cluster/rho_probe_evidence/penguin_rho16"
 
-# The rho = 32 and rho = 64 saturation runs are appended here once they land.
-# The saturation rule currently reports NOT SATURATED, so no row may be
-# published until they do (plan1_prereg.md §3.1).
+# The two saturation runs, declared by plan1_prereg.md §3.1 and executed on aching
+# 2026-08-05 (sequentially, ~9.5 min each). They were produced under a
+# deform_splat.py carrying the non-tautological T0.1 wiring assertions
+# (sha256 e2ca10cf…, against 21ae1e32… for the rows above); the patch only reads
+# `weight` and discards its probe, so it does not alter what the runs computed.
+# The assertions did not fire. Launch lines, both source hashes and the console
+# output are in cluster/rho_probe_evidence/_logs/penguin_rho{32,64}.log.
+[[row]]
+key = "rho32"
+label = "imposed, ρ = 32"
+role = "imposed"
+rigidity = 32.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho32"
+
+[[row]]
+key = "rho64"
+label = "imposed, ρ = 64"
+role = "imposed"
+rigidity = 64.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/penguin_rho64"
 
 # ── the baseline ────────────────────────────────────────────────────────────
-# The authors' unmodified pipeline, 2026-07-22 spike. Recorded only as a console
-# line, at display precision (3 / 4 / 3 decimals), so every fraction derived from
-# it carries a rounding interval.
+# The authors' unmodified pipeline, 2026-07-22 spike. It was recorded only as a
+# console line at display precision (3 / 4 / 3 decimals), and every fraction
+# derived from it inherited a rounding interval.
 #
-# If preflight recovers THIS RUN's stats/val_step0501.json from the cluster,
-# change `kind` to "stats_json" and `path` to the run directory; the table then
-# regenerates at full precision. plan1_prereg.md §7 governs what qualifies: the
+# 2026-08-05: preflight recovered THIS RUN's own statistics record from the
+# cluster — /homes/clll20/deformsplat/results/diva360_finetune/penguin_0217_0239/,
+# mtime 2026-07-22 08:34, matching the spike. It qualifies under plan1_prereg.md
+# §7: its values round to the console line exactly (25.054527 → 25.055,
+# 0.95346910 → 0.9535, 0.05649951 → 0.056), and its step-0 triple is bit-identical
+# to all eight sweep rows, so the comparability gate holds at full precision
+# rather than at the console line's three decimals. The row is therefore bound to
+# the statistics record and the rounding intervals collapse.
+#
+# The disqualified alternative is retained as a warning, not as a fallback: the
 # local ~/results/diva360_finetune/penguin_0217_0239/ (2026-06-24, 25.0107) is a
-# DIFFERENT run and is disqualified.
+# DIFFERENT run. Substituting it would be the prohibited baseline re-run by
+# another route. The superseded console line remains at
+# cluster/spike_logs/phase3_run_console.log.
 [[row]]
 key = "baseline"
 label = "inferred groups (baseline, as published)"
 role = "baseline"
 information = "observed before/after motion"
-kind = "console_log"
+kind = "stats_json"
 root = "archive"
-path = "cluster/spike_logs/phase3_run_console.log"
+path = "cluster/rho_probe_evidence/baseline_penguin_0217_0239"

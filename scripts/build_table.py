@@ -25,6 +25,12 @@ from plan1.render import render_markdown  # noqa: E402
 DEFAULT_MANIFEST = REPO / "manifests" / "penguin_deformsplat.toml"
 METHOD_REPO = REPO.parent / "arap-deform-3dgs"
 CLUSTER_HELPER = REPO.parent / "3D" / "cluster" / "sources_20260729" / "helper.py"
+#: The call site the rho=32 and rho=64 runs went through. The manifest cites its
+#: content hash as provenance for those two rows, so publishing the hash beside the
+#: table is what makes that citation checkable without cluster access.
+PATCHED_CALL_SITE = (
+    REPO.parent / "3D" / "cluster" / "sources_20260805_patched" / "deform_splat.py"
+)
 
 
 def collect_provenance() -> dict[str, str]:
@@ -38,6 +44,10 @@ def collect_provenance() -> dict[str, str]:
     if CLUSTER_HELPER.is_file():
         found["deployed rule (`cluster/sources_20260729/helper.py`)"] = (
             f"sha256 {sha256_file(CLUSTER_HELPER)[:16]}…"
+        )
+    if PATCHED_CALL_SITE.is_file():
+        found["patched call site, ρ = 32/64 rows (`cluster/sources_20260805_patched/deform_splat.py`)"] = (
+            f"sha256 {sha256_file(PATCHED_CALL_SITE)[:16]}…"
         )
     return found
 

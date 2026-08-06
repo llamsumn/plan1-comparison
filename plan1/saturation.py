@@ -149,12 +149,33 @@ def select_saturated_row(
         continue_at=None,
         hard_stop_reached=False,
         reason=(
-            f"saturated: rho={largest.rigidity:g} gains {last_gain:.4f} dB over its "
-            f"predecessor, within the {band:.4f} dB band. Smallest rigidity within "
-            f"the band of the maximum ({maximum.psnr:.4f} dB at "
-            f"rho={maximum.rigidity:g}) is rho={selected.rigidity:g}"
+            f"saturated: "
+            f"{_movement(largest, last_gain, band)}"  # type: ignore[arg-type]  # `saturated` implies non-None
+            f". Smallest rigidity within the band of the maximum "
+            f"({maximum.psnr:.4f} dB at rho={maximum.rigidity:g}) is "
+            f"rho={selected.rigidity:g}"
         ),
         within_band=qualifying,
+    )
+
+
+def _movement(largest: SweepPoint, last_gain: float, band: float) -> str:
+    """How the tail of the curve moved, in words that survive a negative gain.
+
+    Both readings satisfy the same pre-registered predicate — ``last_gain <= band``
+    — but only one of them is a *gain*. Describing a curve that has fallen off its
+    maximum as "gaining -1.0889 dB, within the 0.0841 dB band" is arithmetic
+    nonsense on its face, and it sits in the sentence that names the reported
+    setting. The predicate above is untouched; this is the sentence only.
+    """
+    if last_gain < 0.0:
+        return (
+            f"the curve has turned over — rho={largest.rigidity:g} falls "
+            f"{-last_gain:.4f} dB below its predecessor"
+        )
+    return (
+        f"rho={largest.rigidity:g} gains {last_gain:.4f} dB over its predecessor, "
+        f"within the {band:.4f} dB band"
     )
 
 

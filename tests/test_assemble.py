@@ -7,12 +7,20 @@ gate nothing can fail is not evidence.
 
 import pytest
 
-from conftest import START, exact, make_manifest, make_record, make_row
+from conftest import (
+    PARENT_CELLS,
+    START,
+    make_manifest,
+    make_record,
+    make_row,
+    overlaps,
+)
 from plan1.assemble import ComparabilityError, ManifestError, assemble
+from plan1.records import METRICS
 
 
-# ── the positive case ───────────────────────────────────────────────────────
-def test_well_formed_rows_produce_the_published_table(three_row_case):
+# ── the positive case, in both precision worlds ─────────────────────────────
+def test_well_formed_rows_assemble_under_the_console_baseline(three_row_case):
     manifest, records = three_row_case
     table = assemble(manifest, records)
 
@@ -23,27 +31,93 @@ def test_well_formed_rows_produce_the_published_table(three_row_case):
     # the shared start is printed in the table, so a reader can verify at a glance
     assert table.start["psnr"].value == pytest.approx(16.76434326171875)
 
-    # the parent spec's published table: 63.6% / 72.6% / 79.2%, with the SSIM cell
-    # corrected to 72.5% (see the next test)
+    # point estimates in the console-baseline world. Each is the midpoint of an
+    # interval, not a fact about the fifth decimal — which is what the guard below
+    # exists to keep visible.
     imposed = table.row("imposed16")
     assert imposed.fractions["psnr"].value == pytest.approx(0.6362423, abs=1e-7)
     assert imposed.fractions["ssim"].value == pytest.approx(0.7249567, abs=1e-7)
     assert imposed.fractions["lpips"].value == pytest.approx(0.7924386, abs=1e-7)
-    assert [round(imposed.fractions[m].value * 100, 1) for m in ("psnr", "lpips")] == [
+
+
+def test_the_full_precision_world_produces_the_published_cells(
+    three_row_case_full_precision,
+):
+    """The path every published number now travels: 63.6% / 72.6% / 80.4%."""
+    manifest, records = three_row_case_full_precision
+    imposed = assemble(manifest, records).row("imposed16")
+
+    assert [round(imposed.fractions[m].value * 100, 1) for m in METRICS] == [
         63.6,
-        79.2,
+        72.6,
+        80.4,
     ]
+    for fraction in imposed.fractions.values():
+        assert fraction.exact  # nothing coarse is left to widen them
 
 
-def test_ssim_fraction_is_725_not_the_published_726(three_row_case):
-    """The parent spec's 72.6% came from rounding inputs before dividing.
+# ── the guard: interval to interval, never point to interval ────────────────
+@pytest.mark.parametrize("metric", METRICS)
+def test_published_cells_are_compared_interval_to_interval(three_row_case, metric):
+    """A cell printed at coarser precision is an interval, not an exact number.
 
-    plan-1-comparison-assembly-spec.md "Further Notes" corrects the cell to 72.5%.
-    A correct assembler must produce the corrected value, so this pins it.
+    This replaces a retired test that asserted the parent spec's SSIM cell was
+    wrong and Plan 1's value right. It was not: under the console baseline the
+    assembler's own interval *contained* the parent's cell, so no correction was
+    ever licensed. The rule is stated once, over all three metrics, rather than as
+    a note about the one cell where the mistake happened to surface.
     """
     manifest, records = three_row_case
-    table = assemble(manifest, records)
-    assert round(table.row("imposed16").fractions["ssim"].value * 100, 1) == 72.5
+    fraction = assemble(manifest, records).row("imposed16").fractions[metric]
+    cell = PARENT_CELLS[metric]
+    assert overlaps(fraction, cell), (
+        f"{metric}: assembler [{fraction.low:.6%}, {fraction.high:.6%}] does not "
+        f"overlap the parent's {cell.value:.1%} -> "
+        f"[{cell.interval[0]:.6%}, {cell.interval[1]:.6%}]"
+    )
+
+
+def test_the_full_precision_lpips_cell_legitimately_leaves_the_parent_interval(
+    three_row_case_full_precision,
+):
+    """Why the guard above is NOT parametrised over the full-precision fixture.
+
+    Once the baseline is bound to its own recovered record, every fraction is exact
+    and its interval is zero-width — so overlap collapses back into the comparison
+    being retracted. And here it genuinely fails: 80.4% is outside the parent's
+    [79.15%, 79.25%]. That is not a correction of the parent and not a swapped run.
+    The *input* sharpened. PSNR and SSIM did not move enough to leave their cells;
+    LPIPS did, and the verdict explains it beside the claim it qualifies.
+    """
+    manifest, records = three_row_case_full_precision
+    fractions = assemble(manifest, records).row("imposed16").fractions
+
+    assert overlaps(fractions["psnr"], PARENT_CELLS["psnr"])
+    assert overlaps(fractions["ssim"], PARENT_CELLS["ssim"])
+    assert not overlaps(fractions["lpips"], PARENT_CELLS["lpips"])
+
+
+def test_a_point_in_interval_guard_would_report_a_false_correction(three_row_case):
+    """Why interval-to-interval, and not the obvious weaker form.
+
+    Comparing the parent's cell as a *point* against the assembler's interval is
+    the reasoning being retracted. Run over all three metrics it does not merely
+    read as less rigorous — it manufactures a fresh correction of the parent, on
+    PSNR this time, by exactly the same route.
+    """
+    manifest, records = three_row_case
+    fractions = assemble(manifest, records).row("imposed16").fractions
+
+    def point_in_interval(metric):
+        f, cell = fractions[metric], PARENT_CELLS[metric]
+        return f.low <= cell.value <= f.high
+
+    assert not point_in_interval("psnr")  # the false correction it would report
+    assert point_in_interval("ssim")
+    assert point_in_interval("lpips")
+
+    # and the form actually used passes on all three, PSNR included
+    assert all(overlaps(fractions[m], PARENT_CELLS[m]) for m in METRICS)
 
 
 def test_endpoints_carry_no_fractions(three_row_case):
@@ -138,26 +212,12 @@ def test_coarser_source_compares_at_its_own_precision(three_row_case):
     the gate must compare at the coarser precision or the real table never builds.
     """
     manifest, records = three_row_case
-    records["baseline"] = make_record(
-        "baseline",
-        25.055,
-        0.9535,
-        0.056,
-        decimals={"psnr": 3, "ssim": 4, "lpips": 3},
-    )
     table = assemble(manifest, records)  # must not raise
     assert table.row("baseline").metrics["psnr"].decimals == 3
 
 
 def test_fraction_from_a_coarse_input_carries_its_rounding_interval(three_row_case):
     manifest, records = three_row_case
-    records["baseline"] = make_record(
-        "baseline",
-        25.055,
-        0.9535,
-        0.056,
-        decimals={"psnr": 3, "ssim": 4, "lpips": 3},
-    )
     table = assemble(manifest, records)
     lpips = table.row("imposed16").fractions["lpips"]
 
@@ -167,8 +227,8 @@ def test_fraction_from_a_coarse_input_carries_its_rounding_interval(three_row_ca
     assert (lpips.high - lpips.low) == pytest.approx(0.022, abs=0.002)
 
 
-def test_fraction_from_exact_inputs_is_marked_exact(three_row_case):
-    manifest, records = three_row_case  # baseline built without declared decimals
+def test_fraction_from_exact_inputs_is_marked_exact(three_row_case_full_precision):
+    manifest, records = three_row_case_full_precision
     table = assemble(manifest, records)
     psnr = table.row("imposed16").fractions["psnr"]
     assert psnr.exact

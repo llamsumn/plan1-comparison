@@ -105,6 +105,63 @@ def test_duplicate_rigidity_values_raise():
         select_saturated_row(sweep((1, 10.0), (1, 10.5)), band=0.1)
 
 
+# ── how the verdict describes what it decided ───────────────────────────────
+# The predicate is pre-registered and untouched. Only the SENTENCE changes, and
+# only where the old one was arithmetic nonsense: a curve that has fallen off its
+# maximum was described as "gaining -1.0889 dB … within the band".
+def test_a_turned_over_curve_is_described_as_turning_over():
+    v = select_saturated_row(
+        sweep((1, 10.0), (4, 12.0), (16, 12.5), (32, 11.0)), band=0.1
+    )
+    assert v.saturated
+    assert "turned over" in v.reason
+    assert "falls 1.5000 dB below its predecessor" in v.reason
+    # the sentence that made this unreadable: a negative quantity presented as a
+    # gain, and a fall of 1.5 dB presented as sitting inside a 0.1 dB band
+    assert "gains -" not in v.reason
+    assert "within the 0.1000 dB band" not in v.reason
+
+
+def test_a_flattening_curve_is_still_described_as_a_gain_within_the_band():
+    """The other branch is untouched — a curve that flattens really did gain."""
+    v = select_saturated_row(sweep((1, 10.00), (4, 12.90), (16, 12.95)), band=0.1)
+    assert v.saturated
+    assert "gains 0.0500 dB over its predecessor, within the 0.1000 dB band" in v.reason
+    assert "turned over" not in v.reason
+
+
+def test_a_curve_that_exactly_flatlines_reads_as_a_gain_not_a_turnover():
+    """Zero is not a fall. The branch is on the sign, and 0.0 is not negative."""
+    v = select_saturated_row(sweep((1, 10.0), (4, 12.0), (16, 12.0)), band=0.1)
+    assert v.saturated
+    assert v.last_gain == 0.0
+    assert "turned over" not in v.reason
+
+
+def test_the_wording_change_cannot_move_which_row_is_reported():
+    """The decision pin, over the real sweep, at the real band.
+
+    plan1_prereg.md §3 fixes the RULE, not the sentence describing it. This asserts
+    the part that is fixed, so a prose edit provably could not move it.
+    """
+    v = select_saturated_row(
+        sweep(
+            (0.25, 17.906381607055664),
+            (4, 22.1044979095459),
+            (16, 22.953351974487305),
+            (32, 21.82762336730957),
+            (64, 20.738685607910156),
+        ),
+        band=0.08412551879882812,
+    )
+    assert v.saturated
+    assert v.selected.rigidity == 16
+    assert v.maximum.rigidity == 16
+    assert v.continue_at is None
+    assert [p.rigidity for p in v.within_band] == [16]
+    assert v.last_gain == pytest.approx(-1.0889377593994141)
+
+
 # ── regression guard on the pre-registered claim ────────────────────────────
 def test_archived_sweep_as_it_stands_is_not_saturated():
     """plan1_prereg.md §3.2 records that the rule was already failing when written.
