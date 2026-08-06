@@ -5,22 +5,16 @@ its whole failure surface is drivable without a GPU, an asset file, or a network
 which is the point of putting the seam where it is.
 """
 
-import sys
-from pathlib import Path
-
 import pytest
 
 from plan1.manifest import Manifest, ManifestRow
 from plan1.records import Measurement, RunRecord
 
-#: The method repository, consumed by the conformance test as the reference rule.
-#: An editable install (``pip install -e ../arap-deform-3dgs``) is the documented
-#: path; this fallback keeps the suite runnable in a bare checkout. Either way the
-#: binding is live — it resolves to the sibling working tree, not to a copy.
-METHOD_REPO = Path(__file__).resolve().parents[2] / "arap-deform-3dgs"
-if METHOD_REPO.is_dir() and str(METHOD_REPO) not in sys.path:
-    sys.path.insert(0, str(METHOD_REPO))
-
+# This file used to inject a sibling `../../arap-deform-3dgs` onto `sys.path` so
+# the conformance test could import the reference rule. That injection is the
+# reason the suite reported a different number depending on what else happened to
+# be checked out beside it. #16 ported the rule; `box_b` is now a package in this
+# repository and is imported like any other. Nothing here touches `sys.path`.
 
 #: The archived step-0 fingerprint, at full precision, shared by every penguin run.
 START = {

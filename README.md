@@ -4,16 +4,23 @@ Assembles the penguin ↔ DeformSplat baseline comparison from archived run reco
 under rules pre-registered before any of it ran.
 
 This repository is the **evidence chain behind one published table**, kept as a single
-reviewable unit. It is not the method — the deformation system lives in
-[`arap-deform-3dgs`](../arap-deform-3dgs), which this repo consumes as a dependency and
-never modifies. The planning record (specs, pre-registration, verdicts) lives in the
-`llamsumn/3D-arap` archive.
+reviewable unit — and, since the method was ported in, the code that produced the
+deformation as well. The planning record (specs, pre-registration, verdicts) lives in the
+`llamsumn/3D-arap` archive; the ongoing method development continues in `arap-deform-3dgs`,
+which this repository no longer depends on at run time.
 
 ```
-evidence/             the run records and archived cluster sources, vendored
-../arap-deform-3dgs   the method   — supplies the reference edge-weight rule
-.                     this repo    — the assembler, the manifest, the tests
+arap_core/            the ARAP solver and the 3DGS carry — ported, box C + D
+box_b/edge_weights.py the B2 seam: (mode, magnitude) → per-edge weights
+examples/             a runnable demonstration on a real 5.6 MB asset
+evidence/             the run records, cluster sources and characterisation outputs
+.                     the assembler, the manifest, the tests
 ```
+
+**Nothing here resolves anything outside this directory.** No sibling working tree, no
+`~/3D`, no `..`. That is asserted rather than claimed:
+`tests/test_ported_method.py::test_no_file_in_the_repository_resolves_a_sibling_working_tree`
+parses every module and fails on a string naming a sibling or a `parents[2]` climb.
 
 **The evidence travels with the repository.** Every number in the table resolves under
 `evidence/`, which used to be a sibling `~/3D` checkout. While it was, three test modules
@@ -22,8 +29,30 @@ regenerated into something different without saying so. `evidence/PROVENANCE.tom
 the source path and sha256 of all 45 copied files, and asserts them in both directions:
 a file that changed fails, and so does one that arrived with no row.
 
-The reference edge-weight rule is still resolved from `../arap-deform-3dgs`; porting it is
-the one remaining external dependency.
+## The ported method
+
+`arap_core/` (10 modules, 1,709 lines) and `box_b/edge_weights.py` (116 lines) come from
+`arap-deform-3dgs@ede5fd3`. Every ported file records its source repository, source commit
+and sha256 under `[[ported]]` in `evidence/PROVENANCE.toml`, asserted in both directions by
+`tests/test_ported_method.py` — 19 files, one row each. The reference rule's hash is also
+what the published table's footer prints, so editing `box_b/edge_weights.py` fails the
+conformance test, the footer check and the table build together.
+
+**What deliberately stayed behind:** `box_b/descriptors.py`, `box_b/noise.py` and their 47
+tests — the geometry reader, paused on a diagnosed shrinking-ball defect. On the penguin,
+which is a surface shell, thickness is not a local property, so the estimator's premise does
+not hold there. That is the risk this repository exists to be safe from, and a test asserts
+the two files are absent rather than trusting that nobody copies them in later.
+
+Deform the sample asset — with zero displacement, this is the identity check that guards the
+whole read → solve → carry → write chain:
+
+```bash
+python examples/run_penguin.py --ply data/penguin_original.ply --out /tmp/identity.ply --k 12 --gamma 50 --fixed-box -0.25 -0.25 -0.25 0.35 -0.10 0.15 --handle-box -0.25 0.25 -0.25 0.35 0.40 0.15 --disp 0 0 0
+```
+
+`data/penguin_original.ply` (5.6 MB, 23,548 Gaussians) is **tracked by exception** against
+the `*.ply` ignore rule; the reason is recorded in `.gitignore` where a reader will meet it.
 
 ## The characterisation evidence
 
@@ -59,27 +88,34 @@ validated comparison table. Adding a run is a manifest edit, never a retyped num
 ## Run it
 
 ```bash
-python scripts/build_table.py
+pip install -e ".[test]"
 ```
 
 ```bash
 python -m pytest
 ```
 
-The assembler and the saturation rule are pure stdlib — the whole decision surface is
-testable on CPU with no asset file, no GPU and no network. `numpy` and `torch` are needed
-only by the conformance test.
-
-To bind the conformance test to the method repo by install rather than by path fallback:
-
 ```bash
-pip install -e ../arap-deform-3dgs
+python scripts/build_table.py
 ```
+
+The assembler and the saturation rule are still pure stdlib — the whole decision surface is
+testable on CPU with no GPU and no network. `numpy`, `scipy` and `plyfile` arrived with the
+ported method and are declared runtime dependencies; `torch` is what the deployed cluster
+rule is written in, and it is a **hard** test dependency rather than an optional extra,
+because the two modules that need it are the wiring gate.
+
+There are no `skipif` guards on vendored inputs and no `importorskip`. A missing input or a
+missing `torch` makes the suite **error**, not shrink.
 
 ## What is where
 
 | path | role |
 |---|---|
+| `arap_core/` | the ARAP solver and the 3DGS carry — boxes C and D, ported from `arap-deform-3dgs@ede5fd3` |
+| `box_b/edge_weights.py` | the B2 seam, and the conformance test's reference rule |
+| `examples/run_penguin.py` | the runnable demonstration; `--disp 0 0 0` is the identity check |
+| `tests/method/` | the 31 ported method tests, kept separate from the assembler's |
 | `plan1/assemble.py` | **the seam** — manifest + records → validated table. Gating and gap arithmetic sit behind it |
 | `plan1/saturation.py` | the pre-registered rule that selects the reported rigidity |
 | `plan1/records.py` | the readers, and the precision model. Below the seam |

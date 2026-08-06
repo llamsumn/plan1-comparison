@@ -7,19 +7,25 @@ name = "plan1-comparison"
 version = "0.1.0"
 description = "Assembles the penguin ↔ DeformSplat baseline comparison from archived run records under pre-registered rules"
 requires-python = ">=3.11"   # tomllib
-# The assembler and the saturation rule are pure stdlib on purpose: the whole
-# decision surface is testable with no third-party runtime at all.
-dependencies = []
+# The assembler and the saturation rule remain pure stdlib — the whole decision
+# surface is testable with no third-party runtime. These three are the *method*'s
+# dependencies, which arrived with the port (#16): `arap_core` solves and reads
+# and writes PLY, `box_b` assigns edge weights.
+dependencies = [
+    "numpy",
+    "scipy",
+    "plyfile",
+]
 
 [project.optional-dependencies]
-# numpy and torch are needed only by the conformance test, which drives the two
-# rigidity rules against each other. arap-deform-3dgs supplies the reference rule
-# and is installed editable so the binding stays live:
-#     pip install -e ../arap-deform-3dgs
-test = ["pytest", "numpy", "torch"]
+# torch is what the DEPLOYED cluster rule is written in, so the conformance test
+# and the wiring harness both need it. It is a hard test dependency, not an
+# optional nicety: without it those two modules used to skip, and they are the
+# gate `plan1_verdict.md` §1 names as the precondition for making any claim.
+test = ["pytest", "torch"]
 
 [tool.setuptools]
-packages = ["plan1"]
+packages = ["plan1", "arap_core", "box_b"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

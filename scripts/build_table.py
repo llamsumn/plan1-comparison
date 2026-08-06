@@ -28,7 +28,6 @@ from plan1.assemble import AssemblyError, assemble  # noqa: E402
 from plan1.manifest import load_manifest, load_records  # noqa: E402
 from plan1.provenance import (  # noqa: E402
     EvidenceRecord,
-    head_commit,
     load_evidence,
     sha256_file,
 )
@@ -37,11 +36,13 @@ from plan1.render import render_markdown  # noqa: E402
 DEFAULT_MANIFEST = REPO / "manifests" / "penguin_deformsplat.toml"
 COMMITTED_TABLE = REPO / "out" / "comparison_table.md"
 
-#: The one input this repository does not yet own. `box_b/edge_weights.py` is the
-#: tested reference rule the conformance suite drives the deployed one against;
-#: porting it is #16. Until then it is resolved from the sibling checkout and
-#: checked against the identity the published table was assembled with.
-METHOD_REPO = REPO.parent / "arap-deform-3dgs"
+#: The tested reference rule the conformance suite drives the deployed one
+#: against. It used to be resolved from a sibling `../arap-deform-3dgs` checkout,
+#: which is why this table regenerated differently — or not at all — on any
+#: machine that did not have one. #16 ported it; it is now a file in this
+#: repository, checked against the identity the published table was assembled
+#: with. Nothing here resolves `..` any more.
+REFERENCE_RULE = REPO / "box_b" / "edge_weights.py"
 
 #: The two archived cluster sources, now vendored. The manifest cites the second
 #: hash as provenance for the rho = 32/64 rows, so publishing it beside the table
@@ -64,7 +65,7 @@ class ProvenanceError(Exception):
 
 
 def collect_provenance(
-    evidence: EvidenceRecord | None = None, method_repo: Path = METHOD_REPO
+    evidence: EvidenceRecord | None = None, reference_rule: Path = REFERENCE_RULE
 ) -> dict[str, str]:
     """Identify the code that justified the numbers, by content.
 
@@ -78,7 +79,7 @@ def collect_provenance(
     found: dict[str, str] = {}
 
     reference = evidence.artefact("reference rule (`box_b/edge_weights.py`)")
-    reference_path = Path(method_repo) / "box_b" / "edge_weights.py"
+    reference_path = Path(reference_rule)
     if not reference_path.is_file():
         raise ProvenanceError(
             f"{reference.name} is not present at {reference_path}. The published "
@@ -94,19 +95,13 @@ def collect_provenance(
         )
     found[reference.name] = f"sha256 {reference.value[:16]}…"
 
+    # The commit the ported copy was taken from. Read out of the record, not off a
+    # sibling checkout's `.git` — that read is what #16 removed, and re-adding it
+    # would reintroduce a footer whose value depends on what else is on the disk.
+    # The hash checked immediately above is what actually pins the content; this
+    # row says where that content came from.
     head = evidence.artefact("method repository HEAD")
-    commit = head_commit(Path(method_repo))
-    if commit is None:
-        raise ProvenanceError(
-            f"{head.name} is not present: {method_repo} is not a resolvable "
-            f"checkout. The published table cites {head.value}."
-        )
-    if commit != head.value:
-        raise ProvenanceError(
-            f"{head.name} is {commit}, which does not match the recorded "
-            f"{head.value}. The table was assembled against the recorded commit."
-        )
-    found[head.name] = commit
+    found[head.name] = head.value
 
     for name, relative in VENDORED_ARTEFACTS:
         path = evidence.resolve(relative)
@@ -118,12 +113,14 @@ def collect_provenance(
 
 
 def render_table(
-    manifest_path: Path = DEFAULT_MANIFEST, *, method_repo: Path = METHOD_REPO
+    manifest_path: Path = DEFAULT_MANIFEST, *, reference_rule: Path = REFERENCE_RULE
 ) -> str:
     """The published table, as text. Deterministic: same inputs, same bytes."""
     manifest = load_manifest(manifest_path)
     table = assemble(manifest, load_records(manifest))
-    return render_markdown(table, provenance=collect_provenance(method_repo=method_repo))
+    return render_markdown(
+        table, provenance=collect_provenance(reference_rule=reference_rule)
+    )
 
 
 def main(argv: list[str] | None = None) -> int:

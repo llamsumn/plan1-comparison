@@ -74,22 +74,21 @@ def test_a_missing_provenance_input_raises_rather_than_dropping_a_line(tmp_path)
     table and reported success. The footer is provenance; a provenance table that
     silently omits a row is worse than no footer at all."""
     with pytest.raises(ProvenanceError, match="not present"):
-        collect_provenance(method_repo=tmp_path / "no-such-repo")
+        collect_provenance(reference_rule=tmp_path / "no-such-file.py")
 
 
-def test_a_moved_method_repository_raises_rather_than_publishing_a_new_hash(tmp_path):
-    """The sibling method repository is the last input this repo does not own
-    (#16 ports it). Until then its identity is recorded, and a checkout that has
-    moved on is an error naming both values — not a footer that quietly changed.
+def test_an_edited_reference_rule_raises_rather_than_publishing_a_new_hash(tmp_path):
+    """The reference rule is vendored (#16), so it cannot *move* any more — but it
+    can be edited, and an edited rule is a different rule. The check is the same
+    one it always was, now pointed at a file this repository owns: identity is
+    recorded, and content that has moved on is an error naming both values rather
+    than a footer that quietly changed.
     """
-    fake = tmp_path / "arap-deform-3dgs"
-    (fake / "box_b").mkdir(parents=True)
-    (fake / "box_b" / "edge_weights.py").write_text("# not the reference rule\n")
-    (fake / ".git").mkdir()
-    (fake / ".git" / "HEAD").write_text("0" * 40 + "\n")
+    edited = tmp_path / "edge_weights.py"
+    edited.write_text("# not the reference rule\n")
 
     with pytest.raises(ProvenanceError, match="does not match the recorded"):
-        collect_provenance(method_repo=fake)
+        collect_provenance(reference_rule=edited)
 
 
 def test_the_footer_names_every_recorded_artefact():

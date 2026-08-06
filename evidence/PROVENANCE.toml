@@ -409,27 +409,201 @@ generated = "2026-07-22"
 certified_by = "self — 9/9 checks PASS, 0 misrepresentations, every plotted value re-derived from source CSV"
 why = "the figure↔CSV cross-check. It is what makes the two §6.2 figures citable: the numbers in the picture are the numbers in the grid, asserted rather than assumed"
 
-# ── provenance inputs that are NOT vendored here ────────────────────────────
+# ── the ported method ───────────────────────────────────────────────────────
+# Everything below is *code*, not evidence, so it lives at the repository root
+# where it can be imported rather than under `evidence/` where it would only be
+# read. Same discipline, different home: source repository, source commit, and a
+# hash for every file.
+#
+# Ported from `arap-deform-3dgs` at `ede5fd3a1dda0b69ddb38648c0c97a77021021b0`
+# under #16. Before it, this repository could report that an asset had been
+# deformed; after it, it can deform one — and the three places that resolved a
+# sibling working tree (`tests/conftest.py`'s sys.path injection,
+# `test_conformance.py`'s own resolve, and `build_table.py`'s METHOD_REPO plus
+# its git-HEAD read) are all deleted. `plan1/provenance.py` no longer contains a
+# function capable of reading a sibling checkout at all.
+#
+# **What deliberately did not come.** `box_b/descriptors.py` (348 lines),
+# `box_b/noise.py` (229) and their 47 tests — the geometry reader, paused on a
+# diagnosed shrinking-ball defect. It is the risk this repository exists to be
+# safe from, and leaving it behind is the point rather than an omission.
+#
+# `arap_core/gaussian.py` was taken from `arap-deform-3dgs` and **not** from
+# `~/3D`. It is the only file that differs between the two copies — verified at
+# port time — and the newer one carries B1's real Wigner-D spherical-harmonic
+# rotation where the archive's still has the DC-only stub.
+
+[[ported]]
+path = "arap_core/__init__.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "346ab8491f2239b4d999537eab154f468d7c2d3df2a3faa467747c4cfa2931d4"
+why = "the public surface of box C+D"
+
+[[ported]]
+path = "arap_core/types.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "0b54b7435cd84e0aa489770e81cdabf48602af7f91b85579289c592b2a0baa08"
+why = "Graph, Anchors, Solver, ARAPResult — the data the B→C seam passes"
+
+[[ported]]
+path = "arap_core/graph.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "057860e4db3234c4bfdf7772648f6fa81147bdec322395091f643171586adc9b"
+why = "graph construction and the injected weight functions — the seam design principle that made this port possible"
+
+[[ported]]
+path = "arap_core/edges.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "d830c81e72f778fb46c826b7c48a6097a411afd8d38a9a6da9e6866facedc0a2"
+why = "kNN edge construction and the connectivity assertion"
+
+[[ported]]
+path = "arap_core/select.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "18a2cfc7055bb467e23c6be24cbf9faaca2db0e357e002624a060eabce8b576b"
+why = "anchor selection — one of the seam's two arguments"
+
+[[ported]]
+path = "arap_core/local_step.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "e5c532620a3837067ca7a63b80f1128bc8fcfba17d5c3be7926ca29897ac4798"
+why = "the ARAP local step — per-vertex rotation fit"
+
+[[ported]]
+path = "arap_core/global_step.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "4b1570747c3878c0ad2674d55daf8c2ad161256317fb8a4a75adfcdae5ffa9a7"
+why = "the ARAP global step — the prefactored linear solve"
+
+[[ported]]
+path = "arap_core/driver.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "6e2b54ae2aa6f7914b142b29d97e239ad942d5dce8335f3b6c79e62d47dab1d4"
+why = "the alternating loop and the energy, which is what the diagnostic ladder drives"
+
+[[ported]]
+path = "arap_core/gaussian.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "aafd975f2242dc46f18e07c963f6124bf610cf066cebb3dd995c161ed05fedd0"
+why = "box D's carry: covariance transport and real Wigner-D SH rotation, degrees 0-3. THE ONE FILE THAT DIFFERS from ~/3D's copy — that one is the superseded DC-only stub and hashes to ba6da40e…"
+
+[[ported]]
+path = "arap_core/io_ply.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "7ba82f4976f8734d0c5904f0797127d65c5295dbe8780e528bb343dffa40c172"
+why = "3DGS PLY read and write, in the INRIA coefficient order the SH rotation assumes"
+
+[[ported]]
+path = "box_b/__init__.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "aaebee857985f7136435544e143b1663b07a241313563051c0014e3f0d917368"
+why = "package marker"
+
+[[ported]]
+path = "box_b/edge_weights.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
+why = "THE B2 SEAM and the conformance suite's reference rule. numpy-only, no heavy imports. This hash is also the value the published table's footer prints, and tests/test_conformance.py asserts the two agree — editing this file fails the suite in three places"
+
+# THE ONE PORTED FILE THAT IS NOT BYTE-IDENTICAL TO ITS SOURCE. Every other
+# [[ported]] row is a straight copy. This one carries a three-line change and the
+# reason is recorded here rather than left for a reader to discover by diffing:
+#
+# At `ede5fd3` the script printed, on every run,
+#     "SH view-dependent bands not rotated (DC-only stub)."
+# The first half is true of *this script* — it carries position, rotation and
+# scale only. The parenthetical is false of the *library* and has been since B1:
+# `arap_core.gaussian.rotate_sh` implements real Wigner-D rotation for degrees
+# 0-3 with 6 tests behind it. This is trap #6 on the dissertation's list, and a
+# line of runtime output is a worse place for it than a document, because an
+# examiner running the example reads it without going looking. Corrected in place
+# 2026-08-06; the same stale claim is struck in `arap-deform-3dgs`'s CONTEXT.md
+# and README.md under #20.
+#
+# Source hash at ede5fd3, for anyone diffing: 82bdc8556eca0b42…
+[[ported]]
+path = "examples/run_penguin.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "41a75906fe68c369096fd299af64cc1ade93ce10931351e6316ecd74cc6ad056"
+why = "the runnable demonstration, carrying an identity assertion and an inline energy-monotonicity assertion. NOT byte-identical to source — one corrected print, reasoned above"
+
+[[ported]]
+path = "data/penguin_original.ply"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "9a13235506da2a16e973242183abefff8f021d6cd4e74120051c85f8450aaf20"
+why = "the sample asset, 23,548 Gaussians, 5.6 MB. Tracked by exception against the *.ply ignore — see .gitignore, where the reason is recorded"
+
+[[ported]]
+path = "tests/method/test_edges.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "3c0821d1482d76cdaa4a7f22b87d004af7f08a93aac6bb4a8390ee8e80f263bb"
+why = "7 tests — kNN edges and connectivity"
+
+[[ported]]
+path = "tests/method/test_select.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "eb4c5634e13e4bad3cb50771a59e586fdcb539050b2961316e072dd2237b9bc1"
+why = "7 tests — anchor and region selection"
+
+[[ported]]
+path = "tests/method/test_io_ply.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "f481b2d0a23c7906a5a81c4610b6aa53467632720c23ce72001d64d1a232644b"
+why = "6 tests — PLY round-trip"
+
+[[ported]]
+path = "tests/method/test_gaussian_sh.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "d57f9f59171a0a26585c529ebf27e13b0c53713206a9f93ebe2bb45b71ccb458"
+why = "6 tests — the Wigner-D SH rotation. These are the tests that make the corrected limitation checkable rather than asserted"
+
+[[ported]]
+path = "tests/method/test_edge_weights.py"
+source_repo = "arap-deform-3dgs"
+source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+sha256 = "1621707c143c1b0d2c19e2e315738163d1a556b98a49a66518b5b19028ac9175"
+why = "5 tests — the B2 seam, driven directly"
+
+# ── provenance inputs that the footer names ─────────────────────────────────
 # The published table's footer names four artefacts. Two are the vendored cluster
-# sources above and are hashed from this directory. The other two identify the
-# method repository, which is a separate port (#16) — until it lands,
-# `scripts/build_table.py` resolves the sibling checkout and checks it against
-# the identity recorded here. A missing or moved sibling is an error, never a
-# dropped footer line.
+# sources above, hashed from `evidence/`. The other two identify the method: the
+# reference rule's content, now hashed from the ported file at the repository
+# root, and the commit that copy was taken from — read from this record rather
+# than off a sibling checkout's `.git`, because since #16 there is no sibling.
+# `source` on both is where the copy came from. It is provenance; nothing
+# resolves it.
 
 [[artefact]]
 name = "reference rule (`box_b/edge_weights.py`)"
 kind = "file_sha256"
 source = "~/arap-deform-3dgs/box_b/edge_weights.py"
 value = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
-why = "the tested rule the conformance suite compares the deployed one against"
+why = "the tested rule the conformance suite compares the deployed one against. Since #16 this hash is checked against the ported copy in this repository"
 
 [[artefact]]
 name = "method repository HEAD"
 kind = "git_head"
 source = "~/arap-deform-3dgs"
 value = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
-why = "the commit the published table was assembled against"
+why = "the commit the published table was assembled against, and the commit every [[ported]] row above was taken from"
 
 # ── what was in the archive and deliberately did not travel ─────────────────
 # Recorded so that "the evidence base" is a closed statement rather than an open

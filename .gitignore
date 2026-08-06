@@ -4,3 +4,18 @@ __pycache__/
 .mypy_cache/
 *.egg-info/
 .DS_Store
+
+# Generated geometry — deformed assets and figures reproduce, so they are not
+# tracked.
+*.ply
+*.png
+
+# ── tracked by exception: the sample asset ──────────────────────────────────
+# `data/penguin_original.ply` is 5.6 MB and the penguin example cannot run
+# without it. GitHub's per-file limit is 100 MB, so tracking it is simply fine —
+# and it is the difference between a bare clone that runs the example and one
+# that only reads about it, which is the whole point of this repository. The
+# method repo's CONTEXT.md listed Git LFS and a fetch script as candidate
+# workarounds for a constraint that does not exist; that open item is closed the
+# same way (#20).
+!data/penguin_original.ply

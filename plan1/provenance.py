@@ -39,39 +39,14 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def head_commit(repo_dir: Path) -> str | None:
-    """The commit ``HEAD`` points at, read straight off the filesystem.
-
-    Returns ``None`` when ``repo_dir`` is not a git checkout or the ref cannot be
-    resolved — an unidentifiable version is reported as unknown, never guessed.
-    """
-    git = Path(repo_dir) / ".git"
-    if not git.is_dir():
-        return None
-
-    head_file = git / "HEAD"
-    if not head_file.is_file():
-        return None
-    head = head_file.read_text().strip()
-
-    if not head.startswith("ref: "):
-        return head or None  # detached HEAD holds the sha directly
-
-    ref = head[len("ref: ") :].strip()
-
-    loose = git / ref
-    if loose.is_file():
-        return loose.read_text().strip() or None
-
-    packed = git / "packed-refs"
-    if packed.is_file():
-        for line in packed.read_text().splitlines():
-            if not line.strip() or line.startswith(("#", "^")):
-                continue
-            sha, _, name = line.partition(" ")
-            if name.strip() == ref:
-                return sha.strip()
-    return None
+# ``head_commit()`` lived here until #16. It read a *sibling working tree's* git
+# state off the filesystem so the table's footer could name the method repository's
+# HEAD, and it was the last thing in this package that reached outside the
+# repository for anything. The method is now vendored (see ``[[ported]]`` in
+# ``evidence/PROVENANCE.toml``), so the commit it used to read is a recorded fact
+# about where the copy came from rather than a live observation of a checkout that
+# may not exist. Deleting the function is what makes that true rather than merely
+# claimed: there is no longer any code here that could resolve a sibling.
 
 
 def display_path(path: Path | str) -> str:
@@ -123,12 +98,32 @@ class VendoredFile:
 
 
 @dataclass(frozen=True)
-class RecordedArtefact:
-    """An identity the published table cites but does not vendor.
+class PortedFile:
+    """One file copied out of the method repository, and where it came from.
 
-    Currently the two that name the method repository. They are recorded rather
-    than copied because porting that repository is separate work (#16); until it
-    lands, the sibling checkout is resolved and checked against ``value``.
+    Distinct from ``VendoredFile`` because these are not *evidence* — they are
+    executable code that lives at the repository root and is imported, not read.
+    The two need different homes on disk and the same discipline about identity:
+    source repository, source commit, and a hash.
+    """
+
+    path: str
+    source_repo: str
+    source_commit: str
+    sha256: str
+    why: str
+
+
+@dataclass(frozen=True)
+class RecordedArtefact:
+    """An identity the published table's footer cites.
+
+    The two that name the method: the reference rule's content hash, and the
+    commit of the repository the vendored copy was taken from. Since #16 both are
+    satisfied from inside this repository — the rule is hashed from the ported
+    file, and the commit is read from this record. ``source`` therefore names
+    where the copy *came from*, and is provenance rather than a location anything
+    resolves.
     """
 
     name: str
@@ -153,10 +148,25 @@ class EvidenceRecord:
     files: tuple[VendoredFile, ...]
     artefacts: tuple[RecordedArtefact, ...]
     excluded: tuple[ExcludedPath, ...]
+    ported: tuple[PortedFile, ...] = ()
 
     def resolve(self, path: str) -> Path:
         """A recorded path, as a location under the evidence root."""
         return (self.root / path).resolve()
+
+    def resolve_ported(self, path: str) -> Path:
+        """A ported path, as a location under the repository root.
+
+        Ported code is importable and so lives at the root, not under
+        ``evidence/`` — ``arap_core/`` has to be ``arap_core``.
+        """
+        return (REPO_ROOT / path).resolve()
+
+    def ported_file(self, path: str) -> PortedFile:
+        for entry in self.ported:
+            if entry.path == path:
+                return entry
+        raise KeyError(path)
 
     def artefact(self, name: str) -> RecordedArtefact:
         for artefact in self.artefacts:
@@ -199,5 +209,15 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
         excluded=tuple(
             ExcludedPath(path=entry["path"], size=entry["size"], reason=entry["reason"])
             for entry in blob.get("excluded", ())
+        ),
+        ported=tuple(
+            PortedFile(
+                path=entry["path"],
+                source_repo=entry["source_repo"],
+                source_commit=entry["source_commit"],
+                sha256=entry["sha256"],
+                why=entry["why"],
+            )
+            for entry in blob.get("ported", ())
         ),
     )

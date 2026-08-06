@@ -12,8 +12,14 @@ that branch.
 This suite checks the same rule from the other side, and it is what the
 pre-registered wiring gate rests on locally (plan1_prereg.md §6):
 
-* the **reference** is the method repository's tested ``scale_interior_edges``,
-  **imported** rather than copied, so the test notices if the two ever diverge;
+* the **reference** is the tested ``scale_interior_edges``, ported into this
+  repository from ``arap-deform-3dgs@ede5fd3`` by #16 and pinned by sha256 in
+  ``evidence/PROVENANCE.toml``. It used to be *imported from a sibling working
+  tree*, which meant the test noticed divergence but only ran at all on a machine
+  that had that sibling. That trade is now the other way round and is argued in
+  ``CONTEXT.md``: divergence detection protects a living codebase, and Plan 1 is
+  frozen. ``test_the_vendored_reference_rule_is_the_one_that_was_ported`` is what
+  replaces it — editing the vendored rule fails the suite;
 * the **deployed** rule is loaded out of the archived cluster source *text* by AST,
   so the test runs the code that actually produced the runs — not a transcription
   of it;
@@ -42,7 +48,7 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from plan1.provenance import EVIDENCE_ROOT, head_commit, sha256_file
+from plan1.provenance import EVIDENCE_ROOT, load_evidence, sha256_file
 
 torch = pytest.importorskip("torch", reason="the deployed rule is written in torch")
 
@@ -53,7 +59,6 @@ from box_b.edge_weights import scale_interior_edges  # noqa: E402  (after import
 #: than resolved from a sibling archive, so this suite runs on a bare clone; see
 #: `evidence/PROVENANCE.toml` for where it came from and what it hashes to.
 CLUSTER_HELPER = EVIDENCE_ROOT / "cluster" / "sources_20260729" / "helper.py"
-METHOD_REPO = Path(__file__).resolve().parents[2] / "arap-deform-3dgs"
 
 pytestmark = pytest.mark.skipif(
     not CLUSTER_HELPER.is_file(),
@@ -242,6 +247,24 @@ def test_both_rules_are_identifiable_by_content():
     reference_path = Path(reference_module.__file__)
     assert sha256_file(reference_path)
     assert sha256_file(CLUSTER_HELPER)
-    # the method repo's commit is recorded where it is resolvable; a bare checkout
-    # reports unknown rather than guessing
-    head_commit(METHOD_REPO)
+
+
+def test_the_vendored_reference_rule_is_the_one_that_was_ported():
+    """Editing the vendored reference rule fails the suite.
+
+    This is what vendoring buys back. A live import from a sibling working tree
+    noticed when the two copies diverged; a copy cannot. What a copy *can* do is
+    refuse to be quietly different from the thing it claims to be — so the hash
+    recorded at vendoring time is asserted here, and the same value is what the
+    published table's footer prints. Change `box_b/edge_weights.py` and this test,
+    the table's footer check, and `scripts/build_table.py` all fail together.
+    """
+    import box_b.edge_weights as reference_module
+
+    record = load_evidence()
+    entry = record.ported_file("box_b/edge_weights.py")
+    assert sha256_file(Path(reference_module.__file__)) == entry.sha256
+    # and the footer cites the same value, so the two cannot drift apart
+    assert record.artefact("reference rule (`box_b/edge_weights.py`)").value == (
+        entry.sha256
+    )
