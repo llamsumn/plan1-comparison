@@ -23,6 +23,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Mapping
 
+from plan1.provenance import display_path
+
 #: The three reported metrics. LPIPS is inverted — lower is better.
 METRICS: tuple[str, ...] = ("psnr", "ssim", "lpips")
 
@@ -135,8 +137,11 @@ def read_stats_json(run_dir: Path, eval_step: int, key: str) -> RunRecord:
         final={m: Measurement(float(final[m])) for m in METRICS},
         num_primitives=int(final["num_GS"]),
         eval_step=eval_step,
-        source=str(run_dir),
-        provenance=f"{key}: {final_path} (step {eval_step}), start {start_path}",
+        source=display_path(run_dir),
+        provenance=(
+            f"{key}: {display_path(final_path)} (step {eval_step}), "
+            f"start {display_path(start_path)}"
+        ),
     )
 
 
@@ -196,10 +201,10 @@ def read_console_log(log_path: Path, eval_step: int, key: str) -> RunRecord:
         final=final,
         num_primitives=num_gs,
         eval_step=eval_step,
-        source=str(log_path),
+        source=display_path(log_path),
         provenance=(
-            f"{key}: {log_path}:{final_line + 1} (step {eval_step}), "
-            f"start {log_path}:{start_line + 1}"
+            f"{key}: {display_path(log_path)}:{final_line + 1} (step {eval_step}), "
+            f"start {display_path(log_path)}:{start_line + 1}"
         ),
         checkpoint=checkpoint,
     )

@@ -1,9 +1,11 @@
 """End-to-end against the real archive: manifest -> records -> table.
 
-These are the only tests that read outside the repository. They skip cleanly when
-the archive is absent, so the repo stays reviewable as one unit, but when it is
-present they are what proves the readers, the gate and the arithmetic work on the
-actual evidence rather than only on fixtures.
+These are the tests that read real evidence rather than fixtures — they are what
+proves the readers, the gate and the arithmetic work on the archived runs and not
+only on numbers made up for the purpose. The evidence is vendored under
+`evidence/`, so they run on a bare clone. They previously resolved a sibling
+`~/3D` checkout and skipped in its absence, which quietly removed all 18 of them
+on every machine but one.
 
 **Two worlds, both live.** ``real_table`` is what the manifest publishes today: the
 baseline bound to its own recovered statistics record, every input at full
@@ -22,11 +24,15 @@ import pytest
 from conftest import PARENT_CELLS, overlaps
 from plan1.assemble import assemble
 from plan1.manifest import load_manifest, load_records
+from plan1.provenance import EVIDENCE_ROOT
 from plan1.records import METRICS
 from plan1.render import render_markdown
 
 MANIFEST = Path(__file__).resolve().parents[1] / "manifests" / "penguin_deformsplat.toml"
-ARCHIVE = Path(__file__).resolve().parents[2] / "3D"
+
+#: The vendored evidence base, in the repository. This was a sibling `~/3D`
+#: checkout, and its absence silently removed all 18 tests below.
+ARCHIVE = EVIDENCE_ROOT
 
 #: The console line the baseline row was bound to before preflight recovered the
 #: run's own statistics record. It survives in the archive, so the superseded world
@@ -245,6 +251,8 @@ def test_a_manifest_pointing_at_a_missing_record_raises(tmp_path):
     )
     broken = tmp_path / "broken.toml"
     # roots resolve against the manifest's own directory, so point this one back
-    broken.write_text(manifest_text.replace('archive = "../../3D"', f'archive = "{ARCHIVE}"'))
+    broken.write_text(
+        manifest_text.replace('archive = "../evidence"', f'archive = "{ARCHIVE}"')
+    )
     with pytest.raises(FileNotFoundError, match="no such statistics file"):
         load_records(load_manifest(broken))

@@ -1,0 +1,84 @@
+# PROVENANCE NOTE — READ FIRST
+#
+# This is NOT a direct capture. It is a transcription of the `hare logs -f hardcore_yonath`
+# output as it appeared in the operator's terminal during the 2026-07-22 DeformSplat spike.
+#
+# A direct capture was attempted after the run and FAILED: the container was started with
+# `--rm`, so it self-removed on exit, and `hare logs hardcore_yonath` returned
+#   <<error: logs.arg.authorisation>>
+#   Do not have access rights for hardcore_yonath (or it does not exist)
+# (see phase3_hare_recovered.log). The piped file phase3_penguin.log is truncated at
+# 1344 B by the hare-client/daemon contact drop ~25 s into the run.
+#
+# Treat the numbers below as operator-transcribed evidence, corroborated by the
+# on-disk artifacts (ckpt_finetune.pt, motion_data.pt, penguin*.mp4 timestamps/streams).
+# For August: run detached WITHOUT --rm, dump `hare logs > file`, then `hare rm`.
+# ---------------------------------------------------------------------------
+
+==========
+== CUDA ==
+==========
+
+CUDA Version 11.8.0
+
++ GPU=0
++ object_name=penguin
++ index_from=0217
++ index_to=0239
++ cam_idx=0
++ data_dir=./data/diva360_processed/penguin_0239/
++ '[' '!' -d ./data/diva360_processed/penguin_0239/ ']'
++ ckpt=./results/diva360/penguin_0217/ckpts/ckpt_best_psnr.pt
++ '[' '!' -f ./results/diva360/penguin_0217/ckpts/ckpt_best_psnr.pt ']'
++ CUDA_VISIBLE_DEVICES=0
++ python deform_splat.py default --data_dir ./data/diva360_processed/penguin_0239/ \
+    --result_dir ./results/diva360_finetune/penguin_0217_0239 \
+    --ckpt ./results/diva360/penguin_0217/ckpts/ckpt_best_psnr.pt \
+    --data_factor 1 --data_name diva360 --single_finetune --port 8081 --scale_reg 0.1 \
+    --object_name 'penguin_[0217,0239]' --wandb --wandb_group deformsplat --cam_idx 0 \
+    --disable_viewer --render_traj_simple --video_path ./output_video/diva360/penguin.mp4
+
+xFormers not available
+xFormers not available
+wandb: WARNING `start_method` is deprecated and will be removed in a future version of wandb.
+wandb: Tracking run with wandb version 0.28.0
+wandb: W&B syncing is set to `offline` in this directory.
+wandb: Run data is saved locally in wandb/wandb/offline-run-20260722_082355-da4x7rz2
+
+[Parser] 41 images, taken by 41 cameras.
+Scene scale: 1.327777398976938
+Model initialized. Number of GS: 5000
+
+Evaluation on step=0...
+ 0000  "step=0 - PSNR: 16.764, SSIM: 0.9060, LPIPS: 0.102 "
+Time: 0.079s/image Number of GS: 23548
+
+ 1111  "get campose and drag via RoMa"
+Estimating camtoworlds: 100%|##########| 36/36 [03:13<00:00,  5.39s/it]
+Using coarse resolution (560, 560), and upsample res (864, 1152)
+ 2222  "filter points and start drag"
+ 3333  "initialize anchor and optimizer"
+ 4444  "rigid grouping"
+ 5555  "DeformSplat optimization "
+100%|##########| 501/501 [05:08<00:00,  1.62it/s]
+
+Evaluation on step=501...
+ 0000  "step=501 - PSNR: 25.055, SSIM: 0.9535, LPIPS: 0.056 "
+Time: 0.006s/image Number of GS: 23548
+save checkpoint to  ./results/diva360_finetune/penguin_0217_0239/ckpt_finetune.pt
+
+Running trajectory rendering...
+WARNING:imageio_ffmpeg: input image is not divisible by macro_block_size=16,
+  resizing from (1160, 660) to (1168, 672)
+Rendering trajectory: 100%|##########| 100/100 [00:03<00:00, 26.66it/s]
+Video saved to ./output_video/diva360/penguin.mp4
+
+ 6666  "postprocess for smooth deformation"
+100%|##########| 1000/1000 [10:43<00:00,  1.56it/s]
+Video has been saved to './output_video/diva360/penguin_deformation.mp4'.
+
+wandb: You can sync this run to the cloud by running:
+wandb: wandb sync wandb/wandb/offline-run-20260722_082355-da4x7rz2
+
+# --- run ended; container exited and self-removed (--rm) ---
+# start 08:23:16 GMT / end 08:47:25 GMT / peak GPU ~8957 MiB on one RTX 3090

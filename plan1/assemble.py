@@ -93,6 +93,9 @@ class TableRow:
 class ComparisonTable:
     asset: str
     manifest_source: str
+    #: The manifest's declared assembly date, carried through so the renderer never
+    #: has to ask the clock what day it is.
+    assembled: str
     eval_step: int
     num_primitives: int
     #: The shared starting values, printed so a reader can verify at a glance that
@@ -173,6 +176,7 @@ def assemble(manifest: Manifest, records: Mapping[str, RunRecord]) -> Comparison
     return ComparisonTable(
         asset=manifest.asset,
         manifest_source=manifest.source,
+        assembled=manifest.assembled,
         eval_step=manifest.eval_step,
         num_primitives=first.num_primitives,
         start=first.start,

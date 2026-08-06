@@ -55,6 +55,11 @@ class Manifest:
     eval_step: int
     rows: tuple[ManifestRow, ...]
     source: str
+    #: The date the published table was assembled, declared by the manifest. It is
+    #: a property of the artefact, not of the moment a reader regenerates it — a
+    #: render-time ``date.today()`` silently rewrote the table every day and made
+    #: byte-identical regeneration a claim that held for 24 hours.
+    assembled: str
     roots: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -87,6 +92,7 @@ def load_manifest(path: Path) -> Manifest:
         eval_step=int(blob["eval_step"]),
         rows=rows,
         source=str(path),
+        assembled=blob["assembled"],
         roots=blob.get("roots", {}),
     )
 

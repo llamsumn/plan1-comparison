@@ -46,11 +46,13 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from plan1.provenance import sha256_file
+from plan1.provenance import EVIDENCE_ROOT, sha256_file
 
 torch = pytest.importorskip("torch", reason="the assertion block is written in torch")
 
-ARCHIVE = Path(__file__).resolve().parents[2] / "3D"
+#: The vendored evidence base. This used to be a sibling `~/3D` checkout, which
+#: made this whole module skip on any machine that did not have one.
+ARCHIVE = EVIDENCE_ROOT
 
 #: The call site that ran ρ = 32 and ρ = 64. Archived byte-exact; the manifest cites
 #: this content hash as provenance for those two rows.

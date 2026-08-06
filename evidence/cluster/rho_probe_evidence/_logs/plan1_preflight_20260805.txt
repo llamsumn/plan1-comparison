@@ -1,0 +1,179 @@
+
+================ 0. context ================
+2026-08-05T09:46:33Z
+host : aching
+user : clll20
+root : /homes/clll20/deformsplat
+
+================ 1a. source hashes vs archive sources_20260729 ================
+hasher: sha256sum
+MATCH     util/helper.py     e83bb80d99e725b7be2831a250890f3f5b4af863d05639f0974f110588dc3220
+MATCH     deform_splat.py    21ae1e32fcd45282a81552f23b3d4556d3c0499996f88ebf16bfe85ee9c2bdce
+MATCH     config.py          d6facd25100c5ccce85c970eb94077f09c2eda9c0320fc0bb38bff8f7cfd5032
+MATCH     util/roma.py       193f49879588108f65fcc7faea3a1a623e258c8317ab94c7a738acb35dc70667
+MATCH     sweep_rho.py       95005fc2738841510388f6456c6be0e91c77438ef21d41685cc9ac4886b346d3
+MATCH     measure_rho.py     edfbeb8cbae8a574a4527936eec25176ff4c724ccbf054dde1f75e417850e9bd
+
+================ 1a-supp. mtimes + repo state (drift context, read-only) ================
+-rw------- 1 clll20 frogs  7455 Jun 24 07:16 /homes/clll20/deformsplat/config.py
+-rw------- 1 clll20 frogs 37679 Jul 25 08:02 /homes/clll20/deformsplat/deform_splat.py
+-rw------- 1 clll20 frogs  2789 Jul 26 08:41 /homes/clll20/deformsplat/measure_rho.py
+-rw------- 1 clll20 frogs  2235 Jul 25 08:02 /homes/clll20/deformsplat/sweep_rho.py
+-rw------- 1 clll20 frogs 23270 Jul 25 08:02 /homes/clll20/deformsplat/util/helper.py
+-rw------- 1 clll20 frogs  9019 Jul 25 08:48 /homes/clll20/deformsplat/util/roma.py
+HEAD 60955d6 2025-12-02 06:48:04 +0000 .
+-- dirty files --
+ M datasets/colmap.py
+ M datasets/dfa.py
+ M datasets/diva360.py
+ M deform_splat.py
+ M simple_trainer.py
+ M util/helper.py
+ M util/roma.py
+?? Dockerfile
+?? analyze_grid.py
+?? aspect_pca.py
+?? aspect_ratio.py
+?? datasets/_compat.py
+?? deform_splat.py.prebak
+?? export_ply.py
+?? measure_rho.py
+?? penguin_deformed.ply
+?? penguin_original.ply
+?? rho_probe_phaseB.gitdiff.txt
+?? scripts/sweep_anchor_k.sh
+?? scripts/sweep_gamma.sh
+
+================ 1b. baseline full-precision stats record ================
+-- run dir --
+total 6643
+drwxr-xr-x 6 clll20 root       6 Jun 24 08:48 .
+drwxr-xr-x 3 clll20 root       1 Jun 24 08:38 ..
+-rw-r--r-- 1 clll20 root 5937160 Jul 22 08:34 ckpt_finetune.pt
+drwxr-xr-x 2 clll20 root       0 Jun 24 08:38 ckpts
+-rw-r--r-- 1 clll20 root  863984 Jul 22 08:34 motion_data.pt
+drwxr-xr-x 2 clll20 root      80 Jun 24 08:48 renders
+drwxr-xr-x 2 clll20 root       2 Jun 24 08:48 stats
+drwxr-xr-x 2 clll20 root       2 Jul 22 08:23 tb
+-- stats/ --
+total 1
+drwxr-xr-x 2 clll20 root   2 Jun 24 08:48 .
+drwxr-xr-x 6 clll20 root   6 Jun 24 08:48 ..
+-rw-r--r-- 1 clll20 root 136 Jul 22 08:24 val_step0000.json
+-rw-r--r-- 1 clll20 root 142 Jul 22 08:34 val_step0501.json
+-- val_step0501.json --
+{"psnr": 25.054527282714844, "ssim": 0.9534690976142883, "lpips": 0.05649951100349426, "ellipse_time": 0.0062182068824768065, "num_GS": 23548}
+-- highest-numbered val_*.json --
+### /homes/clll20/deformsplat/results/diva360_finetune/penguin_0217_0239/stats/val_step0501.json
+{"psnr": 25.054527282714844, "ssim": 0.9534690976142883, "lpips": 0.05649951100349426, "ellipse_time": 0.0062182068824768065, "num_GS": 23548}
+-- siblings under results/diva360_finetune/ --
+total 0
+drwxr-xr-x 3 clll20 root 1 Jun 24 08:38 .
+drwxr-xr-x 8 clll20 root 6 Jul 25 08:02 ..
+drwxr-xr-x 6 clll20 root 6 Jun 24 08:48 penguin_0217_0239
+-- any other penguin_0217_0239 dir on the node --
+/homes/clll20/deformsplat/results/sweep_gamma/penguin_0217_0239
+/homes/clll20/deformsplat/results/sweep_anchor_k/penguin_0217_0239
+/homes/clll20/deformsplat/results/sweep_grid/penguin_0217_0239
+/homes/clll20/deformsplat/results/diva360_finetune/penguin_0217_0239
+
+================ 1c. room to run ================
+Filesystem                                                 Size  Used Avail Use% Mounted on
+/dev/sdd1                                                  1.8T  1.7T   26G  99% /mnt/fast0
+mount-aching@00000000-0000-0000-0000-000000000000.homes=/   18T  4.2T   14T  24% /mnt/vurm/homes
+-- hare me --
+containers:
+  train_trex | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline bash scripts/train_diva360.sh 0 trex 0135'
+  tx_1b | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline CUDA_VISIBLE_DEVICES=0 python sweep_rho.py default --data_dir data/diva360_processed/trex_0250/ --ckpt results/diva360/trex_0135/ckpts/ckpt_best_psnr.pt --data_factor 1 --data_name diva360 --single_finetune --scale_reg 0.1 --disable_viewer --cam_idx 0 --object_name trex_0135_0250 --group_override 0 --result_dir results/rho_probe/trex_rho1b --rho_override 1 --rho_enabled_override 1'
+  tx_025 | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline CUDA_VISIBLE_DEVICES=0 python sweep_rho.py default --data_dir data/diva360_processed/trex_0250/ --ckpt results/diva360/trex_0135/ckpts/ckpt_best_psnr.pt --data_factor 1 --data_name diva360 --single_finetune --scale_reg 0.1 --disable_viewer --cam_idx 0 --object_name trex_0135_0250 --group_override 0 --result_dir results/rho_probe/trex_rho025 --rho_override 0.25 --rho_enabled_override 1'
+  tx_4 | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline CUDA_VISIBLE_DEVICES=0 python sweep_rho.py default --data_dir data/diva360_processed/trex_0250/ --ckpt results/diva360/trex_0135/ckpts/ckpt_best_psnr.pt --data_factor 1 --data_name diva360 --single_finetune --scale_reg 0.1 --disable_viewer --cam_idx 0 --object_name trex_0135_0250 --group_override 0 --result_dir results/rho_probe/trex_rho4 --rho_override 4 --rho_enabled_override 1'
+    = 4
+
+ports:
+    = 0
+
+mounts:
+  /mnt/fast0/clll20 | expire = 2026-08-26 07:52:09 (20 days, 22:05:34)
+  /homes/clll20 | permanent
+    = 2
+
+scratch storage:
+  /mnt/fast0
+  /mnt/faster0
+    = 2
+
+public data:
+  /mnt/calabash/public
+    = 1
+
+private data:
+  /mnt/calabash/private
+  /mnt/calabash/registered
+    = 2
+
+
+================ read-ahead A: Step-3 launch paths exist? ================
+drwxr-xr-x 3 clll20 root 2 Nov 14  2025 /homes/clll20/deformsplat/data/diva360_processed/penguin_0239/
+total 37
+drwxr-xr-x  3 clll20 root     2 Nov 14  2025 .
+drwxr-xr-x 40 clll20 root    38 Nov 14  2025 ..
+-rw-r--r--  1 clll20 root 37636 Nov 14  2025 cameras.json
+drwxr-xr-x  2 clll20 root    41 Nov 14  2025 images
+-rw-r--r-- 1 clll20 root 5559886 Jun 24 08:29 /homes/clll20/deformsplat/results/diva360/penguin_0217/ckpts/ckpt_best_psnr.pt
+-- tee targets (tee cannot create dirs) --
+drwx--x--- 15 clll20 frogs 13 Jul 29 07:56 /homes/clll20/deformsplat/results/rho_probe
+drwx--x---  2 clll20 frogs  5 Jul 29 07:56 /homes/clll20/deformsplat/results/rho_probe/_logs
+
+================ read-ahead B: current rho wiring block (Step-2 patch target) ================
+175:            if getattr(self.cfg, 'rho_enabled', False):
+176:                from util.helper import partition_anchors_by_handle, rho_scale_weights
+177:                _rl = partition_anchors_by_handle(anchor, points_3d_filtered.mean(0), getattr(self.cfg, 'rho_frac', 0.3))
+178:                assert torch.equal(weight, rho_scale_weights(weight, indices_knn, _rl, 1.0))  # T0 tensor-exact
+179:                weight = rho_scale_weights(weight, indices_knn, _rl, getattr(self.cfg, 'rho', 1.0))
+-- context lines 168-186 --
+     1	        color_log(5555, "DeformSplat optimization ")
+     2	        
+     3	        quats_origin = F.normalize(self.splats["quats"].clone().detach(), dim=-1)
+     4	        
+     5	        with torch.no_grad():
+     6	            distances, indices_knn = knn(anchor, anchor, k=anchor_k)
+     7	            weight = rbf_weight(distances, gamma=rbf_gamma)
+     8	            if getattr(self.cfg, 'rho_enabled', False):
+     9	                from util.helper import partition_anchors_by_handle, rho_scale_weights
+    10	                _rl = partition_anchors_by_handle(anchor, points_3d_filtered.mean(0), getattr(self.cfg, 'rho_frac', 0.3))
+    11	                assert torch.equal(weight, rho_scale_weights(weight, indices_knn, _rl, 1.0))  # T0 tensor-exact
+    12	                weight = rho_scale_weights(weight, indices_knn, _rl, getattr(self.cfg, 'rho', 1.0))
+    13	
+    14	        for i in tqdm(range(drag_iterations + 1)):
+    15	            
+    16	            R = quaternion_to_matrix(F.normalize(quats, dim=-1)).squeeze()  # (N, 3, 3)
+    17	            anchor_translated = anchor + t  # (N, 3)
+    18	
+    19	            loss_arap = arap_loss(anchor, anchor_translated, R, weight, indices_knn)
+-- rho_scale_weights signature in helper.py --
+630:def rho_scale_weights(weight, indices_knn, region_label, rho, rigid_id=1):
+631-    """Post-scale row-normalised rbf weights by rho on R-R interior edges only.
+632-    rho==1 -> exact no-op. Do NOT renormalise (would cancel rho on interior-R rows)."""
+633-    if rho == 1.0:
+634-        return weight
+635-    i_R = (region_label == rigid_id)
+636-    rr = i_R[:, None] & i_R[indices_knn]
+637-    return weight * torch.where(rr, weight.new_tensor(float(rho)), weight.new_tensor(1.0))
+-- partition_anchors_by_handle signature (label convention) --
+621:def partition_anchors_by_handle(anchor, handle_xyz, rho_frac):
+622-    """D = nearest rho_frac to the handle (label 0); R = far remainder (label 1)."""
+623-    d = (anchor - handle_xyz[None]).norm(dim=1)
+624-    n_D = max(1, int(rho_frac * anchor.shape[0]))
+625-    label = torch.ones(anchor.shape[0], dtype=torch.long, device=anchor.device)
+626-    label[torch.argsort(d)[:n_D]] = 0
+627-    return label
+628-
+629-
+630-def rho_scale_weights(weight, indices_knn, region_label, rho, rigid_id=1):
+631-    """Post-scale row-normalised rbf weights by rho on R-R interior edges only.
+632-    rho==1 -> exact no-op. Do NOT renormalise (would cancel rho on interior-R rows)."""
+633-    if rho == 1.0:
+634-        return weight
+635-    i_R = (region_label == rigid_id)
+
+================ END ================

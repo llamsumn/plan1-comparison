@@ -112,7 +112,11 @@ def make_row(key, role, *, rigidity=None, label=None, information="—"):
 
 def make_manifest(rows, *, asset="penguin_0217_0239", eval_step=501):
     return Manifest(
-        asset=asset, eval_step=eval_step, rows=tuple(rows), source="fixture://manifest"
+        asset=asset,
+        eval_step=eval_step,
+        rows=tuple(rows),
+        source="fixture://manifest",
+        assembled="2026-08-06",
     )
 
 

@@ -7,9 +7,8 @@ a source actually recorded.
 
 from __future__ import annotations
 
-from datetime import date
-
 from plan1.assemble import ComparisonTable, GapFraction
+from plan1.provenance import display_path
 from plan1.records import METRICS, Measurement
 
 #: Display precision per metric, capped by what the source recorded.
@@ -38,9 +37,9 @@ def render_markdown(table: ComparisonTable, provenance: dict[str, str] | None = 
     out(f"# {table.asset} — imposed rigidity against the DeformSplat baseline")
     out("")
     out(
-        f"_Assembled {date.today().isoformat()} by `plan1.assemble` from the manifest "
-        f"at `{table.manifest_source}`. Every number below traces to a named run; see "
-        f"Provenance. Rules pre-registered in "
+        f"_Assembled {table.assembled} by `plan1.assemble` from the manifest "
+        f"at `{display_path(table.manifest_source)}`. Every number below traces to a "
+        f"named run; see Provenance. Rules pre-registered in "
         f"`all_record/deformsplat_corroboration/plan1_prereg.md`._"
     )
     out("")

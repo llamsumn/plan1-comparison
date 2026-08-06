@@ -42,17 +42,17 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from plan1.provenance import head_commit, sha256_file
+from plan1.provenance import EVIDENCE_ROOT, head_commit, sha256_file
 
 torch = pytest.importorskip("torch", reason="the deployed rule is written in torch")
 
 from box_b.edge_weights import scale_interior_edges  # noqa: E402  (after importorskip)
 
-#: The archived cluster sources — the code that produced the runs in
-#: `3D/cluster/rho_probe_evidence/`.
-CLUSTER_HELPER = (
-    Path(__file__).resolve().parents[2] / "3D" / "cluster" / "sources_20260729" / "helper.py"
-)
+#: The archived cluster source — the code that produced the runs under
+#: `evidence/cluster/rho_probe_evidence/`. Vendored into this repository rather
+#: than resolved from a sibling archive, so this suite runs on a bare clone; see
+#: `evidence/PROVENANCE.toml` for where it came from and what it hashes to.
+CLUSTER_HELPER = EVIDENCE_ROOT / "cluster" / "sources_20260729" / "helper.py"
 METHOD_REPO = Path(__file__).resolve().parents[2] / "arap-deform-3dgs"
 
 pytestmark = pytest.mark.skipif(

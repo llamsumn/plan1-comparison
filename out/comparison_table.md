@@ -1,6 +1,6 @@
 # penguin_0217_0239 — imposed rigidity against the DeformSplat baseline
 
-_Assembled 2026-08-06 by `plan1.assemble` from the manifest at `/Users/kahncant/plan1-comparison/manifests/penguin_deformsplat.toml`. Every number below traces to a named run; see Provenance. Rules pre-registered in `all_record/deformsplat_corroboration/plan1_prereg.md`._
+_Assembled 2026-08-06 by `plan1.assemble` from the manifest at `manifests/penguin_deformsplat.toml`. Every number below traces to a named run; see Provenance. Rules pre-registered in `all_record/deformsplat_corroboration/plan1_prereg.md`._
 
 | rigidity source | information used | PSNR | SSIM | LPIPS |
 |---|---|---|---|---|
@@ -43,15 +43,15 @@ Evaluation step 501; 23548 primitives in every row.
 
 | row | source |
 |---|---|
-| `vanilla` | vanilla: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0000.json |
-| `rho1a` | rho1a: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0000.json |
-| `rho1b` | rho1b: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0000.json |
-| `rho025` | rho025: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0000.json |
-| `rho4` | rho4: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0000.json |
-| `rho16` | rho16: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0000.json |
-| `rho32` | rho32: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0000.json |
-| `rho64` | rho64: /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0000.json |
-| `baseline` | baseline: /Users/kahncant/3D/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0501.json (step 501), start /Users/kahncant/3D/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0000.json |
+| `vanilla` | vanilla: evidence/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0000.json |
+| `rho1a` | rho1a: evidence/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0000.json |
+| `rho1b` | rho1b: evidence/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0000.json |
+| `rho025` | rho025: evidence/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0000.json |
+| `rho4` | rho4: evidence/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0000.json |
+| `rho16` | rho16: evidence/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0000.json |
+| `rho32` | rho32: evidence/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0000.json |
+| `rho64` | rho64: evidence/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0000.json |
+| `baseline` | baseline: evidence/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0501.json (step 501), start evidence/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0000.json |
 
 | artefact | identity |
 |---|---|

@@ -6,14 +6,24 @@ under rules pre-registered before any of it ran.
 This repository is the **evidence chain behind one published table**, kept as a single
 reviewable unit. It is not the method — the deformation system lives in
 [`arap-deform-3dgs`](../arap-deform-3dgs), which this repo consumes as a dependency and
-never modifies. The research record (spec, pre-registration, run evidence, cluster
-sources) lives in the `llamsumn/3D-arap` archive.
+never modifies. The planning record (specs, pre-registration, verdicts) lives in the
+`llamsumn/3D-arap` archive.
 
 ```
+evidence/             the run records and archived cluster sources, vendored
 ../arap-deform-3dgs   the method   — supplies the reference edge-weight rule
-../3D                 the archive  — supplies the run records and the spec
 .                     this repo    — the assembler, the manifest, the tests
 ```
+
+**The evidence travels with the repository.** Every number in the table resolves under
+`evidence/`, which used to be a sibling `~/3D` checkout. While it was, three test modules
+skipped silently on any other machine — 80 of 140 tests — and the published table
+regenerated into something different without saying so. `evidence/PROVENANCE.toml` records
+the source path and sha256 of all 24 copied files, and asserts them in both directions:
+a file that changed fails, and so does one that arrived with no row.
+
+The reference edge-weight rule is still resolved from `../arap-deform-3dgs`; porting it is
+the one remaining external dependency.
 
 ## Why the table is not just typed out
 
@@ -55,6 +65,9 @@ pip install -e ../arap-deform-3dgs
 | `plan1/manifest.py` | the row-to-source binding |
 | `plan1/render.py` | Markdown. Above the seam; decides nothing |
 | `manifests/penguin_deformsplat.toml` | which run is which row, and what information each arm had |
+| `evidence/` | the vendored run records, cluster sources and run logs — everything the table resolves |
+| `evidence/PROVENANCE.toml` | where every copied file came from, what it hashes to, and what deliberately did not travel |
+| `out/comparison_table.md` | the published table. Regenerates byte-identically; `tests/test_build_table.py` asserts it |
 | `tests/test_conformance.py` | does the **deployed** rigidity rule match the **tested** reference? |
 | `tests/test_wiring_assertion.py` | is the in-run assertion's **silence** evidence? Drives it against broken rules |
 

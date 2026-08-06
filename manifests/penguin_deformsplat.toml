@@ -15,9 +15,18 @@
 asset = "penguin_0217_0239"
 eval_step = 501
 
+# When the committed table was assembled. Declared rather than stamped at render
+# time: `date.today()` made `out/comparison_table.md` a different file every day,
+# so the claim that it regenerates was true only on the day it was published.
+# Adding or rebinding a row means changing this line too.
+assembled = "2026-08-06"
+
 [roots]
-# Resolved relative to this file. The archive holds the fetched run evidence.
-archive = "../../3D"
+# Resolved relative to this file. The evidence is vendored into this repository —
+# see evidence/PROVENANCE.toml for where each file came from and what it hashes
+# to. It used to be `../../3D`, which made every published number depend on a
+# sibling checkout that an examiner does not have.
+archive = "../evidence"
 
 # ── the no-rigidity row ─────────────────────────────────────────────────────
 # The mechanism-off run alone (plan1_prereg.md §4). Denominator base for every

@@ -1,0 +1,236 @@
+# The vendored evidence base — what travelled, from where, and hashing to what.
+#
+# `plan1-comparison` used to resolve its evidence out of a sibling `~/3D`
+# checkout. That made the published table reproducible only inside one person's
+# directory layout, and made three test modules skip silently everywhere else.
+# The evidence is 224 KB; it now lives here, and `~/3D` is out of the runtime
+# graph entirely.
+#
+# Vendoring trades away divergence detection: a copy cannot notice that its
+# original changed. That trade is deliberate — Plan 1 is frozen (archived runs,
+# fixed deployed text at a cited hash), so "notice if upstream moves" protects
+# nothing about its claim, while self-containment is what an examiner needs. What
+# keeps the trade honest is this file: every copied byte records where it came
+# from and what it hashes to, so anyone holding an original can audit the copy
+# against it. `tests/test_vendored_evidence.py` asserts every row, in both
+# directions — a file with no row fails just as loudly as a row that does not
+# match its file.
+#
+# Sources are recorded as they were reached on the authoring machine. They are
+# provenance, not a runtime path: nothing in this repository resolves them.
+
+[origin]
+archive = "~/3D"
+vendored = "2026-08-06"
+issue = "https://github.com/llamsumn/3D-arap/issues/15"
+
+# ── the nine run directories the manifest binds ─────────────────────────────
+# Every row of the published table resolves to a pair of these. `ckpts/`,
+# `renders/` and `tb/` sat beside `stats/` in the archive and were empty in all
+# nine, so nothing under them travelled.
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0000.json"
+sha256 = "28615c0011a7e22397ccbdd92618661a7d18ecce828d76486c7d6215830b75f4"
+why = "row `vanilla` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0501.json"
+sha256 = "04317fedff2b70d1aa0ff973e1e12eb2c36aedacde1043145b113a79c1632525"
+why = "row `vanilla` — the no-rigidity row, denominator base for every fraction"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0000.json"
+sha256 = "dab4ffaace06661e49f88350fc736cceb117c7143625d225783b9976c589a8ef"
+why = "row `rho1a` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0501.json"
+sha256 = "48237fe2eba39d5ce5de546934272f720b5198889910e1b20b79740693a32050"
+why = "row `rho1a` — unit-rigidity replicate, feeds the replicate band"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0000.json"
+sha256 = "36b4d6a400aa325887dec3a5f8d7fda16d6f6bfe3b30bf2c45c30ab10ded2527"
+why = "row `rho1b` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0501.json"
+sha256 = "74176c0354db825bcbfd68541cfcaa37134ce0cf3182575abe81507f6ac7b178"
+why = "row `rho1b` — unit-rigidity replicate, feeds the replicate band"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho025/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0000.json"
+sha256 = "c412012568680909d201f6b8cdf18bfdc53af73908d4fa07ce86ce30566c09a3"
+why = "row `rho025` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho025/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0501.json"
+sha256 = "03c239009923268a853b2434d004c5bff21f96f80b97865c5e81f4b74c73c780"
+why = "row `rho025` — imposed sweep, rho = 0.25"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho4/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0000.json"
+sha256 = "2b94c81376fb584454162b800c1a4a4974bb73eceacbef90f36b94e1e40efb07"
+why = "row `rho4` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho4/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0501.json"
+sha256 = "2b8e363973d47948c8951bc8577ce5bf26977132643f0d826374a6e0cd44a2e0"
+why = "row `rho4` — imposed sweep, rho = 4"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho16/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0000.json"
+sha256 = "2c1d04a47f11f44e865f7449bad0923facae7f3589d7672d84cffe2c79e4b17c"
+why = "row `rho16` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json"
+sha256 = "08e64a88378cc22f26a9fc923044141c2f2a6cde2adbbac68e9af63a9e4132ef"
+why = "row `rho16` — the row the saturation rule selects; source of 63.6/72.6/80.4%"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho32/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0000.json"
+sha256 = "724787ea46b5700133b6411549bed92bf042df0ce8611e42bcec89ff99526744"
+why = "row `rho32` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho32/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0501.json"
+sha256 = "ac908a12aba6050a8db502a454121ed73064e5494eefd392a4663ae5693bc8b6"
+why = "row `rho32` — saturation run, 2026-08-05"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho64/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0000.json"
+sha256 = "82e6cc90be369d35fae5981c6e902700840eccd1039c357d9fad80dc9688846f"
+why = "row `rho64` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/penguin_rho64/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0501.json"
+sha256 = "39d6f2537e7e3c11fc4789364a1eb0826b769149a03a2ba94ebf22b453f19737"
+why = "row `rho64` — saturation run; the point at which the curve turns over"
+
+[[file]]
+path = "cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0000.json"
+source = "~/3D/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0000.json"
+sha256 = "8e7d031fe55ea2f9ad8fee89de9a33c5a3f7366c8b90deda3fd7a528865c7eda"
+why = "row `baseline` — step-0 fingerprint, bit-identical to all eight sweep rows"
+
+[[file]]
+path = "cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0501.json"
+source = "~/3D/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0501.json"
+sha256 = "73c7bf3aef1b019f2c356979b58f32d6549664f0555c5c5a13705d58f4972042"
+why = "row `baseline` — the DeformSplat run's own statistics record, recovered 2026-08-05"
+
+# ── the run logs ────────────────────────────────────────────────────────────
+# Not read by any reader. They are what makes the verdict's §1 checkable: the
+# saturation runs recorded both source hashes inline, and no AssertionError
+# appears anywhere in either console — which is the silence the wiring harness
+# exists to interpret.
+
+[[file]]
+path = "cluster/rho_probe_evidence/_logs/penguin_rho32.log"
+source = "~/3D/cluster/rho_probe_evidence/_logs/penguin_rho32.log"
+sha256 = "16980890ffb6f49116dd2a6a96a5d3b301f0fd4af584a84666e8bf303b546170"
+why = "rho = 32 console: launch line, both inline source hashes, no AssertionError"
+
+[[file]]
+path = "cluster/rho_probe_evidence/_logs/penguin_rho64.log"
+source = "~/3D/cluster/rho_probe_evidence/_logs/penguin_rho64.log"
+sha256 = "3348258e53a92cf0e0de436931b1a987aee851b683509833a1b31e349214e644"
+why = "rho = 64 console: launch line, both inline source hashes, no AssertionError"
+
+[[file]]
+path = "cluster/rho_probe_evidence/_logs/plan1_preflight_20260805.txt"
+source = "~/3D/cluster/rho_probe_evidence/_logs/plan1_preflight_20260805.txt"
+sha256 = "1680df59cffc13664a2ef3ebb9f4dcb622f096651c53f75b6464e72bcaeff746"
+why = "the preflight that recovered the baseline record and compared 6/6 source hashes; cited by the manifest's baseline row"
+
+# ── the archived cluster sources ────────────────────────────────────────────
+# Both gate modules load these by AST out of the source *text*, so the binding is
+# to the bytes below and not to a transcription of them. Copied, never edited.
+
+[[file]]
+path = "cluster/sources_20260729/helper.py"
+source = "~/3D/cluster/sources_20260729/helper.py"
+sha256 = "e83bb80d99e725b7be2831a250890f3f5b4af863d05639f0974f110588dc3220"
+why = "the deployed rigidity rule the conformance suite drives against the reference"
+
+[[file]]
+path = "cluster/sources_20260805_patched/deform_splat.py"
+source = "~/3D/cluster/sources_20260805_patched/deform_splat.py"
+sha256 = "e2ca10cf4ef7ae00b36cdc9a0baa30518ce028aef0ec37ce75a6c112919ed397"
+why = "the rho = 32/64 call site the wiring harness parses; the manifest cites this hash"
+
+[[file]]
+path = "cluster/spike_logs/phase3_run_console.log"
+source = "~/3D/cluster/spike_logs/phase3_run_console.log"
+sha256 = "070cb58a2e6e472d3f6fdbe457db3566c2dd3a0309eefea813a375094c802284"
+why = "the superseded 2026-07-22 console baseline; the only real file the console-log reader is exercised against"
+
+# ── provenance inputs that are NOT vendored here ────────────────────────────
+# The published table's footer names four artefacts. Two are the vendored cluster
+# sources above and are hashed from this directory. The other two identify the
+# method repository, which is a separate port (#16) — until it lands,
+# `scripts/build_table.py` resolves the sibling checkout and checks it against
+# the identity recorded here. A missing or moved sibling is an error, never a
+# dropped footer line.
+
+[[artefact]]
+name = "reference rule (`box_b/edge_weights.py`)"
+kind = "file_sha256"
+source = "~/arap-deform-3dgs/box_b/edge_weights.py"
+value = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
+why = "the tested rule the conformance suite compares the deployed one against"
+
+[[artefact]]
+name = "method repository HEAD"
+kind = "git_head"
+source = "~/arap-deform-3dgs"
+value = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+why = "the commit the published table was assembled against"
+
+# ── what was in the archive and deliberately did not travel ─────────────────
+# Recorded so that "the evidence base" is a closed statement rather than an open
+# one. Nothing here is lost — `~/3D` still holds it, and adding any of it later
+# is an edit to this file plus a copy.
+
+[[excluded]]
+path = "cluster/rho_probe_evidence/trex_*/"
+size = "12 files, ~48 KB"
+reason = "a second asset's sweep. No manifest row binds it and no published number derives from it. Vendoring it would put unreferenced evidence in a submission artifact."
+
+[[excluded]]
+path = "cluster/rho_probe_evidence/_logs/train_trex.log"
+size = "1.3 MB"
+reason = "trex training console. It is 87% of the archive directory's bulk and supports nothing in this repository."
+
+[[excluded]]
+path = "cluster/rho_probe_evidence/_logs/tx_{025,1b,4}.log"
+size = "3 files, 103 KB"
+reason = "trex sweep consoles, as above."
+
+[[excluded]]
+path = "cluster/rho_probe_evidence/_logs/hare_me_20260729.txt"
+size = "1.8 KB"
+reason = "the 2026-07-29 cluster container listing. Its launch lines are the trex runs'; the penguin saturation runs record their own in penguin_rho{32,64}.log."
+
+[[excluded]]
+path = "cluster/rho_probe_evidence/*/{ckpts,renders,tb}/"
+size = "empty"
+reason = "present as empty directories beside every stats/ in the archive."
