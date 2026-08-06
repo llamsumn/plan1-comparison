@@ -1,0 +1,402 @@
+[
+  {
+    "phase": "1",
+    "id": "L1",
+    "name": "Laplacian symmetry",
+    "value": 0.0,
+    "threshold": 1e-10,
+    "unit": "max|L-L^T|",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "1",
+    "id": "L2",
+    "name": "Laplacian null space",
+    "value": 0.0,
+    "threshold": 1e-09,
+    "unit": "max|L*1|",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "1",
+    "id": "L3",
+    "name": "Rotation properness",
+    "value": 1.4218748958580352e-15,
+    "threshold": 1e-09,
+    "unit": "max(|det-1|,||RtR-I||)",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "1",
+    "id": "L4",
+    "name": "Identity solve",
+    "value": 7.993605777301127e-15,
+    "threshold": 1e-09,
+    "unit": "||def-rest||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "1",
+    "id": "L5",
+    "name": "Energy monotonicity",
+    "value": 2.6645352591003757e-15,
+    "threshold": 1e-12,
+    "unit": "max(E[k+1]-E[k])",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "1",
+    "id": "L6",
+    "name": "Rigid-bend edge lengths",
+    "value": 1.0925704785336166e-12,
+    "threshold": 1e-08,
+    "unit": "max|\u0394edge len|",
+    "passed": true,
+    "notes": "converged=True"
+  },
+  {
+    "phase": "1",
+    "id": "L7",
+    "name": "Covariance PSD (carry)",
+    "value": 0.01001474531822767,
+    "threshold": -1e-12,
+    "unit": "min eig",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.1",
+    "id": "2.1p-cantilever",
+    "name": "Position certificate [cantilever]",
+    "value": 6.399999999985584e-05,
+    "threshold": -1e-10,
+    "unit": "min \u0394E",
+    "passed": true,
+    "notes": "grad_inf=1.73e-14 conv=True iters=934"
+  },
+  {
+    "phase": "2.1",
+    "id": "2.1r-cantilever",
+    "name": "Rotation certificate [cantilever]",
+    "value": 0.0,
+    "threshold": -1e-10,
+    "unit": "min \u0394E",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.1",
+    "id": "2.1p-bar_bend",
+    "name": "Position certificate [bar_bend]",
+    "value": 4.559999999820263e-06,
+    "threshold": -1e-10,
+    "unit": "min \u0394E",
+    "passed": true,
+    "notes": "grad_inf=5.88e-13 conv=True iters=77"
+  },
+  {
+    "phase": "2.1",
+    "id": "2.1r-bar_bend",
+    "name": "Rotation certificate [bar_bend]",
+    "value": 1.8536714385675168e-08,
+    "threshold": -1e-10,
+    "unit": "min \u0394E",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.1",
+    "id": "2.1p-static_far",
+    "name": "Position certificate [static_far]",
+    "value": 4.559999999986797e-06,
+    "threshold": -1e-10,
+    "unit": "min \u0394E",
+    "passed": true,
+    "notes": "grad_inf=3.68e-14 conv=True iters=17"
+  },
+  {
+    "phase": "2.1",
+    "id": "2.1r-static_far",
+    "name": "Rotation certificate [static_far]",
+    "value": 1.9720046706694916e-08,
+    "threshold": -1e-10,
+    "unit": "min \u0394E",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.2",
+    "id": "2.2-rot",
+    "name": "Rotation closed-form",
+    "value": 0.0,
+    "threshold": 1e-09,
+    "unit": "||R_core-R_ref||_F",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.2",
+    "id": "2.2-pos",
+    "name": "Position closed-form",
+    "value": 0.0,
+    "threshold": 1e-08,
+    "unit": "||p_core-p_ref||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.3",
+    "id": "2.3-pos",
+    "name": "Rigid recovery position",
+    "value": 4.707345624410664e-14,
+    "threshold": 1e-08,
+    "unit": "||p-(RX+t)||_inf",
+    "passed": true,
+    "notes": "1 free vertex followed rigidly (err at free=4.7e-14)"
+  },
+  {
+    "phase": "2.3",
+    "id": "2.3-E",
+    "name": "Rigid recovery energy",
+    "value": 2.8803424279212337e-25,
+    "threshold": 1e-12,
+    "unit": "final E",
+    "passed": true,
+    "notes": "max|detR-1|=1.0e-15"
+  },
+  {
+    "phase": "2.4",
+    "id": "2.4-anchor",
+    "name": "Cantilever zero-at-anchor",
+    "value": 0.0,
+    "threshold": 1e-09,
+    "unit": "disp[0]",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.4",
+    "id": "2.4-tip",
+    "name": "Cantilever tip=\u03b4",
+    "value": 0.0,
+    "threshold": 1e-09,
+    "unit": "|disp_tip-\u03b4|",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.4",
+    "id": "2.4-mono",
+    "name": "Cantilever monotone",
+    "value": 0.0,
+    "threshold": -1e-09,
+    "unit": "min \u0394disp",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.4",
+    "id": "2.4-det",
+    "name": "Cantilever proper R",
+    "value": 6.661338147750939e-16,
+    "threshold": 1e-09,
+    "unit": "max|detR-1|",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "2.4",
+    "id": "2.4-gold",
+    "name": "Cantilever vs gold ref",
+    "value": 0.0,
+    "threshold": 1e-06,
+    "unit": "||p-p_ref||_inf",
+    "passed": true,
+    "notes": "scipy: \u0394E=-2.29e-16 moved=1.45e-09"
+  },
+  {
+    "phase": "3",
+    "id": "3-delta",
+    "name": "Weight response \u0394(delta,uniform)",
+    "value": 0.1599935921759021,
+    "threshold": 0.1,
+    "unit": "rel ||\u0394||",
+    "passed": true,
+    "notes": "broad-vs-uniform=0.023; near-ident-guard(<1e-6)=ok"
+  },
+  {
+    "phase": "4",
+    "id": "B1",
+    "name": "Anchor exactness (hard)",
+    "value": 0.0,
+    "threshold": 1e-10,
+    "unit": "residual",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "4",
+    "id": "B2",
+    "name": "Free vertices move",
+    "value": 2.7425642413845757,
+    "threshold": 1e-06,
+    "unit": "max free disp",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "4",
+    "id": "B3",
+    "name": "Translation invariance",
+    "value": 1.9095836023552692e-14,
+    "threshold": 1e-09,
+    "unit": "||\u0394||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "4",
+    "id": "B4",
+    "name": "Rotation invariance",
+    "value": 3.552713678800501e-15,
+    "threshold": 1e-08,
+    "unit": "||\u0394||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "4",
+    "id": "B5",
+    "name": "Symmetry",
+    "value": 8.881784197001252e-16,
+    "threshold": 1e-08,
+    "unit": "||p-mirror(p[\u03c3])||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "4",
+    "id": "B6",
+    "name": "Determinism",
+    "value": 0.0,
+    "threshold": 1e-12,
+    "unit": "||\u0394||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "4",
+    "id": "B7",
+    "name": "Degenerate no-reflection",
+    "value": 0.999999999999999,
+    "threshold": 0.999,
+    "unit": "min det(R)",
+    "passed": true,
+    "notes": "collinear_min=1.0000 coplanar_min=1.0000"
+  },
+  {
+    "phase": "5",
+    "id": "N1",
+    "name": "Prefactor == direct",
+    "value": 0.0,
+    "threshold": 1e-08,
+    "unit": "||\u0394||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "5",
+    "id": "N2",
+    "name": "System conditioning",
+    "value": 52.2310600547358,
+    "threshold": 1000000000000.0,
+    "unit": "cond",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "5",
+    "id": "N3",
+    "name": "True fixed point",
+    "value": 5.828670879282072e-13,
+    "threshold": 1e-09,
+    "unit": "||\u0394||_inf",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "5",
+    "id": "N4",
+    "name": "Convergence trace",
+    "value": 77.0,
+    "threshold": null,
+    "unit": "iters",
+    "passed": true,
+    "notes": "E_floor=4.145e+00 last_step=0.0e+00 conv=True"
+  },
+  {
+    "phase": "6",
+    "id": "G1",
+    "name": "Cov round-trip (rotation)",
+    "value": 3.429459964196401e-16,
+    "threshold": 1e-15,
+    "unit": "rel||\u0394\u03a3|| (median)",
+    "passed": true,
+    "notes": "quaternion path vs matrix route; worst-of-300=1.55e-15 (~7 ulp, FP floor)"
+  },
+  {
+    "phase": "6",
+    "id": "G2",
+    "name": "Cov round-trip (affine)",
+    "value": 3.9968028886505635e-15,
+    "threshold": 1e-08,
+    "unit": "||\u0394\u03a3||",
+    "passed": true,
+    "notes": ""
+  },
+  {
+    "phase": "6",
+    "id": "G3",
+    "name": "PSD preservation",
+    "value": 2.6080413131692028e-15,
+    "threshold": -1e-12,
+    "unit": "min eig",
+    "passed": true,
+    "notes": "scales_finite&>=0=True"
+  },
+  {
+    "phase": "6",
+    "id": "G4",
+    "name": "Quaternion convention",
+    "value": 2.220446049250313e-16,
+    "threshold": 1e-09,
+    "unit": "||\u0394R||",
+    "passed": true,
+    "notes": "(w,x,y,z); w=0.9211 expect cos(\u03b8/2)=0.9211"
+  },
+  {
+    "phase": "6",
+    "id": "G5",
+    "name": "SH rotation boundary (Wigner-D)",
+    "value": 0.0,
+    "threshold": 0.0,
+    "unit": "max|\u0394 DC|",
+    "passed": true,
+    "notes": "DC invariant=0.0e+00; bands1+ rotate=6.352 (>1e-6 required \u2014 a stub would read 0); identity no-op=0.0e+00"
+  },
+  {
+    "phase": "6",
+    "id": "G6",
+    "name": "Real-asset smoke (penguin)",
+    "value": 2.2520807535497486e-09,
+    "threshold": -1e-12,
+    "unit": "min eig",
+    "passed": true,
+    "notes": "N=23548 max|\u2016q\u2016-1|=2.2e-16 finite=True"
+  }
+]

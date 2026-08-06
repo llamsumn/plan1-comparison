@@ -36,9 +36,18 @@ RECORD = load_evidence()
 #: "for completeness" would be the single most expensive mistake available here.
 NOT_PORTED = ("box_b/descriptors.py", "box_b/noise.py")
 
-#: Every directory the port writes into. Anything executable outside `plan1/`,
-#: `scripts/` and `tests/` came from the method repository and needs a row.
-PORTED_TREES = ("arap_core", "box_b", "examples", "data", "tests/method")
+#: Every directory a port writes into. Anything executable outside `plan1/`,
+#: `scripts/` and `tests/` was copied from another repository and needs a row —
+#: `arap_core`, `box_b`, `examples`, `data` and `tests/method` from
+#: `arap-deform-3dgs` (#16), `diagnostics` from the archive (#17).
+PORTED_TREES = (
+    "arap_core",
+    "box_b",
+    "examples",
+    "data",
+    "tests/method",
+    "diagnostics",
+)
 
 
 def ported_files_on_disk() -> list[Path]:
@@ -62,7 +71,13 @@ def test_every_ported_file_hashes_to_its_recorded_value(entry):
 
 @pytest.mark.parametrize("entry", RECORD.ported, ids=lambda e: e.path)
 def test_every_ported_row_names_its_repository_commit_and_reason(entry):
-    assert entry.source_repo == "arap-deform-3dgs"
+    """Two repositories supply ported code, and both pin a real commit.
+
+    `arap-deform-3dgs` supplied the method (#16); the archive supplied the solver
+    diagnostic (#17). A 40-hex commit is required of both — "copied from the
+    archive" without a snapshot is not provenance, it is a memory.
+    """
+    assert entry.source_repo in {"arap-deform-3dgs", "3D-arap"}, entry.source_repo
     assert re.fullmatch(r"[0-9a-f]{40}", entry.source_commit), entry.source_commit
     assert entry.why
 
@@ -80,12 +95,16 @@ def test_every_ported_file_has_a_provenance_row():
 
 
 def test_the_ported_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
-    """19 = 10 `arap_core` modules + 2 `box_b` + the example + the asset + 5 tests.
+    """23 = 19 from #16 + 4 from #17.
+
+    The 19: 10 `arap_core` modules, 2 `box_b`, the example, the asset, 5 tests.
+    The 4: `run_diagnostic.py`, `refs.py`, `arap_core_diagnostic.json`, and
+    `cantilever_profile.csv` — which the ladder writes rather than the port copying.
 
     Derived by listing the port, not by reading the count back off the record —
     which is the whole difference between an assertion and a restatement.
     """
-    assert len(RECORD.ported) == len(ported_files_on_disk()) == 19
+    assert len(RECORD.ported) == len(ported_files_on_disk()) == 23
 
 
 # ── what deliberately did not come ──────────────────────────────────────────

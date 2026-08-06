@@ -54,6 +54,23 @@ python examples/run_penguin.py --ply data/penguin_original.ply --out /tmp/identi
 `data/penguin_original.ply` (5.6 MB, 23,548 Gaussians) is **tracked by exception** against
 the `*.ply` ignore rule; the reason is recorded in `.gitignore` where a reader will meet it.
 
+### The solver's evidence runs
+
+`arap-deform-3dgs`'s own suite never drives the solver — no test there touches `driver`,
+`global_step` or `local_step`. `diagnostics/` carries the 40-rung ladder that does, and
+`tests/test_diagnostic.py` **re-executes** all six phases and compares every record against
+`diagnostics/arap_core_diagnostic.json`, field by field. It does not compare the committed
+JSON against itself; that tautology is the failure mode this project has shipped twice, and
+a test traces the interpreter into all three solver modules to prove they were reached.
+
+Re-executing rather than re-reading found something on the first run. 39 of the 40 records
+reproduced bit-for-bit against the ported core; `G5` did not. It asserted that SH bands 1 and
+above are *left untouched* — a correct boundary check on the DC-only stub it was written for
+in July, and obsolete since B1 replaced that stub with real Wigner-D. `G5` is rewritten to
+ask the question the real implementation has, and both the rewrite and the regenerated record
+are documented in `evidence/PROVENANCE.toml`. Runtime is ~2 s, so it sits in the default
+suite rather than behind a marker.
+
 ## The characterisation evidence
 
 `evidence/characterisation/` holds the study that motivated a *predicted* rigidity field
@@ -116,6 +133,7 @@ missing `torch` makes the suite **error**, not shrink.
 | `box_b/edge_weights.py` | the B2 seam, and the conformance test's reference rule |
 | `examples/run_penguin.py` | the runnable demonstration; `--disp 0 0 0` is the identity check |
 | `tests/method/` | the 31 ported method tests, kept separate from the assembler's |
+| `diagnostics/` | the 40-rung solver ladder. `tests/test_diagnostic.py` **re-runs** it and compares all 40 records — it does not re-read the committed answer |
 | `plan1/assemble.py` | **the seam** — manifest + records → validated table. Gating and gap arithmetic sit behind it |
 | `plan1/saturation.py` | the pre-registered rule that selects the reported rigidity |
 | `plan1/records.py` | the readers, and the precision model. Below the seam |

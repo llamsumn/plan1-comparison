@@ -26,6 +26,8 @@ vendored = "2026-08-06"
 issues = [
   "https://github.com/llamsumn/3D-arap/issues/15",  # run records, cluster sources, logs
   "https://github.com/llamsumn/3D-arap/issues/19",  # characterisation outputs
+  "https://github.com/llamsumn/3D-arap/issues/16",  # the method — see [[ported]]
+  "https://github.com/llamsumn/3D-arap/issues/17",  # the solver diagnostic
 ]
 
 # ── the nine run directories the manifest binds ─────────────────────────────
@@ -581,6 +583,67 @@ source_repo = "arap-deform-3dgs"
 source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
 sha256 = "1621707c143c1b0d2c19e2e315738163d1a556b98a49a66518b5b19028ac9175"
 why = "5 tests — the B2 seam, driven directly"
+
+# ── the solver diagnostic ───────────────────────────────────────────────────
+# Ported from the *archive*, not from the method repository, under #17: the
+# 40-rung ladder that drives `arap_core` end to end. Nothing in
+# `arap-deform-3dgs`'s own suite touches `driver`, `global_step` or `local_step`,
+# so before this the solver's entire evidence was one inline assertion in
+# `run_penguin.py` plus a JSON file in an archive nobody ran.
+# `tests/test_diagnostic.py` re-executes the six phases and compares all 40
+# records field by field. It never calls `main()`, because `main()` calls
+# `write_artifacts()`, and a test that rewrites the file it compares against is
+# the tautology this whole ticket exists to avoid.
+#
+# **TWO OF THE THREE FILES DIVERGE FROM SOURCE, and the reason is a finding.**
+# Re-running the ladder against the *ported* core, 39 of the 40 records
+# reproduced bit-for-bit and one did not:
+#
+#   G5 "SH stub boundary" asserted `max|Δ sh[:, 1:, :]| == 0` — that spherical-
+#   harmonic bands 1 and above are LEFT UNTOUCHED. That was a correct boundary
+#   check on a deliberate limitation when it was written (2026-07-15), and it has
+#   been wrong since B1 replaced the DC-only stub with real Wigner-D. Re-executed
+#   here it fails at 6.35: the bands move, because they are supposed to.
+#
+# This is precisely what the ticket's "re-execute the ladder, do not re-read its
+# answer" requirement was for — a committed JSON compared against itself would
+# have reported 40/40 green and carried a check asserting the absence of a
+# shipped feature. That the other 39 entries are bit-identical is what identifies
+# it as an obsolete check rather than a regression in the port.
+#
+# G5 is rewritten in the vendored copy to ask the boundary question the real
+# implementation has — DC invariant, bands 1+ demonstrably move, identity
+# rotation a byte-exact no-op — with the original quoted at the call site. The
+# JSON is regenerated from the ported core so the record describes the code this
+# repository actually ships. `refs.py` is untouched.
+
+[[ported]]
+path = "diagnostics/run_diagnostic.py"
+source_repo = "3D-arap"
+source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+sha256 = "ad86ad03271a51b528ef8fd117316d4697b616d8fba501b306bb46feed7e1088"
+why = "the 40-rung ladder: Laplacian properties, stationarity, the cantilever profile, boundary cases, numerics and the Gaussian carry. NOT byte-identical — G5 rewritten, reasoned above. Source hash at 2b362d61: 39bf9d84b07115b8…"
+
+[[ported]]
+path = "diagnostics/refs.py"
+source_repo = "3D-arap"
+source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+sha256 = "3563b041fe4838a5b6348da3a9aa6c1e579b32b949de6609d34bdba4643e45e3"
+why = "the independent reference implementations the ladder checks arap_core against — energy, rotation fit, Laplacian, solve. Byte-identical to source"
+
+[[ported]]
+path = "diagnostics/cantilever_profile.csv"
+source_repo = "3D-arap"
+source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+sha256 = "2fe3be8f39bc730a49b6e95e132a3ef3da84bdc6ffe4aa2883544d71b24eedf9"
+why = "phase 2.4's tip-displacement profile. NOT copied — `run_diagnostic.py:341` writes it as a side effect of running the ladder, so the file here was produced by the PORTED core, and it came out byte-identical to the archive's. That is an independent check on the port that no assertion asked for: the same solver, on the same seed, to the byte"
+
+[[ported]]
+path = "diagnostics/arap_core_diagnostic.json"
+source_repo = "3D-arap"
+source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+sha256 = "7c3afcedca3668f79a492fea9ed4dcf0d8ef493ac97b7cdde0f91dda1b8788e0"
+why = "the 40-entry record, 40/40 passing. REGENERATED against the ported core rather than copied, so the record describes the code this repository ships; 39 of 40 entries are bit-identical to the archive's, the 40th is the rewritten G5. Source hash at 2b362d61: 165e3ab31f4d37b5…"
 
 # ── provenance inputs that the footer names ─────────────────────────────────
 # The published table's footer names four artefacts. Two are the vendored cluster
