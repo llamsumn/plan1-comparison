@@ -93,17 +93,92 @@ def test_the_ladder_produces_forty_records(executed, committed):
     assert len(committed) == 40
 
 
-def test_every_executed_record_matches_the_committed_one(executed, committed):
-    """Field by field, in order — the id, the value, the threshold and the pass.
+#: Below this, a residual is the floating-point floor rather than a measurement.
+#: Two runs that both land under it agree about everything that can be known;
+#: comparing them to each other is comparing rounding noise.
+NOISE_FLOOR = 1e-9
 
-    Compared as whole dicts rather than on `passed` alone: a check that still
-    passes while its measured value has moved by an order of magnitude is a
-    finding, and reducing the record to a boolean would discard it.
+#: Above the floor, agreement is required to this relative tolerance. The widest
+#: real gap observed between two BLAS backends on the same numpy and scipy was
+#: about 4e-15 relative (`3-delta`, 0.1599935921759021 against …15), so 1e-6
+#: leaves six orders of headroom and would still catch a genuine regression.
+RELATIVE_TOLERANCE = 1e-6
+
+
+def test_the_ladder_has_the_same_shape_as_the_committed_record(executed, committed):
+    """Structure is exactly reproducible, so it is compared exactly.
+
+    The id, the phase, the name, the unit and the threshold are all written by
+    the source rather than computed from it. A change in any of them means the
+    ladder itself changed, which is never incidental.
     """
     mismatches = [
-        (c["id"], c, f) for c, f in zip(committed, executed, strict=True) if c != f
+        (c["id"], {k: c[k] for k in ("phase", "id", "name", "unit", "threshold")},
+         {k: f[k] for k in ("phase", "id", "name", "unit", "threshold")})
+        for c, f in zip(committed, executed, strict=True)
+        if any(c[k] != f[k] for k in ("phase", "id", "name", "unit", "threshold"))
     ]
     assert not mismatches, mismatches
+
+
+def test_every_rung_reaches_the_same_verdict_as_the_committed_record(executed, committed):
+    """`passed`, exactly. This is the record's actual content."""
+    mismatches = [
+        (c["id"], c["passed"], f["passed"])
+        for c, f in zip(committed, executed, strict=True)
+        if c["passed"] != f["passed"]
+    ]
+    assert not mismatches, mismatches
+
+
+def test_every_measured_value_agrees_with_the_committed_one(executed, committed):
+    """Values agree to within the floating-point floor — not bit-for-bit.
+
+    **This started life as a bit-for-bit dict comparison and was wrong.** It
+    passed on the machine that generated the record and failed on the first
+    genuinely fresh clone: 20 of the 40 values differ in their last bits between
+    BLAS backends, on identical numpy 2.5.1 and scipy 1.18.0. `L3` reads
+    1.4218748958580352e-15 in one and 1.2560739669470201e-15 in the other. Every
+    one of the 20 still passes its threshold, because every one is a residual
+    whose *magnitude* is the finding and whose last bits are the platform's.
+
+    Demanding bit-identity there would have made this suite pass in exactly one
+    directory on exactly one machine — the failure mode this entire repository
+    exists to close, reintroduced by the test written to close it. So:
+
+    * below `NOISE_FLOOR`, two values agree about everything knowable, and only
+      the verdict is compared (which the test above does);
+    * above it, they must agree to `RELATIVE_TOLERANCE`, which is six orders
+      wider than the widest observed platform gap and still tight enough that a
+      real regression cannot hide in it.
+    """
+    mismatches = []
+    for c, f in zip(committed, executed, strict=True):
+        want, got = c["value"], f["value"]
+        if not isinstance(want, (int, float)) or not isinstance(got, (int, float)):
+            if want != got:  # "nan", "inf", None, or a string — compare exactly
+                mismatches.append((c["id"], want, got))
+            continue
+        if abs(want) <= NOISE_FLOOR and abs(got) <= NOISE_FLOOR:
+            continue
+        scale = max(abs(want), abs(got))
+        if abs(want - got) > RELATIVE_TOLERANCE * scale:
+            mismatches.append((c["id"], want, got, abs(want - got) / scale))
+    assert not mismatches, mismatches
+
+
+def test_the_values_that_are_exact_by_construction_are_exact(executed, committed):
+    """Counts are integers, and integers do not drift between BLAS backends.
+
+    Without this, the tolerance above would quietly excuse a solver that took 78
+    iterations where the record says 77 — a real change, well inside 1e-6 of it.
+    """
+    exact = {c["id"] for c in committed if isinstance(c["value"], float)
+             and c["value"].is_integer() and abs(c["value"]) >= 1}
+    assert exact, "no integral-valued rungs found — this guard would be vacuous"
+    for c, f in zip(committed, executed, strict=True):
+        if c["id"] in exact:
+            assert c["value"] == f["value"], (c["id"], c["value"], f["value"])
 
 
 def test_all_forty_pass(executed):

@@ -5,10 +5,9 @@ __pycache__/
 *.egg-info/
 .DS_Store
 
-# Generated geometry — deformed assets and figures reproduce, so they are not
-# tracked.
+# Deformed assets written by the example. `--out` can point anywhere, so this is
+# by extension rather than by directory.
 *.ply
-*.png
 
 # ── tracked by exception: the sample asset ──────────────────────────────────
 # `data/penguin_original.ply` is 5.6 MB and the penguin example cannot run
@@ -19,3 +18,15 @@ __pycache__/
 # workarounds for a constraint that does not exist; that open item is closed the
 # same way (#20).
 !data/penguin_original.ply
+
+# ── and nothing under evidence/ is ever ignored ─────────────────────────────
+# Evidence is copied in and pinned by sha256; none of it is generated here, so an
+# extension-based rule has no business matching any of it. This negation is not
+# hypothetical tidiness: a blanket `*.png` briefly lived above and shadowed the
+# six vendored characterisation figures. They survived only because they had been
+# committed before the rule was added — a fresh `git add` would have dropped
+# them, and the repository would have cloned without the figures Chapter 6 cites
+# while every test still passed. `tests/test_suite_shape.py` now asserts this.
+!evidence/**
+
+

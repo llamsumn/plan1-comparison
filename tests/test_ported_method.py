@@ -183,7 +183,14 @@ def test_no_file_in_the_repository_resolves_a_sibling_working_tree():
     """
     offenders: list[str] = []
     for path in REPO_ROOT.rglob("*.py"):
-        if "__pycache__" in path.parts or ".git" in path.parts:
+        # Skip anything under a dot-directory. A virtualenv at `.venv/` is the
+        # normal way to run the green gate, and `site-packages` is full of
+        # third-party `parents[2]` climbs — torchgen and sympy both have one.
+        # Scanning them says nothing about this repository and made the check
+        # fail on the first genuinely fresh clone.
+        if any(part.startswith(".") for part in path.relative_to(REPO_ROOT).parts):
+            continue
+        if "__pycache__" in path.parts:
             continue
         if path.resolve() == Path(__file__).resolve():
             continue

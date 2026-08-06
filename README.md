@@ -22,6 +22,21 @@ evidence/             the run records, cluster sources and characterisation outp
 `tests/test_ported_method.py::test_no_file_in_the_repository_resolves_a_sibling_working_tree`
 parses every module and fails on a string naming a sibling or a `parents[2]` climb.
 
+## Verify it — the green gate
+
+One command. It installs the repository, runs the whole suite, regenerates the published
+table and diffs it against the committed copy. Anything less than all four is not the claim
+being made.
+
+```bash
+git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv && . .venv/bin/activate && ./scripts/verify.sh
+```
+
+Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
+working trees present and nothing pre-installed, this reports **419 passed** and a clean
+table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
+fewer would fail rather than look like success.
+
 **The evidence travels with the repository.** Every number in the table resolves under
 `evidence/`, which used to be a sibling `~/3D` checkout. While it was, three test modules
 skipped silently on any other machine — 80 of 140 tests — and the published table
@@ -34,7 +49,8 @@ a file that changed fails, and so does one that arrived with no row.
 `arap_core/` (10 modules, 1,709 lines) and `box_b/edge_weights.py` (116 lines) come from
 `arap-deform-3dgs@ede5fd3`. Every ported file records its source repository, source commit
 and sha256 under `[[ported]]` in `evidence/PROVENANCE.toml`, asserted in both directions by
-`tests/test_ported_method.py` — 19 files, one row each. The reference rule's hash is also
+`tests/test_ported_method.py` — 23 files, one row each, 19 from the method repository and 4
+from the archive with the solver diagnostic. The reference rule's hash is also
 what the published table's footer prints, so editing `box_b/edge_weights.py` fails the
 conformance test, the footer check and the table build together.
 

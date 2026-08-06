@@ -69,14 +69,14 @@ import pytest
 #: | #19 — characterisation provenance, row counts, verdict counts | +90 |
 #: | #16 — the 31 ported method tests | +31 |
 #: | #16 — `test_ported_method.py`, plus one conformance test | +46 |
-#: | #17 — `test_diagnostic.py` | +6 |
-#: | #18 — this module | +11 |
+#: | #17 — `test_diagnostic.py` | +9 |
+#: | #18 — this module | +12 |
 #:
 #: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 45
 #: `[[file]]` rows and 23 `[[ported]]` rows, and several checks run once per row.
 #: That is why the number moves whenever evidence lands, and why it is asserted
 #: here rather than left to be noticed.
-EXPECTED_TESTS = 415
+EXPECTED_TESTS = 419
 
 
 def test_the_whole_suite_is_collected(pytestconfig):
@@ -177,6 +177,50 @@ def test_the_runtime_dependencies_are_declared_and_importable(declared):
     pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
     assert declared in pyproject["project"]["dependencies"]
     assert importlib.import_module(declared)
+
+
+def test_no_file_the_repository_depends_on_is_gitignored():
+    """A tracked file that `.gitignore` also matches is a fresh clone waiting to fail.
+
+    Found by actually cloning, which is the only way this shows up: a blanket
+    `*.png` rule added with the method port matched the six vendored
+    characterisation figures added one commit earlier. They stayed in the
+    repository — git keeps tracking what it already tracks — so every test passed
+    and `git status` was clean. But the *rule* said they should not be there, and
+    the next person to re-add them, or to build a clone from a file list rather
+    than from history, would ship a repository missing the figures Chapter 6
+    cites, with a green suite.
+
+    Asserted over every path the repository actually depends on: the evidence base
+    and everything ported. `git` is already a hard requirement of the green gate
+    (`scripts/verify.sh` diffs the regenerated table with it), so its absence is
+    an error here rather than a reason to skip.
+    """
+    import subprocess
+
+    from plan1.provenance import REPO_ROOT, load_evidence
+
+    record = load_evidence()
+    paths = [f"evidence/{entry.path}" for entry in record.files]
+    paths += [entry.path for entry in record.ported]
+
+    # `--no-index` is load-bearing. Without it `git check-ignore` reports nothing
+    # for a file that is already tracked — which is every file this test cares
+    # about, and precisely the blind spot that let the `*.png` rule sit unnoticed
+    # over six tracked figures. A guard with the same blind spot as the bug is not
+    # a guard; this was caught by red-checking it and watching it pass.
+    result = subprocess.run(
+        ["git", "check-ignore", "--no-index", "--stdin"],
+        input="\n".join(paths),
+        capture_output=True,
+        text=True,
+        cwd=REPO_ROOT,
+    )
+    # exit 0 = at least one path is ignored; 1 = none are, which is what we want
+    assert result.returncode == 1, (
+        f"these are depended on but .gitignore matches them, so a fresh "
+        f"`git add` would silently drop them:\n{result.stdout}"
+    )
 
 
 def test_the_test_extra_declares_torch():

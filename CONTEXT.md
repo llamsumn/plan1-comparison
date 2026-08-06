@@ -73,7 +73,7 @@ is identifiable: a reader can always tell *which* bytes this table was built fro
 | not here | why |
 |---|---|
 | `box_b/descriptors.py`, `box_b/noise.py` and their 47 tests | the geometry reader. Paused on a diagnosed shrinking-ball defect — this is the risk the escape plan exists to be safe from. The B2 seam (`box_b/edge_weights.py`) is complete and standing, and it is the only part that travels. |
-| boxes A and B of the method | not built. This repository ships what is validated. |
+| box A of the method, and the unbuilt part of box B | box A is not built at all; box B's v3 design (mode + magnitude + anchoring, per region) is designed and not yet built. This repository ships what is validated — which of box B means the B2 edge-weight seam, and that *is* here. |
 | the characterisation study's **code** | results travel, code is cited. Its outputs are under `evidence/characterisation/` with the command that wrote each one; forking a living study into a frozen artifact would hand a reader two versions to reconcile. |
 | a second asset's (trex) sweep, ~1.4 MB | no manifest row binds it, no published number derives from it. Recorded as an exclusion with a reason, not silently absent. |
 | the specs, pre-registration and verdicts | they live in the archive by two-repo discipline. Cited from here, never copied. |
