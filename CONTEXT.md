@@ -5,7 +5,7 @@ _The single-context orientation doc for this repository. Read this before changi
 ## What this repository is
 
 **The escape plan.** One published comparison table, and the whole evidence chain behind it,
-kept as a single reviewable unit that a examiner can clone and check.
+kept as a single reviewable unit that an examiner can clone and check.
 
 The test every decision here is measured against:
 
@@ -109,7 +109,11 @@ Stated fully in `README.md`; named here so the orientation is complete.
 
 ## Open items
 
-_None. The repository resolves nothing outside itself._
+_None that anything here resolves: the repository reads nothing outside itself._ This
+heading is about **resolution** — paths, imports, siblings — and not about every loose
+end. One citation in `THIRD_PARTY.md` still carries a `VERIFY` flag on its venue; that
+is attribution metadata a reader can check against the upstream project, not something
+this repository resolves at run time.
 
 The last external resolution went with [#16](https://github.com/llamsumn/3D-arap/issues/16),
 which ported the method. Three places had reached for a sibling `../arap-deform-3dgs`:

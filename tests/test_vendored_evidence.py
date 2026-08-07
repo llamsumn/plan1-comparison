@@ -230,15 +230,34 @@ def test_the_published_byline_cites_a_path_that_exists_in_this_repository():
     `all_record/deformsplat_corroboration/plan1_prereg.md`, which is in an archive
     they do not have. A citation that resolves nowhere is worse than none: it claims
     the rules were fixed in advance while making the claim uncheckable.
+
+    Scoped to the whole package rather than to `render.py`. Bound to the byline
+    alone, this passed while `saturation.py`, `assemble.py` and `__init__.py` still
+    sent a reader to the archive path in their module docstrings — including the
+    module that implements the pre-registered rule, which is the file most likely to
+    be opened. A guard that covers one instance of a defect the repository claims to
+    have closed is how the other three survived being fixed.
     """
     from plan1 import render
 
-    source = Path(render.__file__).read_text()
-    assert "all_record/deformsplat_corroboration" not in source.replace(
-        "# The byline used to cite `all_record/deformsplat_corroboration/plan1_prereg.md`", ""
+    # `render.py` keeps the old path in a comment that explains why it moved. That
+    # sentence is the record of the fix, so it is whitelisted by exact text rather
+    # than by exempting the file — anything else in it still fails.
+    historical = "# The byline used to cite `all_record/deformsplat_corroboration/plan1_prereg.md`"
+
+    package = Path(render.__file__).parent
+    offenders = [
+        str(path.relative_to(EVIDENCE_ROOT.parent))
+        for path in sorted(package.glob("*.py"))
+        if "all_record/deformsplat_corroboration" in path.read_text().replace(historical, "")
+    ]
+    assert not offenders, (
+        f"these cite the pre-registration at a path no reader of this repository "
+        f"can reach; it is vendored at evidence/record/plan1_prereg.md: {offenders}"
     )
+
     cited = "evidence/record/plan1_prereg.md"
-    assert cited in source
+    assert cited in Path(render.__file__).read_text()
     assert (EVIDENCE_ROOT.parent / cited).is_file()
 
 

@@ -132,17 +132,19 @@ attribution.
 
 ### Bibliography entry
 
-**Unlike the DeformSplat entry, this one is not verified.** Nothing on this machine
-carries a DiVa360 author list, so it is left as an explicit placeholder rather than a
-plausible guess: an unverified citation that looks finished is worse than one that
-announces itself, and this project already carries proof of that (`luo2024gesi`, a
-self-flagged placeholder that survived into cited text). It is filled from the upstream
-`README` before anything cites it.
+The author list was a `TODO-VERIFY-AUTHORS` placeholder while nothing on this machine
+carried one — an unverified citation that looks finished is worse than one that
+announces itself, and this project carries proof of that (`luo2024gesi`, a self-flagged
+placeholder that survived into cited text). It is now filled from the upstream `README`,
+which is the source this file named in advance, and transcribed from the citation block
+published there rather than reconstructed.
 
 ```bibtex
 @inproceedings{diva360,
+  author    = {Lu, Cheng-You and Zhou, Peisen and Xing, Angela and Pokhariya,
+               Chandradeep and Dey, Arnab and Shah, Ishaan N and Mavidipalli, Rugved
+               and Hu, Dylan and Comport, Andrew and Chen, Kefan and Sridhar, Srinath},
   title     = {{DiVa-360}: The Dynamic Visual Dataset for Immersive Neural Fields},
-  author    = {TODO-VERIFY-AUTHORS},
   booktitle = {Proceedings of the IEEE/CVF Conference on Computer Vision and
                Pattern Recognition (CVPR)},
   year      = {2024},

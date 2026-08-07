@@ -11,9 +11,9 @@ same state. Failure raises; it does not warn. Prior experience on this project i
 that a silently-wrong comparison produces plausible numbers, which is the worst
 outcome available.
 
-Rules implemented here are declared in
-``all_record/deformsplat_corroboration/plan1_prereg.md`` and must not be changed
-without recording a deviation there.
+Rules implemented here are declared in ``evidence/record/plan1_prereg.md``,
+vendored verbatim from the archive, and must not be changed without recording a
+deviation there.
 """
 
 from __future__ import annotations

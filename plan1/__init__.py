@@ -2,8 +2,8 @@
 
 Implements Deliverable 1 / tier 1 of the archive spec
 ``docs/specs/plan-1-comparison-assembly-spec.md`` in the ``llamsumn/3D-arap``
-archive, under the rules pre-registered in
-``all_record/deformsplat_corroboration/plan1_prereg.md``.
+archive, under the rules pre-registered in ``evidence/record/plan1_prereg.md``,
+which is vendored into this repository.
 
 Three pieces, one seam:
 

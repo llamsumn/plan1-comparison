@@ -1,8 +1,8 @@
 """saturation.py — the pre-registered rule that selects the reported rigidity.
 
-Declared in `all_record/deformsplat_corroboration/plan1_prereg.md` §3, before any
-run, so that the choice of reported row is made by a criterion rather than by eye
-once the numbers arrive:
+Declared in `evidence/record/plan1_prereg.md` §3, before any run, so that the
+choice of reported row is made by a criterion rather than by eye once the numbers
+arrive:
 
     The reported imposed-rigidity setting is the SMALLEST rigidity value whose PSNR
     falls within the replicate band of the sweep maximum.

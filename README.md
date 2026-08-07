@@ -33,7 +33,7 @@ git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **486 passed** and a clean
+working trees present and nothing pre-installed, this reports **487 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
