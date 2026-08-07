@@ -74,11 +74,12 @@ def test_every_file_under_evidence_has_a_provenance_row():
 def test_the_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
     """Both checks above pass trivially against an empty directory.
 
-    47 = 24 (#15) + 21 (#19) + 2 (R1). The 24: nine run directories × two stats
-    files = 18, three run logs, two archived cluster sources, one spike console.
-    The 21: every file under `~/3D/characterisation/artifacts/` except its
-    `.DS_Store` — #19's body names 17, and the four it omits are each the input a
-    named document asserts against, so they travelled too. The 2: the
+    47 = 24 run/cluster + 21 characterisation + 2 governing documents. The 24:
+    nine run directories × two stats files = 18, three run logs, two archived
+    cluster sources, one spike console. The 21: every characterisation artifact
+    except a `.DS_Store` — seventeen were named up front, and the four beyond them
+    are each the input a named document asserts against, so they travelled too.
+    Every source path is recorded per file in `PROVENANCE.toml`. The 2: the
     pre-registration and the verdict, cited sixteen times and shipped zero until
     R1. All departures are on the record in `PROVENANCE.toml`.
     """

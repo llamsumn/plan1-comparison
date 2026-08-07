@@ -11,9 +11,9 @@ out to ``git``. The content hash is the primary identifier in any case — it st
 meaningful for the cluster sources, which are not in any repository.
 
 The evidence base itself lives under ``evidence/`` and is described by
-``evidence/PROVENANCE.toml``. Vendoring it is what took ``~/3D`` out of this
-repository's runtime graph; recording where every byte came from is what keeps the
-copy auditable against an original.
+``evidence/PROVENANCE.toml``. Vendoring it is what took every external path out of
+this repository's runtime graph; recording where every byte came from is what keeps
+the copy auditable against an original.
 """
 
 from __future__ import annotations
@@ -54,11 +54,12 @@ def require_vendored(path: Path, what: str) -> Path:
 
     Called at module scope by the three suites that read the evidence base. Each
     of them used to carry ``pytestmark = pytest.mark.skipif(not path.is_file())``
-    instead, from the era when the evidence lived in a sibling ``~/3D`` checkout
-    and its absence was the normal case. Since #15 it is not: the file is in the
-    repository, and its absence means the repository is broken.
+    instead, from the era when the evidence lived in a checkout outside this
+    repository and its absence was the normal case. Since it was vendored that is
+    no longer so: the file is in the repository, and its absence means the
+    repository is broken.
 
-    The distinction is the whole of #18. A skip subtracts from the total and
+    The distinction is the whole point of raising here. A skip subtracts from the total and
     leaves the summary line green, so the suite reports a smaller number that
     looks exactly like the larger one — 60 passed where 140 should have run, with
     nothing in the output saying so. Raising here turns that into a collection

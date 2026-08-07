@@ -37,11 +37,11 @@ DEFAULT_MANIFEST = REPO / "manifests" / "penguin_deformsplat.toml"
 COMMITTED_TABLE = REPO / "out" / "comparison_table.md"
 
 #: The tested reference rule the conformance suite drives the deployed one
-#: against. It used to be resolved from a sibling `../arap-deform-3dgs` checkout,
+#: against. It used to be resolved from a sibling checkout outside this repository,
 #: which is why this table regenerated differently — or not at all — on any
-#: machine that did not have one. #16 ported it; it is now a file in this
-#: repository, checked against the identity the published table was assembled
-#: with. Nothing here resolves `..` any more.
+#: machine that did not have one. The method port brought it in; it is now a file
+#: in this repository, checked against the identity the published table was
+#: assembled with. Nothing here resolves `..` any more.
 REFERENCE_RULE = REPO / "box_b" / "edge_weights.py"
 
 #: The two archived cluster sources, now vendored. The manifest cites the second

@@ -5,9 +5,10 @@ under rules pre-registered before any of it ran.
 
 This repository is the **evidence chain behind one published table**, kept as a single
 reviewable unit — and, since the method was ported in, the code that produced the
-deformation as well. The planning record (specs, pre-registration, verdicts) lives in the
-`llamsumn/3D-arap` archive; the ongoing method development continues in `arap-deform-3dgs`,
-which this repository no longer depends on at run time.
+deformation as well. The pre-registration and the verdict that govern it are vendored
+verbatim at `evidence/record/`; where copied code came from is recorded per file in
+`evidence/PROVENANCE.toml`. Nothing here resolves anything outside this directory at
+run time.
 
 ```
 arap_core/            the ARAP solver and the 3DGS carry — ported, box C + D
@@ -18,7 +19,7 @@ evidence/             the run records, cluster sources and characterisation outp
 ```
 
 **Nothing here resolves anything outside this directory.** No sibling working tree, no
-`~/3D`, no `..`. That is asserted rather than claimed:
+absolute path off this repository, no `..`. That is asserted rather than claimed:
 `tests/test_ported_method.py::test_no_file_in_the_repository_resolves_a_sibling_working_tree`
 parses every module and fails on a string naming a sibling or a `parents[2]` climb.
 
@@ -38,9 +39,9 @@ table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that
 fewer would fail rather than look like success.
 
 **The evidence travels with the repository.** Every number in the table resolves under
-`evidence/`, which used to be a sibling `~/3D` checkout. While it was, three test modules
-skipped silently on any other machine — 80 of 140 tests — and the published table
-regenerated into something different without saying so. `evidence/PROVENANCE.toml` records
+`evidence/`. It used to resolve out of a checkout elsewhere on the authoring machine, and
+while it did, three test modules skipped silently on every other machine — 80 of 140 tests
+— and the published table regenerated into something different without saying so. `evidence/PROVENANCE.toml` records
 the source path and sha256 of all 47 copied files, and asserts them in both directions:
 a file that changed fails, and so does one that arrived with no row.
 
@@ -101,7 +102,7 @@ the `*.ply` ignore rule; the reason is recorded in `.gitignore` where a reader w
 
 ### The solver's evidence runs
 
-`arap-deform-3dgs`'s own suite never drives the solver — no test there touches `driver`,
+The solver arrived here with nothing that drives it — no test touched `driver`,
 `global_step` or `local_step`. `diagnostics/` carries the 40-rung ladder that does, and
 `tests/test_diagnostic.py` **re-executes** all six phases and compares every record against
 `diagnostics/arap_core_diagnostic.json`, field by field. It does not compare the committed
@@ -120,7 +121,7 @@ suite rather than behind a marker.
 
 `evidence/characterisation/` holds the study that motivated a *predicted* rigidity field
 rather than a hand-tuned one: the K × γ grid, the ρ × δ mask grid, the R-swing diagnostic,
-and the two §6.2 figures. Results travel; the study code stays in `~/3D` and is cited —
+and the two §6.2 figures. Results travel; the study code is cited rather than copied —
 every vendored file records the command that wrote it, the date, and the verdict certifying
 it.
 

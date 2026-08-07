@@ -13,9 +13,9 @@ This suite checks the same rule from the other side, and it is what the
 pre-registered wiring gate rests on locally (plan1_prereg.md §6):
 
 * the **reference** is the tested ``scale_interior_edges``, ported into this
-  repository from ``arap-deform-3dgs@ede5fd3`` by #16 and pinned by sha256 in
-  ``evidence/PROVENANCE.toml``. It used to be *imported from a sibling working
-  tree*, which meant the test noticed divergence but only ran at all on a machine
+  repository and pinned by sha256 in ``evidence/PROVENANCE.toml``, which records
+  the source repository and commit it came from. It used to be *imported from a
+  sibling working tree*, which meant the test noticed divergence but only ran on a machine
   that had that sibling. That trade is now the other way round and is argued in
   ``CONTEXT.md``: divergence detection protects a living codebase, and Plan 1 is
   frozen. ``test_the_vendored_reference_rule_is_the_one_that_was_ported`` is what

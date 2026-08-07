@@ -10,8 +10,8 @@ gives at greater length: a row whose file changed must fail, and so must a file
 that arrived with no row. The second is the one that lets code accumulate
 unrecorded.
 
-**And the thing this file exists to prevent.** Before #16, three separate places
-resolved a sibling `../arap-deform-3dgs` working tree, and the suite silently
+**And the thing this file exists to prevent.** Before the port, three separate
+places resolved a sibling working tree, and the suite silently
 reported a different number depending on what else was checked out beside it. The
 last test here is the guard against that coming back by any route.
 """
@@ -38,8 +38,9 @@ NOT_PORTED = ("box_b/descriptors.py", "box_b/noise.py")
 
 #: Every directory a port writes into. Anything executable outside `plan1/`,
 #: `scripts/` and `tests/` was copied from another repository and needs a row —
-#: `arap_core`, `box_b`, `examples`, `data` and `tests/method` from
-#: `arap-deform-3dgs` (#16), `diagnostics` from the archive (#17).
+#: `arap_core`, `box_b`, `examples`, `data` and `tests/method` from the method
+#: repository, `diagnostics` from the archive. Both are named per row in
+#: `PROVENANCE.toml`, which is where provenance is recorded.
 PORTED_TREES = (
     "arap_core",
     "box_b",
@@ -73,9 +74,11 @@ def test_every_ported_file_hashes_to_its_recorded_value(entry):
 def test_every_ported_row_names_its_repository_commit_and_reason(entry):
     """Two repositories supply ported code, and both pin a real commit.
 
-    `arap-deform-3dgs` supplied the method (#16); the archive supplied the solver
-    diagnostic (#17). A 40-hex commit is required of both — "copied from the
-    archive" without a snapshot is not provenance, it is a memory.
+    The method repository supplied the method; the archive supplied the solver
+    diagnostic. A 40-hex commit is required of both — "copied from the archive"
+    without a snapshot is not provenance, it is a memory. The two names below are
+    the authoritative record of where this code came from, which is why they are
+    asserted here rather than described in prose.
     """
     assert entry.source_repo in {"arap-deform-3dgs", "3D-arap"}, entry.source_repo
     assert re.fullmatch(r"[0-9a-f]{40}", entry.source_commit), entry.source_commit
@@ -162,7 +165,7 @@ def test_the_paused_geometry_reader_did_not_travel(path):
 
 
 def test_the_thirty_one_method_tests_are_all_of_the_method_tests():
-    """47 of `arap-deform-3dgs`'s 78 tests belong to the paused track. 31 came."""
+    """47 of the method repository's 78 tests belong to the paused track. 31 came."""
     assert len(list((REPO_ROOT / "tests" / "method").glob("test_*.py"))) == 5
 
 
@@ -175,12 +178,19 @@ SIBLING = "arap-deform" "-3dgs"
 def _live_strings_and_parent_climbs(tree: ast.AST) -> list[str]:
     """String literals and `…parents[2]` subscripts in *executing* code.
 
-    Parsed rather than grepped, because prose is not code. `CONTEXT.md`,
-    `PROVENANCE.toml` and the docstrings in this suite all have to name
-    `arap-deform-3dgs` — that is the provenance of the copy and recording it is
-    required. A line of text mentioning the sibling is a fact about where the code
-    came from; an expression resolving it is the dependency #16 removed. Only the
-    second is a finding, so only the second is looked for.
+    Parsed rather than grepped, because prose is not code. `PROVENANCE.toml` names
+    the source repository per row — that is the provenance of the copy and recording
+    it is required. A line of text naming the sibling is a fact about where the code
+    came from; an expression resolving it is the dependency the port removed. Only
+    the second is a finding, so only the second is looked for.
+
+    The prose in this repository no longer names it, and that is deliberate rather
+    than a gap. Provenance is recorded in one authoritative place; repeating it
+    across docstrings said nothing `PROVENANCE.toml` does not say better, and much
+    of what it said was about how this work is positioned relative to other work
+    rather than about where a byte came from. `SIBLING` below is the exception and
+    has to be: it is the needle this guard hunts, and deleting it would leave a
+    check that passes because it stopped looking.
     """
     docstrings = {
         node.body[0].value

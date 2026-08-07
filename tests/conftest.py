@@ -10,10 +10,10 @@ import pytest
 from plan1.manifest import Manifest, ManifestRow
 from plan1.records import Measurement, RunRecord
 
-# This file used to inject a sibling `../../arap-deform-3dgs` onto `sys.path` so
-# the conformance test could import the reference rule. That injection is the
+# This file used to inject a sibling working tree onto `sys.path` so the
+# conformance test could import the reference rule. That injection is the
 # reason the suite reported a different number depending on what else happened to
-# be checked out beside it. #16 ported the rule; `box_b` is now a package in this
+# be checked out beside it. The port brought the rule in; `box_b` is now a package in this
 # repository and is imported like any other. Nothing here touches `sys.path`.
 
 #: The archived step-0 fingerprint, at full precision, shared by every penguin run.

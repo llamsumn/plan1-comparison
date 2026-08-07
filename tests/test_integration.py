@@ -3,9 +3,9 @@
 These are the tests that read real evidence rather than fixtures — they are what
 proves the readers, the gate and the arithmetic work on the archived runs and not
 only on numbers made up for the purpose. The evidence is vendored under
-`evidence/`, so they run on a bare clone. They previously resolved a sibling
-`~/3D` checkout and skipped in its absence, which quietly removed all 18 of them
-on every machine but one.
+`evidence/`, so they run on a bare clone. They previously resolved a checkout
+outside this repository and skipped in its absence, which quietly removed all 18
+of them on every machine but one.
 
 **Two worlds, both live.** ``real_table`` is what the manifest publishes today: the
 baseline bound to its own recovered statistics record, every input at full
@@ -30,8 +30,8 @@ from plan1.render import render_markdown
 
 MANIFEST = Path(__file__).resolve().parents[1] / "manifests" / "penguin_deformsplat.toml"
 
-#: The vendored evidence base, in the repository. This was a sibling `~/3D`
-#: checkout, and its absence silently removed all 18 tests below.
+#: The vendored evidence base, in the repository. This was a checkout outside it,
+#: and its absence silently removed all 18 tests below.
 ARCHIVE = EVIDENCE_ROOT
 
 #: The console line the baseline row was bound to before preflight recovered the

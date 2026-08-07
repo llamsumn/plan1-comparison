@@ -50,8 +50,8 @@ import torch
 
 from plan1.provenance import EVIDENCE_ROOT, require_vendored, sha256_file
 
-#: The vendored evidence base. This used to be a sibling `~/3D` checkout, which
-#: made this whole module skip on any machine that did not have one.
+#: The vendored evidence base. This used to be a checkout outside this repository,
+#: which made this whole module skip on any machine that did not have one.
 ARCHIVE = EVIDENCE_ROOT
 
 #: The call site that ran ρ = 32 and ρ = 64. Archived byte-exact; the manifest cites

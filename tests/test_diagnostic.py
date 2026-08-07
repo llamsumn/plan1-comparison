@@ -1,10 +1,10 @@
 """The solver's strongest evidence, as something that executes.
 
-`arap-deform-3dgs`'s suite does not drive the solver. No test there touches
-`driver`, `global_step` or `local_step` — the solver's entire evidence was an
-inline assertion in `run_penguin.py` plus a JSON file in an archive nobody ran.
-Now that this repository ships the solver (#16), it ships the solver's validation
-as something a reader can run rather than something they can read.
+The solver arrived with nothing that drives it. No test touched `driver`,
+`global_step` or `local_step` — its entire evidence was an inline assertion in
+`run_penguin.py` plus a JSON file nobody ran. Now that this repository ships the
+solver, it ships the solver's validation as something a reader can run rather
+than something they can read.
 
 **The ladder is re-executed, not re-read.** Comparing a committed JSON against
 itself is the tautology this project has shipped twice — the retracted `T0.1`
@@ -238,7 +238,7 @@ def test_the_driver_and_both_steps_are_actually_executed():
 
 # ── it runs with no sibling and no archive ──────────────────────────────────
 def test_the_diagnostic_resolves_nothing_outside_this_repository(executed):
-    """It used to live in `~/3D` and import `arap_core` from beside it.
+    """It used to live outside this repository and import `arap_core` from beside it.
 
     Here `ROOT` is this repository, so the real-asset smoke check (`G6`) picks up
     the ported `data/penguin_original.ply` — 23,548 Gaussians — rather than

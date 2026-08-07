@@ -1,9 +1,9 @@
 """plan1 — the penguin ↔ DeformSplat comparison assembler.
 
-Implements Deliverable 1 / tier 1 of the archive spec
-``docs/specs/plan-1-comparison-assembly-spec.md`` in the ``llamsumn/3D-arap``
-archive, under the rules pre-registered in ``evidence/record/plan1_prereg.md``,
-which is vendored into this repository.
+Assembles the comparison from archived run records under the rules pre-registered
+in ``evidence/record/plan1_prereg.md``, which is vendored into this repository and
+is the whole of what governs the assembly. The rules are the comparability gate,
+the precision policy and the saturation rule; each is asserted in the suite.
 
 Three pieces, one seam:
 
