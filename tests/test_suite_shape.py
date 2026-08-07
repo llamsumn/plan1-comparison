@@ -74,9 +74,9 @@ import pytest
 #: | R2 — `test_upstream_diff.py`, the third-party attribution guard | +21 |
 #: | R3 — the sample asset's dataset attribution | +3 |
 #: | R10 — `test_projection_figure.py`, the §6.4 figure | +29 |
-#: | R1 — the vendored pre-registration and verdict | +14 |
+#: | R1 — the vendored pre-registration and verdict | +15 |
 #:
-#: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 45
+#: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 47
 #: `[[file]]` rows and 23 `[[ported]]` rows, and several checks run once per row.
 #: That is why the number moves whenever evidence lands, and why it is asserted
 #: here rather than left to be noticed.
@@ -90,10 +90,10 @@ import pytest
 #: R1 is the one that moves the number the old way. It vendors two files, and
 #: `PROVENANCE.toml` rows are parametrised three ways in
 #: `test_vendored_evidence.py` — hash, source-and-reason, and the no-escape check —
-#: so two rows are +6 before a single new test is written. The other +8 are the
+#: so two rows are +6 before a single new test is written. The other +9 are the
 #: guards on the documents themselves and on the byline that used to cite a path no
 #: reader could reach.
-EXPECTED_TESTS = 486
+EXPECTED_TESTS = 487
 
 
 def test_the_whole_suite_is_collected(pytestconfig):

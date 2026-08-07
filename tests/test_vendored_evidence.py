@@ -179,6 +179,26 @@ def test_each_governing_document_pins_the_archive_revision_it_came_from(path):
     assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", entry.archive_date or ""), entry.archive_date
 
 
+def test_the_pre_registration_records_when_it_was_added_not_only_when_it_moved():
+    """Two dates, because one of them alone reads backwards.
+
+    `archive_date` is the revision that travelled: 2026-08-06, which is *after* the
+    2026-08-05 runs and looks like the rule was written to fit them. `archive_first_date`
+    is when the file was added — 2026-08-05, in the commit that also carried the
+    cluster handoff that dispatched those runs. Same day, not the day after.
+
+    Same-day granularity still cannot prove precedence and this is not asked to. It
+    removes a false impression; `test_archived_sweep_as_it_stands_is_not_saturated`
+    is what carries the claim.
+    """
+    entry = next(e for e in RECORD.files if e.path == "record/plan1_prereg.md")
+    assert re.fullmatch(r"[0-9a-f]{40}", entry.archive_first_commit or "")
+    assert entry.archive_first_date == "2026-08-05"
+    assert entry.archive_first_date <= (entry.archive_date or ""), (
+        "the file cannot have been added after the revision that travelled"
+    )
+
+
 def test_only_the_governing_documents_claim_an_archive_revision():
     claimed = {e.path for e in RECORD.files if e.archive_commit is not None}
     assert claimed == set(RECORD_DOCS)

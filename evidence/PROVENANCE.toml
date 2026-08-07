@@ -208,7 +208,16 @@ source = "~/3D/all_record/deformsplat_corroboration/plan1_prereg.md"
 sha256 = "512165b44a99e562471edfeb0f4b58620b08af91368940dd13f0147c4aa15e76"
 archive_commit = "1bef51b3c3d9853366f0faf8e6e7fa8dfdd012fe"
 archive_date = "2026-08-06"
+archive_first_commit = "39c541a7b004a58dc72badcef9387fd9fd0ccf68"
+archive_first_date = "2026-08-05"
 why = "the pre-registration. It declares the saturation rule, the comparability gate and the precision policy BEFORE the rows they select; `plan1/render.py` cites this path in the published table's byline, and until now cited one that shipped nowhere"
+# TWO DATES, AND THE DIFFERENCE BETWEEN THEM IS THE POINT. `archive_date` is when
+# the revision that travelled was committed; `archive_first_date` is when the file
+# was ADDED, in the commit that also carried the cluster handoff which dispatched
+# the runs. 2026-08-05 is the same day as the rho = 32 and rho = 64 runs, not the
+# day after — so the earlier field removes the backwards reading the later one
+# invites on its own. It still does not PROVE precedence: same-day granularity
+# cannot, and neither field should be asked to. The proof is the test named above.
 
 [[file]]
 path = "record/plan1_verdict.md"

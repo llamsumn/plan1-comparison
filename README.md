@@ -50,9 +50,14 @@ shipped zero times — including in the published table's own byline, which sent
 path in an archive they do not have. A citation that resolves nowhere is worse than none: it
 claims the rules were fixed in advance while making the claim uncheckable.
 
-Note what the recorded archive date does **not** say. It is `2026-08-06`, the commit those
-copies were taken from — and the runs the pre-registration licensed are dated `2026-08-05`,
-one day *earlier*. It is not evidence of precedence and is labelled as not being so.
+Note what the recorded archive dates do **not** say. Two are recorded, because one alone
+reads backwards. `archive_date` is `2026-08-06` — the revision that travelled, which is
+*after* the `2026-08-05` runs and would look like a rule written to fit them.
+`archive_first_date` is when the pre-registration was added: `2026-08-05`, in the commit
+that also carried the cluster handoff that dispatched those runs. Same day, not the day
+after.
+
+Neither is offered as proof, and same-day granularity could not provide it anyway.
 Precedence is carried by a test instead:
 `tests/test_saturation.py::test_archived_sweep_as_it_stands_is_not_saturated` applies the
 pre-registered rule to the sweep as it stood when the rule was written and asserts **not

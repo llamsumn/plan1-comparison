@@ -137,6 +137,8 @@ class VendoredFile:
     modification: str | None = None
     archive_commit: str | None = None
     archive_date: str | None = None
+    archive_first_commit: str | None = None
+    archive_first_date: str | None = None
 
 
 @dataclass(frozen=True)
@@ -247,6 +249,8 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
                 modification=entry.get("modification"),
                 archive_commit=entry.get("archive_commit"),
                 archive_date=entry.get("archive_date"),
+                archive_first_commit=entry.get("archive_first_commit"),
+                archive_first_date=entry.get("archive_first_date"),
             )
             for entry in blob.get("file", ())
         ),
