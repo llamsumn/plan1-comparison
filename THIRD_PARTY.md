@@ -30,7 +30,7 @@ assembled here, so they sit at the repository root where
 | project | DeformSplat |
 | upstream | `github.com/vision3d-lab/deformsplat` |
 | commit | `60955d67d066a8b26e1ed8a92f1c51c902a9ccab` (2025-12-02) |
-| paper | *DeformSplat*, SIGGRAPH Asia 2025 — arXiv:2509.22222 |
+| paper | Kim et al., *Rigidity-Aware 3D Gaussian Deformation from a Single Image*, SIGGRAPH Asia 2025 — arXiv:2509.22222. "DeformSplat" is the framework name |
 | licence | Apache License 2.0 — full text at `third_party/deformsplat/LICENSE` |
 | upstream `NOTICE` | none exists at that commit, so Apache-2.0 §4(c) does not apply |
 
@@ -82,22 +82,21 @@ diff that omits a real difference is not a diff.
 
 ### Bibliography entry
 
-The identifiers below are verified — repository, commit, licence, venue and arXiv id
-were each checked against the source. **The author lists are not**, and are left as
-explicit placeholders rather than plausible guesses: an unverified citation that looks
-finished is worse than one that announces itself, and this project already carries one
-(`luo2024gesi`, a self-flagged placeholder that survived into cited text). They are
-filled from the upstream `README`/arXiv listing before anything cites them.
+Repository, commit, licence, venue and arXiv id were each checked against the source.
+The author list is taken from the project's existing bibliography entry, which was
+compiled against the same arXiv id and carries a full author list rather than a
+placeholder — so it is transcribed, not guessed. The venue is still flagged for
+confirmation there and that flag is carried over rather than dropped.
 
 ```bibtex
 @inproceedings{kim2025deformsplat,
-  title     = {DeformSplat},
-  author    = {TODO-VERIFY-AUTHORS},
-  booktitle = {SIGGRAPH Asia},
+  author    = {Kim, Jinhyeok and Bang, Jaehun and Seo, Seunghyun and Joo, Kyungdon},
+  title     = {Rigidity-Aware 3D {G}aussian Deformation from a Single Image},
+  booktitle = {SIGGRAPH Asia 2025 Conference Papers},
   year      = {2025},
-  eprint    = {2509.22222},
-  archivePrefix = {arXiv},
-  note      = {Code: \url{https://github.com/vision3d-lab/deformsplat}, Apache-2.0}
+  note      = {Framework name: DeformSplat. arXiv:2509.22222. Code:
+               \url{https://github.com/vision3d-lab/deformsplat}, Apache-2.0.
+               VERIFY final venue details}
 }
 ```
 
@@ -133,7 +132,12 @@ attribution.
 
 ### Bibliography entry
 
-Same caveat as above — the author list is a placeholder until it is read off the source.
+**Unlike the DeformSplat entry, this one is not verified.** Nothing on this machine
+carries a DiVa360 author list, so it is left as an explicit placeholder rather than a
+plausible guess: an unverified citation that looks finished is worse than one that
+announces itself, and this project already carries proof of that (`luo2024gesi`, a
+self-flagged placeholder that survived into cited text). It is filled from the upstream
+`README` before anything cites it.
 
 ```bibtex
 @inproceedings{diva360,
