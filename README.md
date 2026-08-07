@@ -33,7 +33,7 @@ git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **472 passed** and a clean
+working trees present and nothing pre-installed, this reports **486 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
@@ -41,8 +41,24 @@ fewer would fail rather than look like success.
 `evidence/`, which used to be a sibling `~/3D` checkout. While it was, three test modules
 skipped silently on any other machine — 80 of 140 tests — and the published table
 regenerated into something different without saying so. `evidence/PROVENANCE.toml` records
-the source path and sha256 of all 45 copied files, and asserts them in both directions:
+the source path and sha256 of all 47 copied files, and asserts them in both directions:
 a file that changed fails, and so does one that arrived with no row.
+
+**The rules it was assembled under are in here too.** `evidence/record/` holds the
+pre-registration and the verdict, which were cited sixteen times across this repository and
+shipped zero times — including in the published table's own byline, which sent a reader to a
+path in an archive they do not have. A citation that resolves nowhere is worse than none: it
+claims the rules were fixed in advance while making the claim uncheckable.
+
+Note what the recorded archive date does **not** say. It is `2026-08-06`, the commit those
+copies were taken from — and the runs the pre-registration licensed are dated `2026-08-05`,
+one day *earlier*. It is not evidence of precedence and is labelled as not being so.
+Precedence is carried by a test instead:
+`tests/test_saturation.py::test_archived_sweep_as_it_stands_is_not_saturated` applies the
+pre-registered rule to the sweep as it stood when the rule was written and asserts **not
+saturated, continue at ρ = 32**. The rule forced two further cluster runs before anything
+could be published, and ρ = 64 turned the curve over. A rule that only ever agreed with what
+was already there would be worth nothing; this one is on record disagreeing.
 
 **The run logs carry the cluster account's identifiers** — a username, a hostname and
 home-directory paths — and they are left in deliberately. `_logs/plan1_preflight_20260805.txt`

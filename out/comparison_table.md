@@ -1,6 +1,6 @@
 # penguin_0217_0239 — imposed rigidity against the DeformSplat baseline
 
-_Assembled 2026-08-06 by `plan1.assemble` from the manifest at `manifests/penguin_deformsplat.toml`. Every number below traces to a named run; see Provenance. Rules pre-registered in `all_record/deformsplat_corroboration/plan1_prereg.md`._
+_Assembled 2026-08-06 by `plan1.assemble` from the manifest at `manifests/penguin_deformsplat.toml`. Every number below traces to a named run; see Provenance. Rules pre-registered in `evidence/record/plan1_prereg.md`._
 
 | rigidity source | information used | PSNR | SSIM | LPIPS |
 |---|---|---|---|---|

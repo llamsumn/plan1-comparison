@@ -14,6 +14,7 @@ whole repository is escaping from.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -73,14 +74,15 @@ def test_every_file_under_evidence_has_a_provenance_row():
 def test_the_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
     """Both checks above pass trivially against an empty directory.
 
-    45 = 24 (#15) + 21 (#19). The 24: nine run directories × two stats files = 18,
-    three run logs, two archived cluster sources, one spike console. The 21: every
-    file under `~/3D/characterisation/artifacts/` except its `.DS_Store` — #19's
-    body names 17, and the four it omits are each the input a named document
-    asserts against, so they travelled too. Both departures are on the record in
-    `PROVENANCE.toml`.
+    47 = 24 (#15) + 21 (#19) + 2 (R1). The 24: nine run directories × two stats
+    files = 18, three run logs, two archived cluster sources, one spike console.
+    The 21: every file under `~/3D/characterisation/artifacts/` except its
+    `.DS_Store` — #19's body names 17, and the four it omits are each the input a
+    named document asserts against, so they travelled too. The 2: the
+    pre-registration and the verdict, cited sixteen times and shipped zero until
+    R1. All departures are on the record in `PROVENANCE.toml`.
     """
-    assert len(RECORD.files) == len(vendored_files()) == 45
+    assert len(RECORD.files) == len(vendored_files()) == 47
 
 
 # ── the characterisation outputs carry what a derived artefact needs ────────
@@ -145,6 +147,87 @@ def test_the_three_verdict_counts_are_what_the_verdicts_actually_say():
         text = RECORD.resolve(path).read_text()
         assert text.count("| PASS") == expected, path
         assert f"{expected}/{expected}" in text, path
+
+
+# ── the two documents the artefact argues from ──────────────────────────────
+#: Cited sixteen times across this repository and shipped zero times until R1 —
+#: including in the published table's own byline, which named a path in an archive
+#: no reader could reach.
+RECORD_DOCS = {
+    "record/plan1_prereg.md": "pre-registration",
+    "record/plan1_verdict.md": "verdict",
+}
+
+
+@pytest.mark.parametrize("path", sorted(RECORD_DOCS))
+def test_the_governing_documents_travelled(path):
+    assert RECORD.resolve(path).is_file(), path
+    assert RECORD.resolve(path).read_text().strip(), f"{path} is empty"
+
+
+@pytest.mark.parametrize("path", sorted(RECORD_DOCS))
+def test_each_governing_document_pins_the_archive_revision_it_came_from(path):
+    """Bytes alone are not enough for a document.
+
+    A run record is its own evidence and a hash is all it needs. A pre-registration
+    is a claim about what was decided, so *which revision travelled* has to be
+    answerable — otherwise a reader cannot tell the shipped copy from a later one
+    that says something more convenient.
+    """
+    entry = next(e for e in RECORD.files if e.path == path)
+    assert re.fullmatch(r"[0-9a-f]{40}", entry.archive_commit or ""), entry.archive_commit
+    assert re.fullmatch(r"\d{4}-\d{2}-\d{2}", entry.archive_date or ""), entry.archive_date
+
+
+def test_only_the_governing_documents_claim_an_archive_revision():
+    claimed = {e.path for e in RECORD.files if e.archive_commit is not None}
+    assert claimed == set(RECORD_DOCS)
+
+
+def test_the_archive_date_is_not_offered_as_precedence_evidence():
+    """The trap in R1, written down so it cannot be quietly reintroduced.
+
+    The archive commit is dated 2026-08-06. The runs the pre-registration licensed
+    are dated 2026-08-05 — one day EARLIER — because it is the last commit that
+    touched the file, not the day the rule was written. Anyone reading that date as
+    "the rule came first" would be reading it backwards.
+
+    Precedence is carried by `test_archived_sweep_as_it_stands_is_not_saturated`
+    instead: the rule, applied to the sweep as it stood when it was written, returns
+    NOT SATURATED and demands rho = 32. It forced work rather than ratifying it. This
+    test asserts the distinction is stated where the date is, so the two can never
+    drift apart.
+    """
+    text = (EVIDENCE_ROOT / "PROVENANCE.toml").read_text()
+    assert "NOT the date the pre-registration was written" in text
+    assert "test_archived_sweep_as_it_stands_is_not_saturated" in text
+
+
+def test_the_published_byline_cites_a_path_that_exists_in_this_repository():
+    """The defect R1 exists for, asserted rather than fixed and forgotten.
+
+    The byline used to send a reader to
+    `all_record/deformsplat_corroboration/plan1_prereg.md`, which is in an archive
+    they do not have. A citation that resolves nowhere is worse than none: it claims
+    the rules were fixed in advance while making the claim uncheckable.
+    """
+    from plan1 import render
+
+    source = Path(render.__file__).read_text()
+    assert "all_record/deformsplat_corroboration" not in source.replace(
+        "# The byline used to cite `all_record/deformsplat_corroboration/plan1_prereg.md`", ""
+    )
+    cited = "evidence/record/plan1_prereg.md"
+    assert cited in source
+    assert (EVIDENCE_ROOT.parent / cited).is_file()
+
+
+def test_the_committed_table_cites_the_vendored_pre_registration():
+    """The rendered artefact, not just the renderer. `out/comparison_table.md` is
+    what a reader actually opens."""
+    table = (EVIDENCE_ROOT.parent / "out" / "comparison_table.md").read_text()
+    assert "evidence/record/plan1_prereg.md" in table
+    assert "all_record/" not in table
 
 
 # ── the published citation, checked against the copy ────────────────────────

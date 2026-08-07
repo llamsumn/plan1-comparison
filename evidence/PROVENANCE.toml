@@ -167,6 +167,57 @@ source = "~/3D/cluster/rho_probe_evidence/_logs/plan1_preflight_20260805.txt"
 sha256 = "1680df59cffc13664a2ef3ebb9f4dcb622f096651c53f75b6464e72bcaeff746"
 why = "the preflight that recovered the baseline record and compared 6/6 source hashes; cited by the manifest's baseline row"
 
+# ── the two documents the whole artefact argues from ────────────────────────
+# CITED SIXTEEN TIMES AND SHIPPED ZERO — including in the published table's own
+# byline, which told a reader to consult a path that does not exist in any
+# repository they can reach. `plan1/render.py` now names the copy below.
+#
+# These are the only rows carrying `archive_commit` and `archive_date`, and the
+# reason is that they are the only vendored files whose *identity as a document*
+# matters rather than just their bytes. A `val_step0501.json` is its own evidence;
+# a pre-registration is a claim about what was decided and when, so which revision
+# of it travelled has to be answerable.
+#
+# READ THE DATE FOR WHAT IT IS. `2026-08-06` is when the archive commit these
+# copies were taken from was made — the last commit touching either file. It is
+# NOT the date the pre-registration was written, and it must not be read as
+# precedence evidence: the rho = 32 and rho = 64 runs it licensed are dated
+# 2026-08-05, one day EARLIER, and the verdict is a document that necessarily
+# postdates the runs it judges.
+#
+# What actually carries precedence is behavioural and is already in this
+# repository. `tests/test_saturation.py::test_archived_sweep_as_it_stands_is_not_saturated`
+# applies the pre-registered rule to the sweep as it stood when the rule was
+# written and asserts NOT SATURATED, continue at rho = 32. The rule forced two
+# further cluster runs before anything could be published, and rho = 64 turned the
+# curve over — so it could have moved the reported row, and demonstrably did move
+# the work. A rule that only ever agreed with what was already there would be
+# worth nothing; this one is on record disagreeing. Vendoring these documents adds
+# the text. The test is what makes the text load-bearing.
+#
+# Both are copied VERBATIM, `../../` links and all. Several of those links point
+# out of this repository and will not resolve here. That is deliberate: rewriting
+# a link would change the bytes, and then the sha256 below would no longer let
+# anyone holding the archive audit this copy against it — which is the single
+# property that makes `evidence/` worth having. A dangling link is a smaller cost
+# than an unauditable copy.
+
+[[file]]
+path = "record/plan1_prereg.md"
+source = "~/3D/all_record/deformsplat_corroboration/plan1_prereg.md"
+sha256 = "512165b44a99e562471edfeb0f4b58620b08af91368940dd13f0147c4aa15e76"
+archive_commit = "1bef51b3c3d9853366f0faf8e6e7fa8dfdd012fe"
+archive_date = "2026-08-06"
+why = "the pre-registration. It declares the saturation rule, the comparability gate and the precision policy BEFORE the rows they select; `plan1/render.py` cites this path in the published table's byline, and until now cited one that shipped nowhere"
+
+[[file]]
+path = "record/plan1_verdict.md"
+source = "~/3D/all_record/deformsplat_corroboration/plan1_verdict.md"
+sha256 = "c27cf2b593cc48223ef366ad0f7867d332ef95e28b6fd3e4e76ab8b8b4c10185"
+archive_commit = "1bef51b3c3d9853366f0faf8e6e7fa8dfdd012fe"
+archive_date = "2026-08-06"
+why = "the verdict. §1 names the wiring gate as the precondition for making any claim at all, and its §10 records how every declared branch resolved — including §10.6, which discloses the one post-hoc edit (the saturation reason sentence, with diff; predicate untouched, decision pinned before and after)"
+
 # ── the archived cluster sources ────────────────────────────────────────────
 # Both gate modules load these by AST out of the source *text*, so the binding is
 # to the bytes below and not to a transcription of them. Copied, never edited.

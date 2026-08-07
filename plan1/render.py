@@ -36,11 +36,16 @@ def render_markdown(table: ComparisonTable, provenance: dict[str, str] | None = 
 
     out(f"# {table.asset} — imposed rigidity against the DeformSplat baseline")
     out("")
+    # The byline used to cite `all_record/deformsplat_corroboration/plan1_prereg.md`
+    # — a path in an archive no reader of this table can reach. A citation that
+    # resolves nowhere is worse than no citation: it claims the rules were written
+    # down in advance while making the claim uncheckable. The pre-registration is
+    # now vendored, and this names where it actually is.
     out(
         f"_Assembled {table.assembled} by `plan1.assemble` from the manifest "
         f"at `{display_path(table.manifest_source)}`. Every number below traces to a "
         f"named run; see Provenance. Rules pre-registered in "
-        f"`all_record/deformsplat_corroboration/plan1_prereg.md`._"
+        f"`evidence/record/plan1_prereg.md`._"
     )
     out("")
 

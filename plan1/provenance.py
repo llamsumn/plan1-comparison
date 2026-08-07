@@ -135,6 +135,8 @@ class VendoredFile:
     upstream_commit: str | None = None
     upstream_licence: str | None = None
     modification: str | None = None
+    archive_commit: str | None = None
+    archive_date: str | None = None
 
 
 @dataclass(frozen=True)
@@ -243,6 +245,8 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
                 upstream_commit=entry.get("upstream_commit"),
                 upstream_licence=entry.get("upstream_licence"),
                 modification=entry.get("modification"),
+                archive_commit=entry.get("archive_commit"),
+                archive_date=entry.get("archive_date"),
             )
             for entry in blob.get("file", ())
         ),
