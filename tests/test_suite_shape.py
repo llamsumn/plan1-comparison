@@ -73,16 +73,18 @@ import pytest
 #: | #18 — this module | +12 |
 #: | R2 — `test_upstream_diff.py`, the third-party attribution guard | +21 |
 #: | R3 — the sample asset's dataset attribution | +3 |
+#: | R10 — `test_projection_figure.py`, the §6.4 figure | +29 |
 #:
 #: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 45
 #: `[[file]]` rows and 23 `[[ported]]` rows, and several checks run once per row.
 #: That is why the number moves whenever evidence lands, and why it is asserted
 #: here rather than left to be noticed.
 #:
-#: R2 and R3 are the licence and attribution clean-up. They added no evidence and
-#: no rows, so nothing here is parametrised over `PROVENANCE.toml` — the +23 is
-#: whole tests, most of them over the two committed upstream diffs.
-EXPECTED_TESTS = 443
+#: R2, R3 and R10 are the pre-write-up clean-up. None of them added evidence and
+#: none added a row, so nothing here is parametrised over `PROVENANCE.toml` — the
+#: +53 is whole tests: the two committed upstream diffs, the sample asset's dataset
+#: attribution, and the §6.4 projection figure.
+EXPECTED_TESTS = 472
 
 
 def test_the_whole_suite_is_collected(pytestconfig):

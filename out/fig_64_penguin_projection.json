@@ -1,0 +1,69 @@
+{
+  "caption": "ARAP deformation of a 3D Gaussian Splatting asset, 23,548 primitives. The handle region is displaced by 0.05 along x and the pinned region is held; the solve converged in 106 iterations, energy 0.210316 to 0.003733, monotone throughout. Points are Gaussian means under an orthographic camera — this is a projection, not a splat render.",
+  "decimals": 5,
+  "deformation": {
+    "command": "python examples/run_penguin.py --ply data/penguin_original.ply --out out/penguin_deformed.ply --k 12 --gamma 50 --fixed-box -0.25 -0.25 -0.25 0.35 -0.10 0.15 --handle-box -0.25 0.25 -0.25 0.35 0.40 0.15 --disp 0.05 0.0 0.0 --max-iters 400",
+    "converged": true,
+    "energy": [
+      0.210316,
+      0.003733
+    ],
+    "n_fixed_anchors": 3593,
+    "n_iters": 106,
+    "n_moving_anchors": 3414
+  },
+  "displacement": {
+    "max": 0.05,
+    "mean": 0.03055,
+    "n_moved": 19955,
+    "n_still": 3593
+  },
+  "figure": "fig_64_penguin_projection",
+  "figure_size_px": [
+    2100,
+    760
+  ],
+  "n_gaussians": 23548,
+  "panels": [
+    {
+      "bounds": [
+        -0.22779,
+        -0.22913,
+        0.30894,
+        0.37074
+      ],
+      "centroid": [
+        0.07193,
+        0.06119
+      ],
+      "label": "original",
+      "n_points": 23548,
+      "points_sha256": "698c06373106777541328711818d08ae3ec63b7e86625b75b8c2dcf29c7580c2",
+      "sha256": "9a13235506da2a16e973242183abefff8f021d6cd4e74120051c85f8450aaf20",
+      "source": "data/penguin_original.ply"
+    },
+    {
+      "bounds": [
+        -0.19931,
+        -0.22913,
+        0.33509,
+        0.37074
+      ],
+      "centroid": [
+        0.10057,
+        0.05839
+      ],
+      "label": "deformed",
+      "n_points": 23548,
+      "points_sha256": "15b1f9e3b91ec6ba2fd29cf2be0f6cfb7b25b33f068dcef23aa9788d57e14d24",
+      "sha256": "cb1837aaab6f34407fa6bb0735ce0b61cc426a5a8ddca7d15a9e51f70964f592",
+      "source": "out/penguin_deformed.ply"
+    }
+  ],
+  "regenerate": "python scripts/make_projection_figure.py",
+  "view": {
+    "azimuth_deg": 0.0,
+    "elevation_deg": 0.0
+  },
+  "what": "Orthographic projection of Gaussian means — not a splat render (no rasteriser, opacity, covariance or view-dependent colour)."
+}

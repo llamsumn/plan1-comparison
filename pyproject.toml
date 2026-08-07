@@ -22,7 +22,12 @@ dependencies = [
 # and the wiring harness both need it. It is a hard test dependency, not an
 # optional nicety: without it those two modules used to skip, and they are the
 # gate `plan1_verdict.md` §1 names as the precondition for making any claim.
-test = ["pytest", "torch"]
+# `matplotlib` draws the one figure this repository generates rather than vendors
+# (scripts/make_projection_figure.py). It belongs HERE and not in `dependencies`:
+# the claim above — that the decision surface is testable with no third-party
+# runtime — has to stay true, and `verify.sh` installs `.[test]` so the green gate
+# still gets it.
+test = ["pytest", "torch", "matplotlib"]
 
 [tool.setuptools]
 packages = ["plan1", "arap_core", "box_b"]
@@ -30,3 +35,18 @@ packages = ["plan1", "arap_core", "box_b"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+[tool.mypy]
+# `mypy plan1 scripts` is the standard this repository holds itself to, and it was
+# clean only by accident: nothing under `scripts/` imported `arap_core`, so scipy
+# and plyfile never entered the graph. The §6.4 figure script reads a PLY, they do
+# now, and twelve `import-untyped` errors appeared without a line of this project's
+# code being wrong.
+#
+# scipy, plyfile and matplotlib ship no type information at all — no stubs, no
+# `py.typed`. Declaring that is not suppressing a defect; it is stating a fact about
+# three third-party libraries, and it is scoped to exactly those three so that a
+# genuine error anywhere else still fails.
+[[tool.mypy.overrides]]
+module = ["scipy.*", "plyfile.*", "matplotlib.*"]
+ignore_missing_imports = true

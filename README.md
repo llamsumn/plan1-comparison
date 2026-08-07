@@ -25,15 +25,15 @@ parses every module and fails on a string naming a sibling or a `parents[2]` cli
 ## Verify it — the green gate
 
 One command. It installs the repository, runs the whole suite, regenerates the published
-table and diffs it against the committed copy. Anything less than all four is not the claim
-being made.
+table and diffs it against the committed copy, then rebuilds the §6.4 figure and diffs its
+data record. Anything less than all five is not the claim being made.
 
 ```bash
 git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv && . .venv/bin/activate && ./scripts/verify.sh
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **419 passed** and a clean
+working trees present and nothing pre-installed, this reports **472 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
@@ -116,6 +116,46 @@ these exact bytes:
 this table cannot drift away from what it describes, and pins the five cited CSVs at their
 row counts — a truncated copy is caught as a wrong number rather than shipped as a right one.
 
+## The figure — a projection, not a render
+
+Every figure this project had was a matplotlib plot of a characterisation grid, including
+in the section that carries the contribution. A chapter about deforming a Gaussian splat
+with no picture of a deformed Gaussian splat is a gap a reader notices immediately, and
+the obvious sources were all closed: the nine cluster runs wrote **empty** `renders/`
+directories, and the archive's one render-looking figure is also a plot *and* is built on
+the trex asset this repository excludes.
+
+```bash
+python scripts/make_projection_figure.py
+```
+
+`out/fig_64_penguin_projection.png` scatters the 23,548 Gaussian **means** through an
+orthographic camera: original, deformed, and the deformed points coloured by how far each
+travelled. That third panel is the one that carries the point — the handle region moves,
+the pinned region is exactly still, and the interior varies smoothly between them.
+
+**It is a projection and not a splat render**, and the figure says so on its own face
+rather than only in a caption that will not travel with it. There is no rasteriser, no
+opacity, no covariance and no view-dependent colour. It shows where the primitives went,
+and nothing about what the scene would look like.
+
+**What regenerates byte-identically, and what deliberately does not.** The figure's data
+record does, and `scripts/verify.sh` diffs it. The PNG does **not**, and refusing to assert
+it is the considered position: a matplotlib PNG's bytes depend on the matplotlib version,
+on freetype and on platform font rasterisation, and pinning them would hand an examiner a
+red suite for having a newer matplotlib. This project has already shipped one check that
+passed only on the machine that wrote it — the solver diagnostic compared floats
+bit-for-bit, and 20 of its 40 values move between BLAS backends. What is pinned instead is
+the *drawn data*: each panel records the sha256 of its projected coordinates, and the
+renderer refuses to draw anything that does not hash to it.
+
+For the same reason the 19-second ARAP solve is not in the test path.
+`out/penguin_deformed.ply` is committed and the solve is *recorded* — command, iterations,
+convergence, energy — the same way the characterisation outputs are recorded rather than
+regenerated. One number fell out of that which nothing was designed to produce: 3,593
+primitives are exactly still, and `run_penguin.py` reported 3,593 fixed anchors. Those are
+independent measurements, and a test asserts they agree.
+
 ## Why the table is not just typed out
 
 Nine archived runs feed the table. Reading numbers off nine files and typing them into a
@@ -171,6 +211,9 @@ missing `torch` makes the suite **error**, not shrink.
 | `THIRD_PARTY.md` | the third-party material, its terms, and how the two modified files were changed |
 | `third_party/deformsplat/` | the upstream Apache-2.0 text, and the complete diff of this project's 30 lines against it |
 | `out/comparison_table.md` | the published table. Regenerates byte-identically; `tests/test_build_table.py` asserts it |
+| `scripts/make_projection_figure.py` | the §6.4 figure — an orthographic projection of Gaussian means, **not** a splat render |
+| `out/fig_64_penguin_projection.{png,json}` | that figure, and the display values it was drawn from |
+| `out/penguin_deformed.ply` | the deformed asset the figure is drawn from, written by `run_penguin.py` |
 | `tests/test_conformance.py` | does the **deployed** rigidity rule match the **tested** reference? |
 | `tests/test_wiring_assertion.py` | is the in-run assertion's **silence** evidence? Drives it against broken rules |
 

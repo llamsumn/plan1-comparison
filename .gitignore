@@ -19,6 +19,20 @@ __pycache__/
 # same way (#20).
 !data/penguin_original.ply
 
+# ── and by exception: the deformed asset the §6.4 figure is drawn from ──────
+# `out/penguin_deformed.ply` is an OUTPUT, written by `examples/run_penguin.py` —
+# which is why it sits in `out/` beside the published table rather than in `data/`,
+# where the port record requires a provenance row for every file and it would have
+# to claim to have been copied from somewhere it was not.
+#
+# It is committed because the alternative is a 19-second ARAP solve in the test
+# path, and that solve is the one genuinely BLAS-sensitive step in this repository:
+# the solver diagnostic already found 20 of 40 values moving between backends on
+# identical numpy and scipy. Committing the geometry puts the figure's inputs on
+# the same footing as the table's — fixed bytes, re-derivable arithmetic — instead
+# of making a published figure depend on which BLAS an examiner happens to have.
+!out/penguin_deformed.ply
+
 # ── and nothing under evidence/ is ever ignored ─────────────────────────────
 # Evidence is copied in and pinned by sha256; none of it is generated here, so an
 # extension-based rule has no business matching any of it. This negation is not
