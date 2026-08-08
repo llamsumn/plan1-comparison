@@ -224,8 +224,15 @@ def test_the_paused_geometry_reader_did_not_travel(path):
     )
 
 
-def test_the_thirty_one_method_tests_are_all_of_the_method_tests():
-    """47 of the method repository's 78 tests belong to the paused track. 31 came."""
+def test_the_five_method_test_modules_are_all_of_the_method_test_modules():
+    """47 of the method repository's 78 tests belong to the paused track. 31 came.
+
+    The count of *files* is what is asserted, not of tests: `test_edge_weights.py`
+    has since grown from 5 tests to 11, because mutation found both of the
+    edge-weight seam's validation guards undriven, so the method's tests now number
+    37 rather than the 31 that travelled. A sixth module appearing here would mean
+    something was ported without a decision, which is what this guards.
+    """
     assert len(list((REPO_ROOT / "tests" / "method").glob("test_*.py"))) == 5
 
 

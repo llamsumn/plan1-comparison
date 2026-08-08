@@ -116,6 +116,20 @@ Stated fully in `README.md`; named here so the orientation is complete.
 - **A missing input is a failure, not a skip.** There are no `skipif` guards on vendored
   inputs and no `importorskip`. A suite that shrinks quietly reports a number that means less
   than it looks like.
+- **"The tests pass" and "the tests constrain the code" are different claims, and only the
+  second is worth anything.** They are kept apart by measurement rather than by assurance:
+  `scripts/run_mutation.py` changes one token in the claim surface and runs the whole suite,
+  and `mutation/mutation_record.json` records what happened — 132 of 135 killed, 130 of
+  them by an assertion and 2 by a mutant breaking on import, with the three survivors
+  argued for one by one. A survivor with no reason is a finding, not an entry, and
+  `tests/test_mutation_record.py` fails on one. It also fails when a target no longer
+  hashes to what it hashed to when measured, so the record cannot quietly come to
+  describe code that is no longer here. The run is **not** in
+  `scripts/verify.sh`: twenty minutes is a gate nobody waits for. Two things the record
+  states rather than implies — what was *not* mutated, so a partial measurement is not read
+  as a total one; and which tests are withheld from the kill criterion, because
+  `box_b/edge_weights.py` is hash-pinned and eight tests fail there on a byte changing
+  rather than on behaviour changing.
 - **Attribution is owed to other people, not to other repositories of one's own.**
   `PROVENANCE.toml`'s `[[ported]]` rows used to name two unpublished repositories of this
   author's and a commit in each, and the published table's footer printed one of the commits.

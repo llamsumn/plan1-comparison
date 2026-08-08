@@ -684,8 +684,8 @@ why = "6 tests — the Wigner-D SH rotation. These are the tests that make the c
 [[ported]]
 path = "tests/method/test_edge_weights.py"
 origin = "authored for this project — the method's own tests"
-sha256 = "1621707c143c1b0d2c19e2e315738163d1a556b98a49a66518b5b19028ac9175"
-why = "5 tests — the B2 seam, driven directly"
+sha256 = "63972033c279aa19b403e4d8ce0741d78853a124f10e74152ddbe59ad6f4767f"
+why = "11 tests — the B2 seam, driven directly, including both validation guards at the boundary of what each refuses"
 
 # ── the solver diagnostic ───────────────────────────────────────────────────
 # The 40-rung ladder that drives `arap_core` end to end. The method's own suite

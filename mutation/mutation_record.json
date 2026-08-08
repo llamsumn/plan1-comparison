@@ -1,0 +1,166 @@
+{
+  "generated": "2026-08-08",
+  "tool": {
+    "script": "scripts/run_mutation.py",
+    "python": "3.13.5",
+    "pytest": "8.3.4"
+  },
+  "command": "python scripts/run_mutation.py",
+  "operators": {
+    "<": "<=",
+    "<=": "<",
+    ">": ">=",
+    ">=": ">",
+    "==": "!=",
+    "!=": "==",
+    "+": "-",
+    "-": "+",
+    "*": "/",
+    "/": "*",
+    "and": "or",
+    "or": "and",
+    "True": "False",
+    "False": "True",
+    "is": "is not",
+    "in": "not in",
+    "<integer literal>": "n + 1"
+  },
+  "targets": [
+    {
+      "path": "plan1/assemble.py",
+      "sha256": "afe87a2a879f7a177888dfad860c51ad39e1a4cc37f92a46d4460f52c2027bf0",
+      "mutants": 64,
+      "invalid": 23,
+      "killed": 39,
+      "killed_at_collection": 0,
+      "survived": 2
+    },
+    {
+      "path": "plan1/saturation.py",
+      "sha256": "a2043fd91f1fd7fc3bcc13dd7f5cccbdc8bde96e1a7b24446a4076e32af4f23c",
+      "mutants": 29,
+      "invalid": 5,
+      "killed": 24,
+      "killed_at_collection": 0,
+      "survived": 0
+    },
+    {
+      "path": "plan1/records.py",
+      "sha256": "e87fc714c94ec5c76cccf35980e84289e189a08e9d807f24bc1394a151159e93",
+      "mutants": 47,
+      "invalid": 10,
+      "killed": 37,
+      "killed_at_collection": 1,
+      "survived": 0
+    },
+    {
+      "path": "plan1/manifest.py",
+      "sha256": "e85b75984aa8fd7dd13ee37757f1583867d649a11d7c7e4bff98c0434e67dbcb",
+      "mutants": 14,
+      "invalid": 6,
+      "killed": 8,
+      "killed_at_collection": 0,
+      "survived": 0
+    },
+    {
+      "path": "plan1/provenance.py",
+      "sha256": "c3d6e25a9bb0bdf3721a6e9469981b0073c94e2599b81546cd38c97176ed59c7",
+      "mutants": 20,
+      "invalid": 7,
+      "killed": 12,
+      "killed_at_collection": 1,
+      "survived": 1
+    },
+    {
+      "path": "box_b/edge_weights.py",
+      "sha256": "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4",
+      "mutants": 12,
+      "invalid": 0,
+      "killed": 12,
+      "killed_at_collection": 0,
+      "survived": 0
+    }
+  ],
+  "out_of_scope": [
+    {
+      "path": "plan1/render.py",
+      "reason": "presentation. It decides how a number is printed, not what it is; a surviving mutant there is a formatting question and the committed table is diffed byte-for-byte anyway."
+    },
+    {
+      "path": "scripts/",
+      "reason": "entry points. They read a manifest, call the seam and print; the decisions are all below them."
+    },
+    {
+      "path": "diagnostics/",
+      "reason": "the solver's own evidence, already re-executed rather than re-read by tests/test_diagnostic.py \u2014 a stronger check than mutation gives."
+    },
+    {
+      "path": "arap_core/",
+      "reason": "the ported solver. Its ladder is driven end to end by the diagnostic and compared field by field against a committed record; widening the target set to it is a future decision rather than an oversight."
+    },
+    {
+      "path": "tests/",
+      "reason": "mutating a test measures nothing about the tests."
+    }
+  ],
+  "integrity_checks_excluded": {
+    "applies_to": [
+      "box_b/edge_weights.py"
+    ],
+    "tests": [
+      "tests/test_build_table.py::test_the_committed_table_regenerates_byte_identically",
+      "tests/test_build_table.py::test_the_rendered_table_names_no_absolute_path",
+      "tests/test_build_table.py::test_the_rendered_table_resolves_nothing_outside_the_repository",
+      "tests/test_build_table.py::test_the_assembly_date_is_declared_rather_than_stamped_at_run_time",
+      "tests/test_build_table.py::test_the_footer_names_every_recorded_artefact",
+      "tests/test_conformance.py::test_the_vendored_reference_rule_is_the_one_that_was_ported",
+      "tests/test_ported_method.py::test_every_ported_file_hashes_to_its_recorded_value",
+      "tests/test_ported_method.py::test_the_published_table_still_names_nothing_outside_the_repository"
+    ],
+    "reason": "These fail on the file's bytes changing rather than on its behaviour changing: its sha256 is recorded in evidence/PROVENANCE.toml and printed in the published table's footer, and the table refuses to render when the two disagree. Counting them as kills would report a checksum as test strength."
+  },
+  "bytecode": "Cached bytecode is purged for each target before it is mutated and no new cache is written during the run (`python -B`). CPython treats a `.pyc` as current when the source's whole-second mtime and size both match, and a one-token mutation usually leaves the size unchanged \u2014 so without this the suite can run against a mutant that is no longer on disk.",
+  "always_excluded": {
+    "tests": [
+      "tests/test_mutation_record.py",
+      "tests/test_suite_shape.py::test_the_collected_total_matches_the_expected_total"
+    ],
+    "reason": "The first is the record's own reader module. Twelve of its fourteen tests read the file this run writes, so during a run their verdict is about the previous record rather than about the mutant; it is deselected whole rather than by node so the list cannot drift as tests are added to it, which withholds the two that do not read the record as well. The second counts the session's collected tests, and pytest removes a deselected test from that count, so any deselection fails it on every mutant for a reason unrelated to the mutant."
+  },
+  "kill_criterion": "A mutant is killed when the suite does not come back green. pytest exit 1 is a test that ran and failed \u2014 an assertion caught the change \u2014 and exit 2 is a collection error, where the mutant compiled but broke on import so nothing was ever asserted. Both are kills, because in neither case did the change pass unnoticed, but only the first is evidence about the tests. `killed_at_collection` counts the second kind separately, per target and in the totals, so the score can be read down to the assertions that earned it.",
+  "totals": {
+    "mutants": 186,
+    "invalid": 51,
+    "killed": 132,
+    "killed_at_collection": 2,
+    "survived": 3,
+    "applicable": 135
+  },
+  "score": 0.9778,
+  "survivors": [
+    {
+      "path": "plan1/assemble.py",
+      "line": 175,
+      "operator": "0 -> 1",
+      "source": "first = ordered[0][1]",
+      "category": "equivalent",
+      "reason": "This line reads the evaluation step, the primitive count and the step-0 triple off one row in order to put them in the table header, and by the time it runs the comparability gate has already refused to continue unless every row agrees on all three. So any row yields the same three values, and taking the second rather than the first cannot change the table. The mutant is the gate doing its job: it survives because the invariant above it holds, and it would be killed the moment that stopped being true."
+    },
+    {
+      "path": "plan1/assemble.py",
+      "line": 246,
+      "operator": "+ -> -",
+      "source": "for other_row, other in ordered[index + 1 :]:",
+      "category": "equivalent",
+      "reason": "The primitive-count loop, walked backwards. Starting each inner loop at index - 1 instead of index + 1 still compares every ADJACENT pair, and agreement here is integer equality, which is transitive: if every neighbouring pair agrees then every pair agrees, so the mutant raises on exactly the inputs the original raises on. What it can change is which two rows the error message names, not whether there is one. The sibling mutation index + 2 is NOT equivalent, because it skips adjacent pairs, and it is killed by test_the_gate_compares_a_disagreeing_pair_in_the_middle_of_the_manifest. The same backwards walk on the START-FINGERPRINT loop nine lines below is also not equivalent, because agreement there is comparison at the coarser of two precisions and is not transitive; that one is killed by test_the_gate_compares_a_pair_that_is_neither_adjacent_nor_an_endpoint_pair."
+    },
+    {
+      "path": "plan1/provenance.py",
+      "line": 37,
+      "operator": "65536 -> 65537",
+      "source": "for block in iter(lambda: handle.read(65536), b\"\"):",
+      "category": "equivalent",
+      "reason": "The read block size for the sha256 of a file. A digest is defined over the byte stream, not over how the stream was cut up, so the block size changes only how many reads it takes to get there and every recorded hash comes out identical. A test could not distinguish the two without measuring read counts, which is not a property this repository has any reason to hold."
+    }
+  ]
+}

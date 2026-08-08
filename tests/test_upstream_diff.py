@@ -298,8 +298,13 @@ def test_none_of_the_attribution_files_are_gitignored():
     are in neither, so they need saying separately — and an attribution file that a
     fresh `git add` drops is worse than no attribution file, because the repository
     then looks compliant to everyone holding a clone made from history.
+
+    The message this used to fail with named the wrong cause whenever git could not
+    run: `audit.gitignored` is where that is now decided, for this test and for
+    `test_suite_shape.py`'s, so the two cannot drift into disagreeing about what an
+    exit code means.
     """
-    import subprocess
+    from audit import gitignored
 
     paths = [
         "LICENSE",
@@ -310,19 +315,10 @@ def test_none_of_the_attribution_files_are_gitignored():
     for path in paths:
         assert (REPO_ROOT / path).is_file(), path
 
-    # `--no-index` for the same reason it is load-bearing in test_suite_shape.py:
-    # without it, `check-ignore` reports nothing for an already-tracked file, which
-    # is precisely the blind spot that let the `*.png` rule sit unnoticed.
-    result = subprocess.run(
-        ["git", "check-ignore", "--no-index", "--stdin"],
-        input="\n".join(paths),
-        capture_output=True,
-        text=True,
-        cwd=REPO_ROOT,
-    )
-    assert result.returncode == 1, (
+    ignored = gitignored(paths)
+    assert not ignored, (
         f"attribution files matched by .gitignore, so a fresh `git add` would drop "
-        f"them:\n{result.stdout}"
+        f"them:\n" + "\n".join(ignored)
     )
 
 

@@ -26,6 +26,11 @@ Three audits are built on it:
   asserted anywhere yet; it belongs to the coverage work and is built here because
   it is the same walk.
 
+A fourth function, `gitignored`, asks git the *other* question — would a fresh
+`git add` drop this file — and lives here for the same reason the walk does: two
+test modules were asking it independently and both had read git's exit code as a
+two-way answer when it has three.
+
 **The needles are assembled from parts, deliberately.** Every forbidden string
 below is written as a concatenation, so this file does not contain the text it
 hunts, and does not have to be exempted from its own audit. That matters more than
@@ -41,6 +46,7 @@ import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Sequence
 
 from plan1.provenance import REPO_ROOT
 
@@ -203,6 +209,44 @@ def repository_files() -> tuple[Path, ...]:
             f"result."
         )
     return paths
+
+
+def gitignored(paths: Sequence[str], cwd: Path = REPO_ROOT) -> list[str]:
+    """Which of `paths` would a fresh `git add` drop, because `.gitignore` matches it.
+
+    `git check-ignore` answers in exit codes: 0 when at least one path is matched, 1
+    when none is, and **something else entirely** when it could not run — 128 for
+    "not a git repository", which is what a reader who downloaded a zip rather than
+    cloning would hit. Two tests used to read that as a two-way answer and treat
+    every non-1 exit as a match, so a missing repository was reported as *files
+    matched by .gitignore* over an empty list of files. Naming the wrong cause is
+    worse than naming none: it sends the next person to edit the ignore rules.
+
+    So the third answer is separated out here, once, and raises — the same choice
+    `repository_files()` makes above, and for the same reason. `git` is a hard
+    requirement of the green gate (`scripts/verify.sh` diffs the regenerated table
+    with it), so its absence is an error rather than a result.
+
+    `--no-index` is load-bearing. Without it `check-ignore` reports nothing for a
+    file that is already tracked, which is every file the two callers care about —
+    and precisely the blind spot that let a blanket `*.png` rule sit unnoticed over
+    six tracked figures.
+    """
+    result = subprocess.run(
+        ["git", "check-ignore", "--no-index", "--stdin"],
+        input="\n".join(paths),
+        capture_output=True,
+        text=True,
+        cwd=cwd,
+    )
+    if result.returncode not in (0, 1):
+        raise RuntimeError(
+            f"`git check-ignore` could not answer in {cwd} (exit "
+            f"{result.returncode}): {result.stderr.strip()!r}. This says nothing "
+            f"about the ignore rules — git did not get as far as reading them. Run "
+            f"the suite in a git checkout."
+        )
+    return [line for line in result.stdout.splitlines() if line]
 
 
 def is_text(path: Path) -> bool:

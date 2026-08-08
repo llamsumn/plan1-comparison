@@ -26,10 +26,14 @@ from typing import Mapping
 from plan1.provenance import display_path
 
 #: The three reported metrics. LPIPS is inverted — lower is better.
+#:
+#: There is deliberately no companion constant declaring the direction per metric.
+#: One existed, and it was dead: defined here, referenced nowhere, and therefore
+#: free to state the opposite of the truth without a single test noticing. Nothing
+#: needs it, because nothing branches on the direction — the gap fraction is
+#: sign-agnostic by construction, and ``assemble.GapFraction``'s docstring is where
+#: that argument lives.
 METRICS: tuple[str, ...] = ("psnr", "ssim", "lpips")
-
-#: ``True`` where a larger value is a better one.
-HIGHER_IS_BETTER: Mapping[str, bool] = {"psnr": True, "ssim": True, "lpips": False}
 
 
 @dataclass(frozen=True)

@@ -34,7 +34,7 @@ git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **627 passed** and a clean
+working trees present and nothing pre-installed, this reports **689 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
@@ -90,6 +90,57 @@ hashes, and the file is pinned by sha256 like everything else under `evidence/`.
 it would change those bytes and break the hash that makes the 6/6 checkable, which is the
 only reason the file is worth shipping. No credentials, keys or tokens appear anywhere in
 this repository.
+
+## Can these tests fail?
+
+A green suite says the tests ran. It does not say they constrain anything, and here the
+two came apart at the worst available place: the comparison that selects the published
+row could be changed from inclusive to exclusive and every test still passed. So could
+the predicate that decides whether any row may be published at all. Coverage did not
+predict it and in fact ran against it — the module with the surviving mutants reported
+**100%** line coverage; the module whose every mutant died reported **86%**. A line can
+be executed and still constrain nothing.
+
+`scripts/run_mutation.py` answers the question by measuring it: change one token in the
+claim surface, run the whole suite, and see whether anything notices. It tokenises rather
+than searching, so comments and docstrings are out of reach — a textual mutator produces
+large numbers of "survivors" inside prose, and a record padded with those measures
+nothing.
+
+The result is committed at `mutation/mutation_record.json`: **132 of 135 killed** across
+the assembler, the saturation rule, the readers, the manifest, the provenance loader and
+the edge-weight seam, with the three survivors listed and argued for individually. All
+three are equivalent mutants — a value read off a row the gate has already forced into
+agreement, a loop walked backwards over a transitive relation, and the block size of a
+file read.
+
+Two of the 132 are marked as the weaker kind of kill, and separating them is the point:
+those two mutants compiled but broke on import, so the suite never got as far as
+asserting anything. They did not pass unnoticed, but they are evidence about the
+interpreter rather than about the tests, and a score that folded them in would be the
+more flattering of two readings presented as the only one. **130 were caught by an
+assertion.**
+
+`tests/test_mutation_record.py` reads the record back and fails if a survivor carries no
+argument, if the source line it was found on has moved, or if any of the six targets no
+longer hashes to what it hashed to when it was measured — so editing the claim surface
+makes the record's staleness a test failure rather than something a reader has to
+notice.
+
+It is deliberately **not** in `./scripts/verify.sh`. The run takes about twenty minutes,
+and a gate nobody waits for is not a gate.
+
+Two things the record states rather than leaving to be inferred. **What was not mutated**
+— rendering, the entry-point scripts, the solver diagnostic and the ported solver are out
+of scope and the record names them, because an unqualified score invites a reader to take
+a partial measurement for a total one. And **which tests are withheld from the kill
+criterion**: `box_b/edge_weights.py` is pinned by sha256 and that hash is printed in the
+published table's footer, so eight tests fail on any byte changing there before behaviour
+enters into it. Counting those as kills would report a checksum as test strength — which
+is exactly what an earlier exploratory run did, calling that module the strongest in the
+repository while five of its mutants were in fact surviving, all of them inside
+validation guards nothing drove. It now kills all twelve, and they are its own tests
+doing it.
 
 ## The ported method
 
@@ -240,7 +291,7 @@ missing `torch` makes the suite **error**, not shrink.
 | `arap_core/` | the ARAP solver and the 3DGS carry — boxes C and D |
 | `box_b/edge_weights.py` | the B2 seam, and the conformance test's reference rule |
 | `examples/run_penguin.py` | the runnable demonstration; `--disp 0 0 0` is the identity check |
-| `tests/method/` | the 31 ported method tests, kept separate from the assembler's |
+| `tests/method/` | the method's own 37 tests, kept separate from the assembler's: 31 came with the port, 6 were added here when mutation found both of the edge-weight seam's validation guards undriven |
 | `diagnostics/` | the 40-rung solver ladder. `tests/test_diagnostic.py` **re-runs** it and compares all 40 records — it does not re-read the committed answer |
 | `plan1/assemble.py` | **the seam** — manifest + records → validated table. Gating and gap arithmetic sit behind it |
 | `plan1/saturation.py` | the pre-registered rule that selects the reported rigidity |
@@ -253,6 +304,9 @@ missing `torch` makes the suite **error**, not shrink.
 | `evidence/record/` | the pre-registration and the verdict that govern the table, plus the two companions they cite; `LINKS.md` says where each of their outward links goes |
 | `evidence/PROVENANCE.toml` | what every copied file is, what it hashes to, and what deliberately did not travel |
 | `tests/audit.py` | the repository-wide walk: what counts as a file here, and the three audits over it |
+| `scripts/run_mutation.py` | the assertion-strength measurement — one token changed, the whole suite run. Not in the gate; it takes about twenty minutes |
+| `mutation/mutation_record.json` | what it measured: the target set, the score, and every survivor with the reason it is acceptable |
+| `tests/test_mutation_record.py` | reads that record back. Fails if a survivor carries no argument, or if the line it names has moved |
 | `LICENSE` | MIT, and what it does **not** cover |
 | `THIRD_PARTY.md` | the third-party material, its terms, and how the two modified files were changed |
 | `third_party/deformsplat/` | the upstream Apache-2.0 text, and the complete diff of this project's 30 lines against it |

@@ -6,7 +6,35 @@ rigidity is still gaining more than the band over its predecessor, the curve has
 saturated and no row may be reported.
 
 Behaviour only — these drive synthetic sweeps and assert which row comes out.
+
+**Both of the rule's comparisons are inclusive, and until now nothing said so.**
+Every sweep below sat comfortably inside or outside the band, so `>=` could be
+changed to `>` and `<=` to `<` and all 627 tests still passed — measured, not
+supposed. Those two characters are the entire content of the rule at the point where
+it decides: *within* the band means at the edge as well as inside it, and a curve
+that has stopped gaining includes one that gained exactly the band. So the two
+thresholds are now driven at the boundary value itself and one float either side of
+it, in the section marked below.
+
+**Each of them was watched failing first.** This project has shipped two guards that
+could not fail, so a boundary assertion — the kind most likely to be written to pass
+— is not trusted here until the wrong implementation has been seen failing it. What
+was driven, and which test caught it:
+
+| the source, made wrong | the test that failed |
+|---|---|
+| `last_gain <= band` → `<` | `test_a_gain_of_exactly_the_band_counts_as_saturated` |
+| `p.psnr >= maximum.psnr - band` → `>` | `test_a_row_exactly_on_the_band_edge_is_inside_the_band` |
+| `len(ordered) >= 2` → `> 2` | `test_two_points_are_the_fewest_that_can_demonstrate_saturation` |
+| `hard_stop_reached=False` → `True`, saturated path | `test_the_hard_stop_flag_is_false_on_the_saturated_path` |
+| `hard_stop = continue_at is None` → `is not None` | `test_the_hard_stop_flag_is_false_while_the_ladder_still_has_a_rung` |
+| `if not band > 0.0` → `if band <= 0.0` | `test_a_nan_band_is_refused_rather_than_silently_accepted` |
+
+The mapping is recorded rather than the pass counts, because a total goes stale the
+moment a test is added and this table does not.
 """
+
+import math
 
 import pytest
 
@@ -72,6 +100,108 @@ def test_hard_stop_at_256_reports_a_finding_rather_than_continuing():
     assert "did not saturate" in v.reason
 
 
+# ── the two thresholds, at the boundary value itself ────────────────────────
+# The pre-registration says "within the replicate band". Both comparisons that
+# implement it are inclusive, and each is pinned here at the boundary and at the
+# nearest float on the wrong side of it — which is as close to the edge as a double
+# can be driven, so nothing is left between the two cases for a change to hide in.
+def test_a_gain_of_exactly_the_band_counts_as_saturated():
+    """`last_gain <= band`, at equality. 10.5 - 10.0 is exactly 0.5 in binary."""
+    v = select_saturated_row(sweep((1, 10.0), (4, 10.5)), band=0.5)
+    assert v.last_gain == 0.5
+    assert v.saturated, "a gain of exactly the band is within it, not outside it"
+    assert v.selected.rigidity == 1
+
+
+def test_a_gain_one_float_above_the_band_is_not_saturated():
+    """The other side of the same equality, one ulp away.
+
+    The gain is held at exactly 0.5 and the *band* is stepped down instead, because
+    stepping the PSNR up by one ulp at magnitude 10 would round straight back to 10.5
+    and quietly test nothing.
+    """
+    v = select_saturated_row(
+        sweep((1, 10.0), (4, 10.5)), band=math.nextafter(0.5, 0.0)
+    )
+    assert v.last_gain == 0.5
+    assert not v.saturated
+    assert v.selected is None
+
+
+def test_a_row_exactly_on_the_band_edge_is_inside_the_band():
+    """`psnr >= maximum - band`, at equality — the comparison that picks the row.
+
+    The maximum is 12.5 and the band 0.5, so the edge is exactly 12.0 and rho=4 sits
+    on it. Inclusive, rho=4 is reported; exclusive, the reported row jumps to rho=16.
+    This is the rule that selects the published row, so the two characters between
+    those outcomes are the whole of it.
+    """
+    v = select_saturated_row(
+        sweep((1, 8.0), (4, 12.0), (16, 12.5), (32, 12.5)), band=0.5
+    )
+    assert v.saturated
+    assert v.maximum.psnr == 12.5
+    assert v.selected.rigidity == 4
+    assert [p.rigidity for p in v.within_band] == [4, 16, 32]
+
+
+def test_a_row_one_float_below_the_band_edge_is_outside_it():
+    """The same sweep with rho=4 stepped down by a single ulp: it drops out."""
+    v = select_saturated_row(
+        sweep(
+            (1, 8.0),
+            (4, math.nextafter(12.0, -math.inf)),
+            (16, 12.5),
+            (32, 12.5),
+        ),
+        band=0.5,
+    )
+    assert v.saturated
+    assert v.selected.rigidity == 16
+    assert [p.rigidity for p in v.within_band] == [16, 32]
+
+
+def test_two_points_are_the_fewest_that_can_demonstrate_saturation():
+    """`len(ordered) >= 2`, at the boundary.
+
+    One point cannot saturate because there is nothing to have gained over; two
+    can, and the smaller number is the interesting one because the rule is about a
+    curve turning over and two points are the fewest that make a curve.
+    """
+    two = select_saturated_row(sweep((1, 10.0), (4, 10.25)), band=0.5)
+    assert two.saturated
+    assert two.selected.rigidity == 1
+
+    one = select_saturated_row(sweep((4, 10.25)), band=0.5)
+    assert not one.saturated
+
+
+# ── the hard-stop flag, on every branch that sets it ────────────────────────
+# Three branches set it and only one was asserted. A flag that is checked in one
+# place and written in three is a flag that means something different in each.
+def test_the_hard_stop_flag_is_false_on_the_saturated_path():
+    """Saturating *at* the last rung is not a hard stop — it is the answer.
+
+    The hard stop is the finding "we ran out of ladder without saturating", and it
+    has to stay distinguishable from "we saturated, and there happened to be no rung
+    left". Driven at rho=256, the exhausting rung, so the two are told apart on the
+    only input where they could be confused.
+    """
+    v = select_saturated_row(sweep((1, 10.0), (256, 10.25)), band=0.5)
+    assert v.saturated
+    assert v.hard_stop_reached is False
+    assert v.continue_at is None
+    assert "did not saturate" not in v.reason
+
+
+def test_the_hard_stop_flag_is_false_while_the_ladder_still_has_a_rung():
+    """The unsaturated branch that continues — the flag is the negation of that."""
+    v = select_saturated_row(sweep((1, 10.0), (16, 30.0)), band=0.5)
+    assert not v.saturated
+    assert v.continue_at == 32
+    assert v.hard_stop_reached is False
+
+
 # ── degenerate inputs ───────────────────────────────────────────────────────
 def test_empty_sweep_raises():
     with pytest.raises(ValueError, match="at least one"):
@@ -98,6 +228,31 @@ def test_single_point_sweep_at_the_hard_stop_still_reports():
 def test_band_must_be_positive():
     with pytest.raises(ValueError, match="band"):
         select_saturated_row(sweep((1, 10.0), (4, 12.0)), band=0.0)
+
+
+def test_the_smallest_positive_band_is_accepted():
+    """The other side of the zero boundary. Anything above zero is a band.
+
+    The band is derived from the null replicates rather than typed, so its magnitude
+    is not this rule's business — only that it is a real interval. A denormal is the
+    smallest thing that is.
+    """
+    v = select_saturated_row(
+        sweep((1, 10.0), (4, 12.0)), band=math.nextafter(0.0, math.inf)
+    )
+    assert not v.saturated  # a 2 dB gain is outside any band this small
+
+
+def test_a_nan_band_is_refused_rather_than_silently_accepted():
+    """Why the guard is written `not band > 0.0` and not `band <= 0.0`.
+
+    The two read identically until the band arrives as a NaN — which is what an
+    arithmetic accident upstream produces — and then the second lets it through, and
+    every comparison downstream silently answers False. The rule would report an
+    unsaturated curve for a reason that has nothing to do with the curve.
+    """
+    with pytest.raises(ValueError, match="band"):
+        select_saturated_row(sweep((1, 10.0), (4, 12.0)), band=float("nan"))
 
 
 def test_duplicate_rigidity_values_raise():

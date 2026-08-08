@@ -43,6 +43,7 @@ from audit import (
     audited_files,
     exemption,
     forbidden_references,
+    gitignored,
     is_text,
     pragma_reasons,
     repository_files,
@@ -228,6 +229,43 @@ def test_the_exemption_covers_the_vendored_copies_and_nothing_else():
         relative = _relative(path)
         if relative.startswith("evidence/"):
             assert relative in AUTHORED_UNDER_EVIDENCE, relative
+
+
+# ── "would a fresh `git add` drop this?", and its three answers ─────────────
+# Two tests elsewhere ask git that question, and both used to read its answer as a
+# yes/no: exit 1 meant nothing was ignored, and *everything else* was reported as
+# "these files are matched by .gitignore". Git has a third answer — it could not
+# run at all, which is exit 128 — and in that case both tests failed naming a cause
+# that was not the cause, over an empty list of files. A message that names the
+# wrong problem is worse than no message, and this repository has already retracted
+# one assertion for reporting something other than what it measured.
+def test_the_gitignore_query_reports_the_paths_the_rules_match():
+    """The detector, watched firing. `__pycache__/` and `*.py[cod]` both match it."""
+    matched = gitignored(["tests/__pycache__/stale.pyc", "plan1/records.py"])
+    assert matched == ["tests/__pycache__/stale.pyc"]
+
+
+def test_the_gitignore_query_is_silent_when_the_rules_match_nothing():
+    """The answer the two callers are looking for, as an empty list rather than an
+    exit code — so no caller has to know that 1 is the good one."""
+    assert gitignored(["plan1/records.py", "README.md"]) == []
+
+
+def test_the_gitignore_query_raises_when_git_cannot_answer_at_all(tmp_path):
+    """The bug: `git` returning 128 read as "the files are ignored".
+
+    Found by copying the tree without `.git` — the way a reader who downloaded a zip
+    would meet it. Both callers reported *attribution files matched by .gitignore*,
+    listing none, when what had actually happened is that there was no repository to
+    ask. The distinction has to be made here, once, because it is the same three-way
+    answer in both places.
+    """
+    with pytest.raises(RuntimeError) as raised:
+        gitignored(["plan1/records.py"], cwd=tmp_path)
+    message = str(raised.value)
+    assert "could not" in message
+    assert "128" in message
+    assert ".gitignore" not in message  # naming the wrong cause is the whole bug
 
 
 # ── coverage pragmas: extracted here, asserted by the coverage work ─────────
