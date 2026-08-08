@@ -26,11 +26,16 @@ START = {
 #: The precision the 2026-07-22 console line recorded the baseline at.
 CONSOLE_DECIMALS = {"psnr": 3, "ssim": 4, "lpips": 3}
 
-#: The parent spec's published gap-recovered cells, exactly as it printed them: one
-#: decimal place, as percentages. Each therefore *denotes an interval* of its own —
-#: 63.6% asserts only that the value lies in [63.55%, 63.65%]. Treating one of these
-#: as an exact number is the mistake the assembly spec's retraction records, so they
-#: are carried here as Measurements and never as bare floats.
+#: The cells as the superseded parent specification printed them: one decimal place,
+#: as percentages. Each therefore *denotes an interval* of its own — 63.6% asserts
+#: only that the value lies in [63.55%, 63.65%]. Treating one of these as an exact
+#: number is the mistake that produced the retracted correction, so they are carried
+#: here as Measurements and never as bare floats.
+#:
+#: That specification is one of the planning documents that deliberately did not
+#: travel; `evidence/record/LINKS.md` records what it was and why. Its cells are here
+#: because they are what a claim was made against, and this is where the claim is
+#: checked — the values are the evidence, not the document.
 PARENT_CELLS = {
     "psnr": Measurement(0.636, decimals=3),
     "ssim": Measurement(0.726, decimals=3),
@@ -142,8 +147,9 @@ def three_row_case():
 
     The recorded precision is what stops these intervals collapsing to zero width.
     That collapse is what made a point estimate with roughly two tenths of a
-    percentage point of slack look like a hard fact — see the retraction in
-    `docs/specs/plan-1-comparison-assembly-spec.md`.
+    percentage point of slack look like a hard fact. The claim was retracted;
+    `test_integration.py::test_the_console_baseline_intervals_cover_the_parent_cells`
+    is the retraction as an assertion rather than a sentence.
     """
     records = _null_and_imposed()
     records["baseline"] = make_record(

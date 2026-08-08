@@ -138,10 +138,15 @@ path = "cluster/rho_probe_evidence/penguin_rho64"
 # rather than at the console line's three decimals. The row is therefore bound to
 # the statistics record and the rounding intervals collapse.
 #
-# The disqualified alternative is retained as a warning, not as a fallback: the
-# local ~/results/diva360_finetune/penguin_0217_0239/ (2026-06-24, 25.0107) is a
-# DIFFERENT run. Substituting it would be the prohibited baseline re-run by
-# another route. The superseded console line remains at
+# The disqualified alternative is retained as a warning, not as a fallback: a
+# second `results/diva360_finetune/penguin_0217_0239/` directory the cluster
+# account also held (2026-06-24, 25.0107) is a DIFFERENT run — its step-0
+# fingerprint matches but it does not round to the console line. Substituting it
+# would be the prohibited baseline re-run by another route. Both the warning and
+# the disqualification were declared in advance: see §7 of
+# evidence/record/plan1_prereg.md, and §2 of
+# evidence/record/plan1_feasibility_addendum.md for what preflight found. The
+# superseded console line remains at
 # cluster/spike_logs/phase3_run_console.log.
 [[row]]
 key = "baseline"

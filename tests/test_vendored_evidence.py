@@ -1,9 +1,9 @@
-"""The vendored evidence is auditable against the archive it was copied from.
+"""The vendored evidence is auditable against the originals it was copied from.
 
 Vendoring gives up divergence detection — a copy cannot notice that its original
-moved. `evidence/PROVENANCE.toml` is what is offered in exchange: source path and
-sha256 for every copied byte, so a reader holding an original can check the copy
-against it.
+moved. `evidence/PROVENANCE.toml` is what is offered in exchange: for every copied
+byte, what it is and what it hashes to, so a reader holding an original can check the
+copy against it.
 
 That record is only worth anything if it is asserted **in both directions**. A row
 whose file has changed must fail; so must a file that arrived with no row. The
@@ -19,8 +19,16 @@ from pathlib import Path
 
 import pytest
 
+from audit import (
+    AUTHORED_UNDER_EVIDENCE,
+    HOME_MARKERS,
+    PRIVATE_REPOS,
+    forbidden_references,
+    origin_problems,
+)
 from plan1.provenance import (
     EVIDENCE_ROOT,
+    REPO_ROOT,
     VendoredFile,
     load_evidence,
     sha256_file,
@@ -35,11 +43,20 @@ PATCHED_SHA256 = "e2ca10cf4ef7ae00b36cdc9a0baa30518ce028aef0ec37ce75a6c112919ed3
 
 
 def vendored_files() -> list[Path]:
-    """Every file actually present under `evidence/`, bar the record itself."""
+    """Every *copied* file under `evidence/`.
+
+    Two files there are this repository's own — the manifest, and the note that
+    classifies the vendored records' links — so neither has an original to be
+    audited against and neither carries a row. They are named in `tests/audit.py`,
+    which also owns the other half of the same distinction: those two are audited
+    for forbidden references and the copies are not. One list, so "what needs a row"
+    and "what gets audited" cannot drift into disagreement.
+    """
+    authored = {REPO_ROOT / relative for relative in AUTHORED_UNDER_EVIDENCE}
     return sorted(
         path
         for path in EVIDENCE_ROOT.rglob("*")
-        if path.is_file() and path.name != "PROVENANCE.toml" and path.name != ".DS_Store"
+        if path.is_file() and path not in authored and path.name != ".DS_Store"
     )
 
 
@@ -52,11 +69,61 @@ def test_every_vendored_file_hashes_to_its_recorded_value(entry):
 
 
 @pytest.mark.parametrize("entry", RECORD.files, ids=lambda e: e.path)
-def test_every_row_names_where_it_came_from_and_why_it_travelled(entry):
-    """A hash alone is not provenance. Without a source the copy cannot be
-    audited, and without a reason nobody can tell whether it should be here."""
-    assert entry.source.startswith("~/"), entry.source
-    assert entry.why
+def test_every_row_says_what_the_file_is_and_why_it_travelled(entry):
+    """A hash alone is not provenance. Without knowing what the file *is*, a reader
+    cannot judge whether it supports the sentence citing it; without a reason,
+    nobody can tell whether it should be here at all.
+
+    **This assertion used to require the opposite.** It read
+    `assert entry.source.startswith(…)` against a leading tilde-and-separator — it
+    *mandated* that every row name a directory on the authoring machine, and 55 rows
+    obliged. That is how the leak was not merely tolerated but enforced: cleaning it
+    up had to start by watching this line fail. It did, on 2026-08-08, 49 times, with
+    `AttributeError: 'VendoredFile' object has no attribute 'source'`.
+
+    What replaces it is the property a reader actually wants — the origin says what
+    the measurement is, and says it without reaching for a path, a repository or a
+    ticket that they cannot resolve.
+    """
+    assert entry.why, f"{entry.path} has no reason for travelling"
+    problems = origin_problems(entry.origin)
+    assert not problems, (
+        f"{entry.path}'s origin is {entry.origin!r}:\n  " + "\n  ".join(problems)
+    )
+
+
+@pytest.mark.parametrize(
+    "bad_origin",
+    [
+        "",
+        HOME_MARKERS[0] + "3D/cluster/rho_probe_evidence/penguin_rho16/stats/x.json",
+        "copied out of " + PRIVATE_REPOS[0],
+        "vendored under " + "#" + "15",
+        "cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json",
+    ],
+    ids=["empty", "home path", "private repository", "ticket", "bare path"],
+)
+def test_the_origin_guard_fails_on_a_row_that_names_something_unreachable(bad_origin):
+    """The guard above, driven against a deliberately bad row.
+
+    A guard nobody has watched fail is a guard nobody knows the failure mode of, and
+    this one replaced an assertion that could not fail in the useful direction — it
+    demanded the leak. So the five ways a row can be wrong are each put to it here,
+    which is the practice `tests/test_conformance.py`'s negative controls establish
+    for the wiring gate.
+
+    The real guard is *called*, not reimplemented. A negative control that asserted
+    against its own copy of the predicate would pass while the guard itself was
+    edited into uselessness.
+    """
+    bad = VendoredFile(
+        path="cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json",
+        origin=bad_origin,
+        sha256="0" * 64,
+        why="a reason that is present, so the origin is what fails",
+    )
+    with pytest.raises(AssertionError):
+        test_every_row_says_what_the_file_is_and_why_it_travelled(bad)
 
 
 # ── and what is there is described ──────────────────────────────────────────
@@ -74,16 +141,18 @@ def test_every_file_under_evidence_has_a_provenance_row():
 def test_the_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
     """Both checks above pass trivially against an empty directory.
 
-    47 = 24 run/cluster + 21 characterisation + 2 governing documents. The 24:
-    nine run directories × two stats files = 18, three run logs, two archived
-    cluster sources, one spike console. The 21: every characterisation artifact
-    except a `.DS_Store` — seventeen were named up front, and the four beyond them
-    are each the input a named document asserts against, so they travelled too.
-    Every source path is recorded per file in `PROVENANCE.toml`. The 2: the
-    pre-registration and the verdict, cited sixteen times and shipped zero until
-    R1. All departures are on the record in `PROVENANCE.toml`.
+    49 = 24 run/cluster + 21 characterisation + 4 documents. The 24: nine run
+    directories × two stats files = 18, three run logs, two archived cluster
+    sources, one spike console. The 21: every characterisation artifact except a
+    `.DS_Store` — seventeen were scoped up front, and the four beyond them are each
+    the input a named document asserts against, so they travelled too. The 4: the
+    pre-registration and the verdict, cited sixteen times and shipped zero times,
+    plus the two companions those two cite by name — the Phase-B probe verdict and
+    the feasibility addendum, whose sibling-relative citations resolved nowhere
+    until the documents landed beside them. All departures are on the record in
+    `PROVENANCE.toml`.
     """
-    assert len(RECORD.files) == len(vendored_files()) == 47
+    assert len(RECORD.files) == len(vendored_files()) == 49
 
 
 # ── the characterisation outputs carry what a derived artefact needs ────────
@@ -114,8 +183,8 @@ def test_every_characterisation_output_names_its_command_date_and_verdict(entry)
     `val_step0501.json` came off the cluster and means what it says. A figure or a
     summary CSV is the output of a program, and a reader who cannot see which
     program, when it ran, and which verdict checked the result has no way to tell
-    whether the file still supports the sentence citing it. #19's requirement, as
-    three fields rather than three sentences of prose.
+    whether the file still supports the sentence citing it. Three fields rather than
+    three sentences of prose.
     """
     assert entry.command, f"{entry.path} has no generating command"
     assert entry.generated, f"{entry.path} has no generation date"
@@ -151,7 +220,7 @@ def test_the_three_verdict_counts_are_what_the_verdicts_actually_say():
 
 
 # ── the two documents the artefact argues from ──────────────────────────────
-#: Cited sixteen times across this repository and shipped zero times until R1 —
+#: Cited sixteen times across this repository and shipped zero times until vendored —
 #: including in the published table's own byline, which named a path in an archive
 #: no reader could reach.
 RECORD_DOCS = {
@@ -206,7 +275,7 @@ def test_only_the_governing_documents_claim_an_archive_revision():
 
 
 def test_the_archive_date_is_not_offered_as_precedence_evidence():
-    """The trap in R1, written down so it cannot be quietly reintroduced.
+    """The trap in the recorded dates, written down so it cannot be reintroduced.
 
     The archive commit is dated 2026-08-06. The runs the pre-registration licensed
     are dated 2026-08-05 — one day EARLIER — because it is the last commit that
@@ -225,7 +294,7 @@ def test_the_archive_date_is_not_offered_as_precedence_evidence():
 
 
 def test_the_published_byline_cites_a_path_that_exists_in_this_repository():
-    """The defect R1 exists for, asserted rather than fixed and forgotten.
+    """The defect the vendoring exists for, asserted rather than fixed and forgotten.
 
     The byline used to send a reader to
     `all_record/deformsplat_corroboration/plan1_prereg.md`, which is in an archive
@@ -291,24 +360,28 @@ def test_the_two_gate_sources_travelled():
 @pytest.mark.parametrize("entry", RECORD.files, ids=lambda e: e.path)
 def test_no_row_escapes_the_evidence_directory(entry):
     """`resolve()` follows `..`; a row that pointed outside would reintroduce
-    exactly the external dependency this ticket removed."""
+    exactly the external dependency the vendoring removed."""
     assert RECORD.resolve(entry.path).is_relative_to(EVIDENCE_ROOT)
 
 
-# ── the artefacts the footer names but does not vendor ──────────────────────
-def test_the_recorded_artefacts_cover_the_method_repository():
-    """Two footer rows identify the method repo, which is a separate port (#16).
-    Their expected identities are recorded so a moved sibling is an error rather
-    than a silently different table."""
+# ── the artefacts the footer names ──────────────────────────────────────────
+def test_every_recorded_artefact_identifies_content_that_is_in_this_repository():
+    """The footer may only cite things a reader can inspect.
+
+    There used to be a second row here: `method repository HEAD`, a 40-hex commit in
+    a repository nobody outside the project can clone. It was published in the one
+    table where every line is meant to be checkable, and it was the only line that
+    was not. Asserting the *set* rather than a minimum is what keeps it from coming
+    back — a new row has to be argued for here before it can be printed.
+    """
     names = {artefact.name for artefact in RECORD.artefacts}
-    assert names == {
-        "reference rule (`box_b/edge_weights.py`)",
-        "method repository HEAD",
-    }
+    assert names == {"reference rule (`box_b/edge_weights.py`)"}
     for artefact in RECORD.artefacts:
-        assert artefact.kind in {"file_sha256", "git_head"}
-        assert artefact.value
+        assert artefact.kind == "file_sha256", artefact.kind
+        assert re.fullmatch(r"[0-9a-f]{64}", artefact.value), artefact.value
         assert artefact.why
+        findings = forbidden_references(artefact.origin)
+        assert not findings, [str(finding) for finding in findings]
 
 
 # ── exclusions are stated, not left as an absence ───────────────────────────

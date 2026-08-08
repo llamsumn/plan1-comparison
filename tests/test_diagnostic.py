@@ -41,7 +41,7 @@ from plan1.provenance import REPO_ROOT
 DIAGNOSTIC_DIR = REPO_ROOT / "diagnostics"
 COMMITTED = DIAGNOSTIC_DIR / "arap_core_diagnostic.json"
 
-#: The three modules the ticket requires be *reached* rather than assumed. The
+#: The three modules that have to be *reached* rather than assumed. The
 #: diagnostic drives the solver end to end, so all three execute — but "the
 #: driver runs" is the kind of claim that is easy to assert and easy to be wrong
 #: about, so it is observed rather than believed (see the tracing test below).

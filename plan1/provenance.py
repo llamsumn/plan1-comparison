@@ -3,7 +3,7 @@
 Three questions have to stay answerable after the fact: *which version of the
 reference rule did the conformance test bind to*, *is the cluster source still the
 one that produced the archived runs*, and *is the vendored copy of the evidence
-still the archive's*. All three are answered by content, not by a path or a
+still the original's*. All three are answered by content, not by a path or a
 timestamp.
 
 Git state is read by **opening files under ``.git`` directly**, never by shelling
@@ -12,8 +12,8 @@ meaningful for the cluster sources, which are not in any repository.
 
 The evidence base itself lives under ``evidence/`` and is described by
 ``evidence/PROVENANCE.toml``. Vendoring it is what took every external path out of
-this repository's runtime graph; recording where every byte came from is what keeps
-the copy auditable against an original.
+this repository's runtime graph; recording what every byte *is*, and what it hashes
+to, is what keeps the copy auditable against an original.
 """
 
 from __future__ import annotations
@@ -39,14 +39,15 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-# ``head_commit()`` lived here until #16. It read a *sibling working tree's* git
-# state off the filesystem so the table's footer could name the method repository's
-# HEAD, and it was the last thing in this package that reached outside the
-# repository for anything. The method is now vendored (see ``[[ported]]`` in
-# ``evidence/PROVENANCE.toml``), so the commit it used to read is a recorded fact
-# about where the copy came from rather than a live observation of a checkout that
-# may not exist. Deleting the function is what makes that true rather than merely
-# claimed: there is no longer any code here that could resolve a sibling.
+# ``head_commit()`` lived here once. It read a *sibling working tree's* git state
+# off the filesystem so the table's footer could print that tree's HEAD, and it was
+# the last thing in this package that reached outside the repository for anything.
+# Deleting the function is what makes its absence a fact rather than a claim: there
+# is no longer any code here that could resolve a sibling. The footer row it fed is
+# gone too — a commit in a repository a reader cannot clone is an identifier that
+# cannot be checked. What pins the method now is the content hash on its
+# ``[[ported]]`` row in ``evidence/PROVENANCE.toml``, which is the part that ever
+# did any work.
 
 
 def require_vendored(path: Path, what: str) -> Path:
@@ -79,7 +80,8 @@ def require_vendored(path: Path, what: str) -> Path:
 def display_path(path: Path | str) -> str:
     """A path as a published artefact should print it: relative to the repository.
 
-    A table that prints ``/Users/someone/plan1-comparison/evidence/…`` regenerates
+    A table that prints an absolute path — some clone location under somebody's
+    home directory, then ``plan1-comparison/evidence/…`` — regenerates
     byte-identically on exactly one machine. Anything inside the repository is
     printed relative to it; anything outside is a bug at the call site rather than
     something to render politely, so it is returned unchanged and the renderer's
@@ -102,7 +104,15 @@ def display_path(path: Path | str) -> str:
 # ── the vendored evidence base ──────────────────────────────────────────────
 @dataclass(frozen=True)
 class VendoredFile:
-    """One copied file: where it came from, what it hashes to, why it travelled.
+    """One copied file: what it is, what it hashes to, why it travelled.
+
+    ``origin`` says what the thing is — which run and which evaluation step, which
+    study step, which document — rather than which directory the copy was reached
+    in. It used to be a ``source`` path on the authoring machine, and that was
+    worth less than it looked: a reader cannot resolve it, and for 24 of the rows it
+    was character-identical to the file's own location here once the private prefix
+    came off, so the prefix was the only thing it carried. What makes the copy
+    auditable is ``sha256``, and that has not changed.
 
     ``command``, ``generated`` and ``certified_by`` are the three extra facts a
     *derived* artefact needs and a raw run record does not. A ``val_step0501.json``
@@ -126,7 +136,7 @@ class VendoredFile:
     """
 
     path: str
-    source: str
+    origin: str
     sha256: str
     why: str
     command: str | None = None
@@ -144,22 +154,29 @@ class VendoredFile:
 
 @dataclass(frozen=True)
 class PortedFile:
-    """One file copied out of the method repository, and where it came from.
+    """One file of the method: what it is, and what it hashes to.
 
     Distinct from ``VendoredFile`` because these are not *evidence* — they are
     executable code that lives at the repository root and is imported, not read.
-    The two need different homes on disk and the same discipline about identity:
-    source repository, source commit, and a hash.
+    The two need different homes on disk and the same discipline about identity, so
+    they carry the same fields: ``origin``, ``sha256``, ``why``.
+
+    These rows used to carry ``source_repo`` and ``source_commit`` instead, naming
+    one of two of this author's own repositories and a 40-hex commit in it. Neither
+    is published, so the citation could not be followed — and there was nobody to
+    attribute to in any case: the code is this project's own and this repository is
+    now its only published home. What the rows are *for* is unaffected, because it
+    was never the commit: they are integrity pins, and ``sha256`` is the pin.
 
     ``attribution`` is for the one row that is not code and not this project's to
     give: ``data/penguin_original.ply`` is a 3DGS export of a checkpoint trained on
-    a third-party dataset, so the port record says where it came from but not whom
-    it is owed to. One field, naming the dataset and its licence, closes that.
+    a third-party dataset, so ``origin`` says what the file is while leaving whom it
+    is owed to unrecorded. One field, naming the dataset and its licence, closes
+    that.
     """
 
     path: str
-    source_repo: str
-    source_commit: str
+    origin: str
     sha256: str
     why: str
     attribution: str | None = None
@@ -169,17 +186,19 @@ class PortedFile:
 class RecordedArtefact:
     """An identity the published table's footer cites.
 
-    The two that name the method: the reference rule's content hash, and the
-    commit of the repository the vendored copy was taken from. Since #16 both are
-    satisfied from inside this repository — the rule is hashed from the ported
-    file, and the commit is read from this record. ``source`` therefore names
-    where the copy *came from*, and is provenance rather than a location anything
-    resolves.
+    One row names the method: the reference rule's content hash, satisfied from
+    inside this repository by hashing the file at ``box_b/edge_weights.py``.
+    ``origin`` says which content the hash is of.
+
+    A second row used to sit beside it, printing the HEAD commit of the repository
+    the method was copied from. It published a 40-hex identifier a reader could not
+    resolve, so the footer cited something uncheckable in order to look thorough. It
+    is gone; the hash is what pins the content.
     """
 
     name: str
     kind: str
-    source: str
+    origin: str
     value: str
     why: str
 
@@ -238,7 +257,7 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
         files=tuple(
             VendoredFile(
                 path=entry["path"],
-                source=entry["source"],
+                origin=entry["origin"],
                 sha256=entry["sha256"],
                 why=entry["why"],
                 command=entry.get("command"),
@@ -259,7 +278,7 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
             RecordedArtefact(
                 name=entry["name"],
                 kind=entry["kind"],
-                source=entry["source"],
+                origin=entry["origin"],
                 value=entry["value"],
                 why=entry["why"],
             )
@@ -272,8 +291,7 @@ def load_evidence(root: Path = EVIDENCE_ROOT) -> EvidenceRecord:
         ported=tuple(
             PortedFile(
                 path=entry["path"],
-                source_repo=entry["source_repo"],
-                source_commit=entry["source_commit"],
+                origin=entry["origin"],
                 sha256=entry["sha256"],
                 why=entry["why"],
                 attribution=entry.get("attribution"),

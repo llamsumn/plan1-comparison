@@ -22,12 +22,12 @@ tests disappear some *other* way — a renamed directory, a `testpaths` edit, a
 collection error swallowed in CI — and produce a smaller green number again. So
 the total is asserted.
 
-**This assertion was written red first**, which is an acceptance criterion on #18
-rather than a courtesy, because this project has already shipped two guards that
-could not fail: the `T0.1` in-run assertion that evaluated `torch.equal(w, w)`,
-and a provenance footer that dropped the rows it could not resolve. A guard nobody
-has watched fail is a guard nobody knows the failure mode of. What was watched, on
-2026-08-06, with the literal output:
+**This assertion was written red first**, which was a requirement rather than a
+courtesy, because this project has already shipped two guards that could not fail:
+the `T0.1` in-run assertion that evaluated `torch.equal(w, w)`, and a provenance
+footer that dropped the rows it could not resolve. A guard nobody has watched fail
+is a guard nobody knows the failure mode of. What was watched, on 2026-08-06, with
+the literal output:
 
 1. **A vendored input deleted.** `mv evidence/cluster/sources_20260729/helper.py`
    away, then `python -m pytest -q`::
@@ -65,35 +65,50 @@ import pytest
 #:
 #: | source | tests |
 #: |---|---|
-#: | the assembler suite, as it stood after #15 | 225 |
-#: | #19 — characterisation provenance, row counts, verdict counts | +90 |
-#: | #16 — the 31 ported method tests | +31 |
-#: | #16 — `test_ported_method.py`, plus one conformance test | +46 |
-#: | #17 — `test_diagnostic.py` | +9 |
-#: | #18 — this module | +12 |
-#: | R2 — `test_upstream_diff.py`, the third-party attribution guard | +21 |
-#: | R3 — the sample asset's dataset attribution | +3 |
-#: | R10 — `test_projection_figure.py`, the §6.4 figure | +29 |
-#: | R1 — the vendored pre-registration and verdict | +15 |
+#: | the assembler suite, once the evidence was vendored | 225 |
+#: | characterisation provenance, row counts, verdict counts | +90 |
+#: | the 31 method tests | +31 |
+#: | `test_ported_method.py`, plus one conformance test | +46 |
+#: | `test_diagnostic.py` — the solver ladder, re-executed | +9 |
+#: | this module | +12 |
+#: | `test_upstream_diff.py`, the third-party attribution guard | +21 |
+#: | the sample asset's dataset attribution | +3 |
+#: | `test_projection_figure.py`, the §6.4 figure | +29 |
+#: | the vendored pre-registration and verdict | +15 |
+#: | `test_source_audit.py` — the repository-wide reference audit | +86 |
+#: | `test_vendored_record_links.py` — every link in the four records | +38 |
+#: | the two vendored companions, and the inverted row guards | +16 |
 #:
-#: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 47
+#: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 49
 #: `[[file]]` rows and 23 `[[ported]]` rows, and several checks run once per row.
 #: That is why the number moves whenever evidence lands, and why it is asserted
 #: here rather than left to be noticed.
 #:
-#: R2, R3, R10 and R1 are the pre-write-up clean-up, +67 between them.
+#: Four of the rows above are the pre-write-up clean-up, +67 between them. Three of
+#: the four added no evidence and no rows, so their +52 is whole tests: the two
+#: committed upstream diffs, the sample asset's dataset attribution, and the §6.4
+#: projection figure. Vendoring the two governing documents is the one that moves the
+#: number the old way — `PROVENANCE.toml` rows are parametrised three ways in
+#: `test_vendored_evidence.py` (hash, origin-and-reason, no-escape), so two rows are
+#: +6 before a single new test is written.
 #:
-#: R2, R3 and R10 added no evidence and no rows, so their +52 is whole tests: the
-#: two committed upstream diffs, the sample asset's dataset attribution, and the
-#: §6.4 projection figure.
+#: The last three rows are self-contained provenance, +140. They break down as:
 #:
-#: R1 is the one that moves the number the old way. It vendors two files, and
-#: `PROVENANCE.toml` rows are parametrised three ways in
-#: `test_vendored_evidence.py` — hash, source-and-reason, and the no-escape check —
-#: so two rows are +6 before a single new test is written. The other +9 are the
-#: guards on the documents themselves and on the byline that used to cite a path no
-#: reader could reach.
-EXPECTED_TESTS = 487
+#: | check | tests |
+#: |---|---|
+#: | one per audited file — 64 tracked text files, the manifest included | 64 |
+#: | one per audited Markdown file, for links that resolve | 5 |
+#: | the three detectors' negative controls, plus 5 look-alikes they must ignore | 8 |
+#: | the walk, the exemption, and the pragma extractor | 9 |
+#: | one per link in the four vendored records | 29 |
+#: | one per record the note has to cover, plus 3 on the note itself | 7 |
+#: | negative controls on the link guard, both directions | 2 |
+#: | the two new `[[file]]` rows, parametrised three ways | 6 |
+#: | negative controls on the two inverted row guards, 5 each | 10 |
+#:
+#: The 64 is the number to watch: it is every text file in the repository, so adding
+#: a source file moves this total by one whether or not it adds a test.
+EXPECTED_TESTS = 627
 
 
 def test_the_whole_suite_is_collected(pytestconfig):
@@ -182,9 +197,8 @@ def test_torch_is_a_hard_dependency_not_an_optional_extra():
 def test_the_runtime_dependencies_are_declared_and_importable(declared):
     """`dependencies` was `[]`, so a bare `pip install -e .` gave a broken runtime.
 
-    The method arrived with #16 and needs all three. Declared in
-    `pyproject.toml`; asserted importable here, so the declaration and the reality
-    cannot drift.
+    The method needs all three. Declared in `pyproject.toml`; asserted importable
+    here, so the declaration and the reality cannot drift.
     """
     import importlib
     import tomllib

@@ -26,6 +26,7 @@ from scripts.build_table import (  # noqa: E402
     collect_provenance,
     render_table,
 )
+from audit import forbidden_references  # noqa: E402
 
 
 def test_the_committed_table_regenerates_byte_identically():
@@ -39,11 +40,16 @@ def test_the_rendered_table_names_no_absolute_path():
     Every path the table prints — the manifest, each run record, each vendored
     source — has to be relative to the repository, or the output is a function of
     where the clone happens to sit.
+
+    The home-directory half of this is delegated to `tests/audit.py` rather than
+    spelled out here, so that "names a directory on somebody's computer" has one
+    definition in this repository instead of one per guard. Spelling it out locally
+    is how the manifest accumulated 55 of them while a Python-only guard watched.
     """
     absolute = [
         line
         for line in render_table().splitlines()
-        if re.search(r"[`( ]/[A-Za-z]", line) or "/Users/" in line or "/home/" in line
+        if re.search(r"[`( ]/[A-Za-z]", line) or forbidden_references(line)
     ]
     assert not absolute, absolute
 
@@ -78,8 +84,8 @@ def test_a_missing_provenance_input_raises_rather_than_dropping_a_line(tmp_path)
 
 
 def test_an_edited_reference_rule_raises_rather_than_publishing_a_new_hash(tmp_path):
-    """The reference rule is vendored (#16), so it cannot *move* any more — but it
-    can be edited, and an edited rule is a different rule. The check is the same
+    """The reference rule is in this repository, so it cannot *move* any more — but
+    it can be edited, and an edited rule is a different rule. The check is the same
     one it always was, now pointed at a file this repository owns: identity is
     recorded, and content that has moved on is an error naming both values rather
     than a footer that quietly changed.
@@ -93,13 +99,19 @@ def test_an_edited_reference_rule_raises_rather_than_publishing_a_new_hash(tmp_p
 
 def test_the_footer_names_every_recorded_artefact():
     """No row may be dropped, so the footer's shape is asserted rather than
-    trusted to whichever inputs happened to resolve."""
+    trusted to whichever inputs happened to resolve.
+
+    Three rows, not the four this used to assert. The fourth printed the HEAD commit
+    of the repository the method was copied from — an identifier in a repository no
+    reader can clone, published in the one table where every line is supposed to be
+    checkable. Each of the three that remain identifies content that is present
+    here, so the footer can be verified with nothing but the clone.
+    """
     footer = collect_provenance()
     assert list(footer) == [
         "reference rule (`box_b/edge_weights.py`)",
-        "method repository HEAD",
         "deployed rule (`cluster/sources_20260729/helper.py`)",
         "patched call site, ρ = 32/64 rows (`cluster/sources_20260805_patched/deform_splat.py`)",
     ]
     for value in footer.values():
-        assert value
+        assert value.startswith("sha256 "), value

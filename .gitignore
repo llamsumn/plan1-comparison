@@ -5,6 +5,13 @@ __pycache__/
 *.egg-info/
 .DS_Store
 
+# Coverage's own database. Written into the working tree by a measured run, and
+# not ignored until now — so `git add .` would have committed a 143 KB binary
+# artefact of one machine's run. `tests/audit.py` walks untracked files that are
+# not ignored, precisely so that a stray like this is visible.
+.coverage
+.coverage.*
+
 # Deformed assets written by the example. `--out` can point anywhere, so this is
 # by extension rather than by directory.
 *.ply
@@ -13,10 +20,9 @@ __pycache__/
 # `data/penguin_original.ply` is 5.6 MB and the penguin example cannot run
 # without it. GitHub's per-file limit is 100 MB, so tracking it is simply fine —
 # and it is the difference between a bare clone that runs the example and one
-# that only reads about it, which is the whole point of this repository. The
-# method repo's CONTEXT.md listed Git LFS and a fetch script as candidate
-# workarounds for a constraint that does not exist; that open item is closed the
-# same way (#20).
+# that only reads about it, which is the whole point of this repository. Git LFS
+# and a fetch script were both considered, as workarounds for a size constraint
+# that turns out not to exist.
 !data/penguin_original.ply
 
 # ── and by exception: the deformed asset the §6.4 figure is drawn from ──────

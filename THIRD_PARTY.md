@@ -121,8 +121,9 @@ run logs under `evidence/cluster/` name `data/diva360_processed/penguin_0239/` a
 attribution is owed on that basis.
 
 **The 3DGS checkpoint was not trained by this project.** It came with the cluster
-image, and reusing it rather than training it is recorded in the archive's
-`cluster/SPIKE_VERDICT.md`. Nothing in this repository claims otherwise, and nothing in
+image, and reusing it rather than training it is recorded on the asset's `[[ported]]`
+row in `evidence/PROVENANCE.toml`, where its `attribution` field states it in the same
+words. Nothing in this repository claims otherwise, and nothing in
 the published table depends on how it was produced — the comparison is between arms
 that all start from the identical step-0 state, which is asserted rather than assumed.
 

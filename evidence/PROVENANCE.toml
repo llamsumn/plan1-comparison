@@ -1,145 +1,154 @@
-# The vendored evidence base — what travelled, from where, and hashing to what.
+# The vendored evidence base — what travelled, what it is, and what it hashes to.
 #
-# `plan1-comparison` used to resolve its evidence out of a sibling `~/3D`
-# checkout. That made the published table reproducible only inside one person's
-# directory layout, and made three test modules skip silently everywhere else.
-# The evidence is 1.7 MB — 236 KB of run records and cluster sources (#15) plus
-# 1.5 MB of characterisation outputs (#19) — and it now lives here, with `~/3D`
-# out of the runtime graph entirely.
+# `plan1-comparison` used to resolve its evidence out of a checkout elsewhere on
+# the authoring machine. That made the published table reproducible only inside one
+# person's directory layout, and made three test modules skip silently everywhere
+# else. The evidence is 1.7 MB — 236 KB of run records and cluster sources plus
+# 1.5 MB of characterisation outputs — and it now lives here, with nothing outside
+# this repository in the runtime graph at all.
 #
 # Vendoring trades away divergence detection: a copy cannot notice that its
 # original changed. That trade is deliberate — Plan 1 is frozen (archived runs,
 # fixed deployed text at a cited hash), so "notice if upstream moves" protects
 # nothing about its claim, while self-containment is what an examiner needs. What
-# keeps the trade honest is this file: every copied byte records where it came
-# from and what it hashes to, so anyone holding an original can audit the copy
-# against it. `tests/test_vendored_evidence.py` asserts every row, in both
-# directions — a file with no row fails just as loudly as a row that does not
-# match its file.
+# keeps the trade honest is this file: every copied byte records what it is and
+# what it hashes to, so anyone holding an original can audit the copy against it.
+# `tests/test_vendored_evidence.py` asserts every row, in both directions — a file
+# with no row fails just as loudly as a row that does not match its file.
 #
-# Sources are recorded as they were reached on the authoring machine. They are
-# provenance, not a runtime path: nothing in this repository resolves them.
+# `origin` SAYS WHAT THE THING IS, NOT WHERE IT SAT. Each row used to record the
+# absolute path the copy was reached at on the authoring machine — a directory on
+# somebody else's computer, which a reader can neither resolve nor check. For 24 of
+# the rows that path was character-identical to the file's own location here once
+# the private prefix came off, so the prefix was the only content it carried.
+# `origin` records the measurement instead: which run, which evaluation step, which
+# study step, which document. That is self-contained, and it is what a reader
+# actually needs in order to judge whether a file supports the sentence citing it.
+# The hash is what makes the copy auditable, and it always was.
 
-[origin]
-archive = "~/3D"
-vendored = "2026-08-06"
-issues = [
-  "https://github.com/llamsumn/3D-arap/issues/15",  # run records, cluster sources, logs
-  "https://github.com/llamsumn/3D-arap/issues/19",  # characterisation outputs
-  "https://github.com/llamsumn/3D-arap/issues/16",  # the method — see [[ported]]
-  "https://github.com/llamsumn/3D-arap/issues/17",  # the solver diagnostic
-]
+[vendoring]
+# When the copies were taken. The bulk travelled on the first date; the two
+# companion documents under `record/` followed on the second, when the citations
+# inside the records they accompany were made to resolve.
+dates = ["2026-08-06", "2026-08-08"]
 
 # ── the nine run directories the manifest binds ─────────────────────────────
 # Every row of the published table resolves to a pair of these. `ckpts/`,
 # `renders/` and `tb/` sat beside `stats/` in the archive and were empty in all
 # nine, so nothing under them travelled.
+#
+# Six of the nine are the Phase-B ρ-probe sweep, whose own verdict is vendored at
+# `record/phase_b_probe_verdict.md` and lists all six with the finetune PSNRs that
+# appear in the published table. Two are the saturation runs the pre-registered
+# rule forced, and they record their launch lines and both source hashes in their
+# own consoles under `_logs/`. The ninth is the DeformSplat baseline, whose
+# statistics record the 2026-08-05 preflight recovered.
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0000.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_vanilla` — validation pass at step 0"
 sha256 = "28615c0011a7e22397ccbdd92618661a7d18ecce828d76486c7d6215830b75f4"
 why = "row `vanilla` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_vanilla/stats/val_step0501.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_vanilla` (grouping off, unit rigidity) — validation pass at step 501"
 sha256 = "04317fedff2b70d1aa0ff973e1e12eb2c36aedacde1043145b113a79c1632525"
 why = "row `vanilla` — the no-rigidity row, denominator base for every fraction"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0000.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho1a` — validation pass at step 0"
 sha256 = "dab4ffaace06661e49f88350fc736cceb117c7143625d225783b9976c589a8ef"
 why = "row `rho1a` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho1a/stats/val_step0501.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho1a` (ρ = 1) — validation pass at step 501"
 sha256 = "48237fe2eba39d5ce5de546934272f720b5198889910e1b20b79740693a32050"
 why = "row `rho1a` — unit-rigidity replicate, feeds the replicate band"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0000.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho1b` — validation pass at step 0"
 sha256 = "36b4d6a400aa325887dec3a5f8d7fda16d6f6bfe3b30bf2c45c30ab10ded2527"
 why = "row `rho1b` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho1b/stats/val_step0501.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho1b` (ρ = 1, second replicate) — validation pass at step 501"
 sha256 = "74176c0354db825bcbfd68541cfcaa37134ce0cf3182575abe81507f6ac7b178"
 why = "row `rho1b` — unit-rigidity replicate, feeds the replicate band"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho025/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0000.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho025` — validation pass at step 0"
 sha256 = "c412012568680909d201f6b8cdf18bfdc53af73908d4fa07ce86ce30566c09a3"
 why = "row `rho025` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho025/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho025/stats/val_step0501.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho025` (ρ = 0.25, the softening arm) — validation pass at step 501"
 sha256 = "03c239009923268a853b2434d004c5bff21f96f80b97865c5e81f4b74c73c780"
 why = "row `rho025` — imposed sweep, rho = 0.25"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho4/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0000.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho4` — validation pass at step 0"
 sha256 = "2b94c81376fb584454162b800c1a4a4974bb73eceacbef90f36b94e1e40efb07"
 why = "row `rho4` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho4/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho4/stats/val_step0501.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho4` (ρ = 4) — validation pass at step 501"
 sha256 = "2b8e363973d47948c8951bc8577ce5bf26977132643f0d826374a6e0cd44a2e0"
 why = "row `rho4` — imposed sweep, rho = 4"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho16/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0000.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho16` — validation pass at step 0"
 sha256 = "2c1d04a47f11f44e865f7449bad0923facae7f3589d7672d84cffe2c79e4b17c"
 why = "row `rho16` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho16/stats/val_step0501.json"
+origin = "Phase-B ρ-probe sweep, run `penguin_rho16` (ρ = 16) — validation pass at step 501"
 sha256 = "08e64a88378cc22f26a9fc923044141c2f2a6cde2adbbac68e9af63a9e4132ef"
 why = "row `rho16` — the row the saturation rule selects; source of 63.6/72.6/80.4%"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho32/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0000.json"
+origin = "saturation run of 2026-08-05, `penguin_rho32` — validation pass at step 0"
 sha256 = "724787ea46b5700133b6411549bed92bf042df0ce8611e42bcec89ff99526744"
 why = "row `rho32` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho32/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho32/stats/val_step0501.json"
+origin = "saturation run of 2026-08-05, `penguin_rho32` (ρ = 32) — validation pass at step 501"
 sha256 = "ac908a12aba6050a8db502a454121ed73064e5494eefd392a4663ae5693bc8b6"
 why = "row `rho32` — saturation run, 2026-08-05"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho64/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0000.json"
+origin = "saturation run of 2026-08-05, `penguin_rho64` — validation pass at step 0"
 sha256 = "82e6cc90be369d35fae5981c6e902700840eccd1039c357d9fad80dc9688846f"
 why = "row `rho64` — step-0 comparability fingerprint"
 
 [[file]]
 path = "cluster/rho_probe_evidence/penguin_rho64/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/penguin_rho64/stats/val_step0501.json"
+origin = "saturation run of 2026-08-05, `penguin_rho64` (ρ = 64) — validation pass at step 501"
 sha256 = "39d6f2537e7e3c11fc4789364a1eb0826b769149a03a2ba94ebf22b453f19737"
 why = "row `rho64` — saturation run; the point at which the curve turns over"
 
 [[file]]
 path = "cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0000.json"
-source = "~/3D/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0000.json"
+origin = "DeformSplat baseline finetune `penguin_0217_0239` — validation pass at step 0"
 sha256 = "8e7d031fe55ea2f9ad8fee89de9a33c5a3f7366c8b90deda3fd7a528865c7eda"
 why = "row `baseline` — step-0 fingerprint, bit-identical to all eight sweep rows"
 
 [[file]]
 path = "cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0501.json"
-source = "~/3D/cluster/rho_probe_evidence/baseline_penguin_0217_0239/stats/val_step0501.json"
+origin = "DeformSplat baseline finetune `penguin_0217_0239` — validation pass at step 501, recovered by the 2026-08-05 preflight"
 sha256 = "73c7bf3aef1b019f2c356979b58f32d6549664f0555c5c5a13705d58f4972042"
 why = "row `baseline` — the DeformSplat run's own statistics record, recovered 2026-08-05"
 
@@ -151,32 +160,33 @@ why = "row `baseline` — the DeformSplat run's own statistics record, recovered
 
 [[file]]
 path = "cluster/rho_probe_evidence/_logs/penguin_rho32.log"
-source = "~/3D/cluster/rho_probe_evidence/_logs/penguin_rho32.log"
+origin = "console of the 2026-08-05 saturation run at ρ = 32"
 sha256 = "16980890ffb6f49116dd2a6a96a5d3b301f0fd4af584a84666e8bf303b546170"
 why = "rho = 32 console: launch line, both inline source hashes, no AssertionError"
 
 [[file]]
 path = "cluster/rho_probe_evidence/_logs/penguin_rho64.log"
-source = "~/3D/cluster/rho_probe_evidence/_logs/penguin_rho64.log"
+origin = "console of the 2026-08-05 saturation run at ρ = 64"
 sha256 = "3348258e53a92cf0e0de436931b1a987aee851b683509833a1b31e349214e644"
 why = "rho = 64 console: launch line, both inline source hashes, no AssertionError"
 
 [[file]]
 path = "cluster/rho_probe_evidence/_logs/plan1_preflight_20260805.txt"
-source = "~/3D/cluster/rho_probe_evidence/_logs/plan1_preflight_20260805.txt"
+origin = "transcript of the 2026-08-05 preflight pass, observation only"
 sha256 = "1680df59cffc13664a2ef3ebb9f4dcb622f096651c53f75b6464e72bcaeff746"
-why = "the preflight that recovered the baseline record and compared 6/6 source hashes; cited by the manifest's baseline row"
+why = "the preflight that recovered the baseline record and compared 6/6 source hashes; cited by the manifest's baseline row, and summarised by the addendum at record/plan1_feasibility_addendum.md"
 
-# ── the two documents the whole artefact argues from ────────────────────────
-# CITED SIXTEEN TIMES AND SHIPPED ZERO — including in the published table's own
-# byline, which told a reader to consult a path that does not exist in any
-# repository they can reach. `plan1/render.py` now names the copy below.
+# ── the four documents the whole artefact argues from ───────────────────────
+# THE FIRST TWO WERE CITED SIXTEEN TIMES AND SHIPPED ZERO — including in the
+# published table's own byline, which told a reader to consult a path that does not
+# exist in any repository they can reach. `plan1/render.py` now names the copy
+# below.
 #
-# These are the only rows carrying `archive_commit` and `archive_date`, and the
-# reason is that they are the only vendored files whose *identity as a document*
-# matters rather than just their bytes. A `val_step0501.json` is its own evidence;
-# a pre-registration is a claim about what was decided and when, so which revision
-# of it travelled has to be answerable.
+# The pre-registration and the verdict are the only rows carrying `archive_commit`
+# and `archive_date`, and the reason is that they are the only vendored files whose
+# *identity as a document* matters rather than just their bytes. A
+# `val_step0501.json` is its own evidence; a pre-registration is a claim about what
+# was decided and when, so which revision of it travelled has to be answerable.
 #
 # READ THE DATE FOR WHAT IT IS. `2026-08-06` is when the archive commit these
 # copies were taken from was made — the last commit touching either file. It is
@@ -195,16 +205,26 @@ why = "the preflight that recovered the baseline record and compared 6/6 source 
 # worth nothing; this one is on record disagreeing. Vendoring these documents adds
 # the text. The test is what makes the text load-bearing.
 #
-# Both are copied VERBATIM, `../../` links and all. Several of those links point
-# out of this repository and will not resolve here. That is deliberate: rewriting
-# a link would change the bytes, and then the sha256 below would no longer let
-# anyone holding the archive audit this copy against it — which is the single
-# property that makes `evidence/` worth having. A dangling link is a smaller cost
-# than an unauditable copy.
+# THE OTHER TWO ARE THE COMPANIONS THESE TWO CITE BY NAME. The pre-registration
+# names the Phase-B probe verdict as the companion whose two carve-outs its §6
+# exists to close; the verdict names the feasibility addendum as where "sources
+# unchanged, so the evidence transfers" is checkable. Both were sibling-relative
+# links into a directory a reader does not have, so both citations resolved
+# nowhere. Placing the documents here is what makes them resolve — no link was
+# rewritten and no pinned byte was touched.
+#
+# All four are copied VERBATIM, `../../` links and all. Several of those links
+# point out of this repository and cannot resolve here. That is deliberate:
+# rewriting a link would change the bytes, and then the sha256 below would no
+# longer let anyone holding the original audit this copy against it — which is the
+# single property that makes `evidence/` worth having. Every one of those links is
+# classified instead, in `record/LINKS.md`, and
+# `tests/test_vendored_record_links.py` fails if one is neither resolvable nor
+# accounted for there.
 
 [[file]]
 path = "record/plan1_prereg.md"
-source = "~/3D/all_record/deformsplat_corroboration/plan1_prereg.md"
+origin = "the Plan 1 pre-registration — the rules as declared before preflight and before the saturation runs"
 sha256 = "512165b44a99e562471edfeb0f4b58620b08af91368940dd13f0147c4aa15e76"
 archive_commit = "1bef51b3c3d9853366f0faf8e6e7fa8dfdd012fe"
 archive_date = "2026-08-06"
@@ -221,11 +241,23 @@ why = "the pre-registration. It declares the saturation rule, the comparability 
 
 [[file]]
 path = "record/plan1_verdict.md"
-source = "~/3D/all_record/deformsplat_corroboration/plan1_verdict.md"
+origin = "the Plan 1 verdict — how every declared branch actually resolved, written after the sweep completed"
 sha256 = "c27cf2b593cc48223ef366ad0f7867d332ef95e28b6fd3e4e76ab8b8b4c10185"
 archive_commit = "1bef51b3c3d9853366f0faf8e6e7fa8dfdd012fe"
 archive_date = "2026-08-06"
 why = "the verdict. §1 names the wiring gate as the precondition for making any claim at all, and its §10 records how every declared branch resolved — including §10.6, which discloses the one post-hoc edit (the saturation reason sentence, with diff; predicate untouched, decision pinned before and after)"
+
+[[file]]
+path = "record/phase_b_probe_verdict.md"
+origin = "the Phase-B ρ-probe verdict, authored 2026-07-25 — the feasibility finding that the imposed-ρ knob is live on the render loop, with its two carve-outs"
+sha256 = "50888b5094b930ff4d515999deb537dfdbca3873b495d731d451cf3b6f1d174f"
+why = "the companion the pre-registration's header names, and whose two carve-outs its §6 exists to close: the T0 harness-integrity gate that was missed and re-defined post-hoc, and the tautological in-run assertion. It is also the record of the six sweep runs above — it lists all six with the finetune PSNRs the published table reports. Cited by a sibling-relative link that resolved nowhere until it travelled"
+
+[[file]]
+path = "record/plan1_feasibility_addendum.md"
+origin = "the Plan 1 feasibility addendum, 2026-08-05 — what the preflight pass found, and the four observations that changed how the remaining work executed"
+sha256 = "4e664310ee6d494d029076762fcd362d64610e0b86d14640729e7c7295d0ec05"
+why = "the companion the verdict's §4 names for its first claim — 6/6 source hashes MATCH, so the wiring evidence transfers to the archived rows and no drift limitation is owed. It also records that the penguin run consoles were destroyed and the two launch commands reconstructed, validated by a bit-identical step-0 triple rather than by provenance. Cited by a sibling-relative link that resolved nowhere until it travelled"
 
 # ── the archived cluster sources ────────────────────────────────────────────
 # Both gate modules load these by AST out of the source *text*, so the binding is
@@ -237,7 +269,7 @@ why = "the verdict. §1 names the wiring gate as the precondition for making any
 # `modification` to the four fields every other row has.
 #
 # The licence asks that a modified file carry a notice saying it was modified, and
-# these two cannot: `source` is hash-pinned above, the manifest cites the second
+# these two cannot: the bytes are hash-pinned above, the manifest cites the second
 # hash directly, and `test_conformance.py` and `test_wiring_assertion.py` both
 # parse the source text by AST. A licence header inserted into either file would
 # break all four at once, and would also make the vendored copy stop being what
@@ -251,7 +283,7 @@ why = "the verdict. §1 names the wiring gate as the precondition for making any
 
 [[file]]
 path = "cluster/sources_20260729/helper.py"
-source = "~/3D/cluster/sources_20260729/helper.py"
+origin = "the DeformSplat rigidity helper as deployed on the cluster, snapshotted 2026-07-29 and confirmed unchanged by the 2026-08-05 preflight"
 sha256 = "e83bb80d99e725b7be2831a250890f3f5b4af863d05639f0974f110588dc3220"
 why = "the deployed rigidity rule the conformance suite drives against the reference"
 upstream_repo = "github.com/vision3d-lab/deformsplat"
@@ -261,7 +293,7 @@ modification = "MODIFIED from upstream `util/helper.py`: +19 lines appended, add
 
 [[file]]
 path = "cluster/sources_20260805_patched/deform_splat.py"
-source = "~/3D/cluster/sources_20260805_patched/deform_splat.py"
+origin = "the DeformSplat call site as patched for the saturation runs, snapshotted 2026-08-05 — the version both ρ = 32 and ρ = 64 went through"
 sha256 = "e2ca10cf4ef7ae00b36cdc9a0baa30518ce028aef0ec37ce75a6c112919ed397"
 why = "the rho = 32/64 call site the wiring harness parses; the manifest cites this hash"
 upstream_repo = "github.com/vision3d-lab/deformsplat"
@@ -271,13 +303,13 @@ modification = "MODIFIED from upstream `deform_splat.py`: +11 lines at the `weig
 
 [[file]]
 path = "cluster/spike_logs/phase3_run_console.log"
-source = "~/3D/cluster/spike_logs/phase3_run_console.log"
+origin = "console of the superseded 2026-07-22 feasibility spike run"
 sha256 = "070cb58a2e6e472d3f6fdbe457db3566c2dd3a0309eefea813a375094c802284"
 why = "the superseded 2026-07-22 console baseline; the only real file the console-log reader is exercised against"
 
 # ── the characterisation outputs ────────────────────────────────────────────
 # The study that motivated the rigidity field: what a scope knob does, whether it
-# is hand-tunable, and where the regime boundary sits. Its *code* stays in `~/3D`
+# is hand-tunable, and where the regime boundary sits. Its *code* does not travel
 # — results travel, code is cited — but every figure and every number the results
 # chapter cites has to be under version control with the artifact that publishes
 # it, which is what these 21 files are.
@@ -294,10 +326,11 @@ why = "the superseded 2026-07-22 console baseline; the only real file the consol
 #   MASK_VERDICT.md    17/17 checks pass
 #   FIGURE_CHECK.md     9/9  checks pass, 0 misrepresentations over 100 aggregate cells
 #
-# **Departure from #19, under "measurement beats ticket".** The ticket names 17
-# files. The directory holds 21 (plus a macOS `.DS_Store`). The four it does not
-# name are not strays — each is the input a document that *is* named asserts
-# against, so vendoring the document without it would ship an uncheckable claim:
+# **Twenty-one files, not the seventeen originally scoped, under "measurement beats
+# plan".** The study directory holds 21 (plus a macOS `.DS_Store`). The four beyond
+# the seventeen are not strays — each is the input a document that *is* named
+# asserts against, so vendoring the document without it would ship an uncheckable
+# claim:
 #   _shared/rbf_weight_distribution.csv  — KGAMMA check S2 recomputes γ1 med=0.498,
 #                                          γ5 med=0.031, ratio 16.3× out of it
 #   item2_mask/mask_grid.json            — MASK check A7 is *defined* as CSV vs this
@@ -310,7 +343,7 @@ why = "the superseded 2026-07-22 console baseline; the only real file the consol
 
 [[file]]
 path = "characterisation/_shared/PREFLIGHT_REPORT.md"
-source = "~/3D/characterisation/artifacts/_shared/PREFLIGHT_REPORT.md"
+origin = "the characterisation study's shared preflight gate, item 1 and item 2"
 sha256 = "12b3bc105167681d7fd0500fe6ef0d3ff1b95d2531b10a1687e0728c9b078f4e"
 command = "python -m characterisation._shared.preflight"
 generated = "2026-07-19"
@@ -319,7 +352,7 @@ why = "the gate that licensed the Phase-3 grid: imports, seam symbols, locked co
 
 [[file]]
 path = "characterisation/_shared/.preflight_refs.json"
-source = "~/3D/characterisation/artifacts/_shared/.preflight_refs.json"
+origin = "the characterisation study's shared preflight gate — its reference values at full precision"
 sha256 = "7b3b50a93099ffd923d4ed64a065b3a438746a025ec3ec8fdafcb8d0d69bec22"
 command = "python -m characterisation._shared.preflight"
 generated = "2026-07-19"
@@ -328,7 +361,7 @@ why = "the three smoke references at full precision; PREFLIGHT_REPORT.md quotes 
 
 [[file]]
 path = "characterisation/_shared/rbf_weight_distribution.csv"
-source = "~/3D/characterisation/artifacts/_shared/rbf_weight_distribution.csv"
+origin = "the characterisation study's shared edge-weight instrumentation, item 1 and item 2"
 sha256 = "e158451182f23280e7680cfe7a838ffa3e3a58c57b2b99d9149697d278d19790"
 command = "python -m characterisation._shared.instrument_a"
 generated = "2026-07-16"
@@ -337,7 +370,7 @@ why = "the edge-weight quantiles behind the kernel-structure claim: median 0.498
 
 [[file]]
 path = "characterisation/item1_kgamma/kgamma_summary.csv"
-source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_summary.csv"
+origin = "the characterisation study's item-1 K × γ grid run"
 sha256 = "5b688f402970659c0a13c095066ab07267db961c5f555c83b27b0a1c02c120d7"
 command = "python -m characterisation.item1_kgamma.run_grid"
 generated = "2026-07-16"
@@ -346,7 +379,7 @@ why = "433 lines — the item-1 K × γ grid. The source of record for 'K is ine
 
 [[file]]
 path = "characterisation/item1_kgamma/kgamma_controllability.csv"
-source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_controllability.csv"
+origin = "the characterisation study's item-1 K × γ grid run — its per-sweep classification pass"
 sha256 = "7fe57167c49ec8b610ee6ca78d7c307e8c6578fcacd210190975ed76c10f9dc6"
 command = "python -m characterisation.item1_kgamma.run_grid"
 generated = "2026-07-19"
@@ -355,7 +388,7 @@ why = "49 lines — the per-sweep responds/flat classification. The five `respon
 
 [[file]]
 path = "characterisation/item1_kgamma/kgamma_grid.png"
-source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_grid.png"
+origin = "the characterisation study's item-1 figure pass"
 sha256 = "9d46b2e27b110a173b8b993c7c06f1e3c4abcb18cbf05517f206455991843f69"
 command = "python -m characterisation.item1_kgamma.make_figure"
 generated = "2026-07-19"
@@ -364,7 +397,7 @@ why = "the 2×2 item-1 figure — support against K and γ on both geometries"
 
 [[file]]
 path = "characterisation/item1_kgamma/kgamma_grid.json"
-source = "~/3D/characterisation/artifacts/item1_kgamma/kgamma_grid.json"
+origin = "the characterisation study's item-1 figure pass — the display values it drew from"
 sha256 = "00f45f59b537759189f8ff8adb3ea9112144b3726ea6a9a97a7e4104375d2b4d"
 command = "python -m characterisation.item1_kgamma.make_figure"
 generated = "2026-07-19"
@@ -373,7 +406,7 @@ why = "the per-cell display values kgamma_grid.png was drawn from, written besid
 
 [[file]]
 path = "characterisation/item1_kgamma/KGAMMA_VERDICT.md"
-source = "~/3D/characterisation/artifacts/item1_kgamma/KGAMMA_VERDICT.md"
+origin = "the characterisation study's item-1 verdict pass"
 sha256 = "f38fd29bba4b9bc32821adf7daec3cd2394ef2142891bbfea12601b0b9cec55b"
 command = "python -m characterisation.item1_kgamma.make_verdict"
 generated = "2026-07-19"
@@ -382,7 +415,7 @@ why = "the item-1 GREEN gate. Its finding — edit scope is not reliably hand-tu
 
 [[file]]
 path = "characterisation/item2_mask/mask_grid.csv"
-source = "~/3D/characterisation/artifacts/item2_mask/mask_grid.csv"
+origin = "the characterisation study's item-2 ρ × δ mask sweep"
 sha256 = "f01b6bef1d68bbfc40ee789da87be521a29df640cee7dda9f7fe657534885a3c"
 command = "python -m characterisation.item2_mask.mask_sweep"
 generated = "2026-07-17"
@@ -391,7 +424,7 @@ why = "393 lines — the item-2 ρ × δ mask grid. Every published item-2 numbe
 
 [[file]]
 path = "characterisation/item2_mask/mask_grid.json"
-source = "~/3D/characterisation/artifacts/item2_mask/mask_grid.json"
+origin = "the characterisation study's item-2 ρ × δ mask sweep — its aggregated cells"
 sha256 = "d9edcfc0737762151929965c1e6fb68bc7f830171db23d9910c133691e0e5fb5"
 command = "python -m characterisation.item2_mask.mask_sweep"
 generated = "2026-07-17"
@@ -400,7 +433,7 @@ why = "the aggregated cells the figures draw. MASK check A7 (0 misrepresentation
 
 [[file]]
 path = "characterisation/item2_mask/mask_grid.png"
-source = "~/3D/characterisation/artifacts/item2_mask/mask_grid.png"
+origin = "the characterisation study's item-2 figure pass"
 sha256 = "bfe5c0fec2aebe70d7ea69b7e795d96501cfb63c36db7fd42c0367f16cf9c8a7"
 command = "python -m characterisation.item2_mask.make_mask_figure"
 generated = "2026-07-19"
@@ -409,7 +442,7 @@ why = "the ρ × δ grid figure"
 
 [[file]]
 path = "characterisation/item2_mask/mask_curves.png"
-source = "~/3D/characterisation/artifacts/item2_mask/mask_curves.png"
+origin = "the characterisation study's item-2 figure pass"
 sha256 = "54626c16a8d4a2325592c372c4f2f5de058b764e6170b31b26770ec8b876ad61"
 command = "python -m characterisation.item2_mask.make_mask_figure"
 generated = "2026-07-19"
@@ -418,7 +451,7 @@ why = "the ρ response curves at δ=0 — the headline axis, bar 14.61× and blo
 
 [[file]]
 path = "characterisation/item2_mask/rswing.png"
-source = "~/3D/characterisation/artifacts/item2_mask/rswing.png"
+origin = "the characterisation study's item-2 R-swing diagnostic"
 sha256 = "c8b84d1296db17bf80e20c338a6abd075f74512940b0d0ed0776f1934888cded"
 command = "python -m characterisation.item2_mask.rswing_diagnostic"
 generated = "2026-07-17"
@@ -427,7 +460,7 @@ why = "the R-swing diagnostic figure — the annulus partition's effect on reali
 
 [[file]]
 path = "characterisation/item2_mask/rswing_geometry.csv"
-source = "~/3D/characterisation/artifacts/item2_mask/rswing_geometry.csv"
+origin = "the characterisation study's item-2 R-swing diagnostic"
 sha256 = "898306a727925eb164fa3271d0137882aff0faedf4e7bda5b1fcdf536bb2ab90"
 command = "python -m characterisation.item2_mask.rswing_diagnostic"
 generated = "2026-07-17"
@@ -436,7 +469,7 @@ why = "288 lines — per-panel R and D fractions and the degeneracy flag, by par
 
 [[file]]
 path = "characterisation/item2_mask/rswing_support.csv"
-source = "~/3D/characterisation/artifacts/item2_mask/rswing_support.csv"
+origin = "the characterisation study's item-2 R-swing diagnostic"
 sha256 = "cfecc967c936a3eb4f80f854564be6b457578de98f7efa037e5d80858995c06d"
 command = "python -m characterisation.item2_mask.rswing_diagnostic"
 generated = "2026-07-17"
@@ -445,7 +478,7 @@ why = "41 lines — realised support per partition and stage, the R-swing's meas
 
 [[file]]
 path = "characterisation/item2_mask/MASK_VERDICT.md"
-source = "~/3D/characterisation/artifacts/item2_mask/MASK_VERDICT.md"
+origin = "the characterisation study's item-2 verdict pass"
 sha256 = "a1764d75b2c5e65244be65ec789b3fe40e7aeb13a7b9bdbe6cba331fcdff112f"
 command = "python -m characterisation.item2_mask.verify_mask"
 generated = "2026-07-19"
@@ -454,7 +487,7 @@ why = "the item-2 GREEN gate, and the reason box B predicts a *per-region* rigid
 
 [[file]]
 path = "characterisation/reporting/fig_62_dead_vs_live.png"
-source = "~/3D/characterisation/artifacts/reporting/fig_62_dead_vs_live.png"
+origin = "the characterisation study's reporting pass for the results chapter's §6.2"
 sha256 = "91ee8fa6d58f474bd6ec4a59fb38ad41cd8465ea5e2d7b01358b59387b0c8860"
 command = "python -m characterisation.reporting.make_62_figures"
 generated = "2026-07-22"
@@ -463,7 +496,7 @@ why = "§6.2 figure A. Shared y-limits are asserted in the generator, not left t
 
 [[file]]
 path = "characterisation/reporting/fig_62_dead_vs_live.pdf"
-source = "~/3D/characterisation/artifacts/reporting/fig_62_dead_vs_live.pdf"
+origin = "the characterisation study's reporting pass for the results chapter's §6.2"
 sha256 = "cd42d681732b79afa0cb205e3ff7254a1c240647326b47df761349a995bd5344"
 command = "python -m characterisation.reporting.make_62_figures"
 generated = "2026-07-22"
@@ -472,7 +505,7 @@ why = "§6.2 figure A, vector form — the one the chapter includes"
 
 [[file]]
 path = "characterisation/reporting/fig_62_regime_u.png"
-source = "~/3D/characterisation/artifacts/reporting/fig_62_regime_u.png"
+origin = "the characterisation study's reporting pass for the results chapter's §6.2"
 sha256 = "c2d12a796bddd1ab6f676a97313d70542bb1c6462aa31be8dbb05862be915554"
 command = "python -m characterisation.reporting.make_62_figures"
 generated = "2026-07-22"
@@ -481,7 +514,7 @@ why = "§6.2 figure B — the regime-U finding, the global→contained transitio
 
 [[file]]
 path = "characterisation/reporting/fig_62_regime_u.pdf"
-source = "~/3D/characterisation/artifacts/reporting/fig_62_regime_u.pdf"
+origin = "the characterisation study's reporting pass for the results chapter's §6.2"
 sha256 = "c97ac9c4869314a62ba9b17d3e9991e94756deeda6e80f58cab09f0ae90795f2"
 command = "python -m characterisation.reporting.make_62_figures"
 generated = "2026-07-22"
@@ -490,207 +523,181 @@ why = "§6.2 figure B, vector form — the one the chapter includes"
 
 [[file]]
 path = "characterisation/reporting/FIGURE_CHECK.md"
-source = "~/3D/characterisation/artifacts/reporting/FIGURE_CHECK.md"
+origin = "the characterisation study's reporting verdict pass — figure against source CSV"
 sha256 = "c442fce53cb02aa326afa63308846f8981341ba0157ddfb898ae0b308a559990"
 command = "python -m characterisation.reporting.verify_62_figures"
 generated = "2026-07-22"
 certified_by = "self — 9/9 checks PASS, 0 misrepresentations, every plotted value re-derived from source CSV"
 why = "the figure↔CSV cross-check. It is what makes the two §6.2 figures citable: the numbers in the picture are the numbers in the grid, asserted rather than assumed"
 
-# ── the ported method ───────────────────────────────────────────────────────
+# ── the method ──────────────────────────────────────────────────────────────
 # Everything below is *code*, not evidence, so it lives at the repository root
 # where it can be imported rather than under `evidence/` where it would only be
-# read. Same discipline, different home: source repository, source commit, and a
-# hash for every file.
+# read. Same discipline, different home: what the file is, and a hash for it.
 #
-# Ported from `arap-deform-3dgs` at `ede5fd3a1dda0b69ddb38648c0c97a77021021b0`
-# under #16. Before it, this repository could report that an asset had been
-# deformed; after it, it can deform one — and the three places that resolved a
-# sibling working tree (`tests/conftest.py`'s sys.path injection,
-# `test_conformance.py`'s own resolve, and `build_table.py`'s METHOD_REPO plus
-# its git-HEAD read) are all deleted. `plan1/provenance.py` no longer contains a
-# function capable of reading a sibling checkout at all.
+# THESE ROWS NAME NO SOURCE REPOSITORY, AND THAT IS THE HONEST RECORD RATHER THAN
+# A GAP. They used to name two of this author's own repositories and a commit in
+# each. Neither is published, so the citation could not be followed, and there was
+# nobody to attribute to in any case: the code is this project's own and this
+# repository is now its only published home. What the rows are FOR survives intact
+# — they are integrity pins. `tests/test_conformance.py` checks the reference
+# rule's hash against the row below and against the published table's footer, so
+# editing `box_b/edge_weights.py` fails the suite in three places at once. That is
+# the part that did work; a commit id in a repository a reader cannot clone never
+# did.
+#
+# Genuine third-party material is a different question and keeps its full
+# attribution: see `upstream_repo` on the two cluster sources above, `attribution`
+# on the sample asset below, and `THIRD_PARTY.md`.
 #
 # **What deliberately did not come.** `box_b/descriptors.py` (348 lines),
 # `box_b/noise.py` (229) and their 47 tests — the geometry reader, paused on a
 # diagnosed shrinking-ball defect. It is the risk this repository exists to be
 # safe from, and leaving it behind is the point rather than an omission.
-#
-# `arap_core/gaussian.py` was taken from `arap-deform-3dgs` and **not** from
-# `~/3D`. It is the only file that differs between the two copies — verified at
-# port time — and the newer one carries B1's real Wigner-D spherical-harmonic
-# rotation where the archive's still has the DC-only stub.
 
 [[ported]]
 path = "arap_core/__init__.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core's public surface, boxes C and D"
 sha256 = "346ab8491f2239b4d999537eab154f468d7c2d3df2a3faa467747c4cfa2931d4"
 why = "the public surface of box C+D"
 
 [[ported]]
 path = "arap_core/types.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "0b54b7435cd84e0aa489770e81cdabf48602af7f91b85579289c592b2a0baa08"
 why = "Graph, Anchors, Solver, ARAPResult — the data the B→C seam passes"
 
 [[ported]]
 path = "arap_core/graph.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "057860e4db3234c4bfdf7772648f6fa81147bdec322395091f643171586adc9b"
 why = "graph construction and the injected weight functions — the seam design principle that made this port possible"
 
 [[ported]]
 path = "arap_core/edges.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "d830c81e72f778fb46c826b7c48a6097a411afd8d38a9a6da9e6866facedc0a2"
 why = "kNN edge construction and the connectivity assertion"
 
 [[ported]]
 path = "arap_core/select.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "18a2cfc7055bb467e23c6be24cbf9faaca2db0e357e002624a060eabce8b576b"
 why = "anchor selection — one of the seam's two arguments"
 
 [[ported]]
 path = "arap_core/local_step.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "e5c532620a3837067ca7a63b80f1128bc8fcfba17d5c3be7926ca29897ac4798"
 why = "the ARAP local step — per-vertex rotation fit"
 
 [[ported]]
 path = "arap_core/global_step.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "4b1570747c3878c0ad2674d55daf8c2ad161256317fb8a4a75adfcdae5ffa9a7"
 why = "the ARAP global step — the prefactored linear solve"
 
 [[ported]]
 path = "arap_core/driver.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "6e2b54ae2aa6f7914b142b29d97e239ad942d5dce8335f3b6c79e62d47dab1d4"
 why = "the alternating loop and the energy, which is what the diagnostic ladder drives"
 
 [[ported]]
 path = "arap_core/gaussian.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core's Gaussian carry, box D"
 sha256 = "aafd975f2242dc46f18e07c963f6124bf610cf066cebb3dd995c161ed05fedd0"
-why = "box D's carry: covariance transport and real Wigner-D SH rotation, degrees 0-3. THE ONE FILE THAT DIFFERS from ~/3D's copy — that one is the superseded DC-only stub and hashes to ba6da40e…"
+why = "box D's carry: covariance transport and real Wigner-D SH rotation, degrees 0-3. The rotation is real rather than a DC-only stub, and `tests/method/test_gaussian_sh.py` is what makes that checkable"
 
 [[ported]]
 path = "arap_core/io_ply.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the ARAP core, boxes C and D"
 sha256 = "7ba82f4976f8734d0c5904f0797127d65c5295dbe8780e528bb343dffa40c172"
 why = "3DGS PLY read and write, in the INRIA coefficient order the SH rotation assumes"
 
 [[ported]]
 path = "box_b/__init__.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — box B"
 sha256 = "aaebee857985f7136435544e143b1663b07a241313563051c0014e3f0d917368"
 why = "package marker"
 
 [[ported]]
 path = "box_b/edge_weights.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the B2 seam, box B"
 sha256 = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
 why = "THE B2 SEAM and the conformance suite's reference rule. numpy-only, no heavy imports. This hash is also the value the published table's footer prints, and tests/test_conformance.py asserts the two agree — editing this file fails the suite in three places"
 
-# THE ONE PORTED FILE THAT IS NOT BYTE-IDENTICAL TO ITS SOURCE. Every other
-# [[ported]] row is a straight copy. This one carries a three-line change and the
-# reason is recorded here rather than left for a reader to discover by diffing:
-#
-# At `ede5fd3` the script printed, on every run,
+# THE ONE FILE HERE THAT CARRIES A CORRECTION RATHER THAN ONLY A COPY. At the
+# revision this repository was assembled from, the script printed, on every run,
 #     "SH view-dependent bands not rotated (DC-only stub)."
 # The first half is true of *this script* — it carries position, rotation and
-# scale only. The parenthetical is false of the *library* and has been since B1:
-# `arap_core.gaussian.rotate_sh` implements real Wigner-D rotation for degrees
-# 0-3 with 6 tests behind it. This is trap #6 on the dissertation's list, and a
-# line of runtime output is a worse place for it than a document, because an
-# examiner running the example reads it without going looking. Corrected in place
-# 2026-08-06; the same stale claim is struck in `arap-deform-3dgs`'s CONTEXT.md
-# and README.md under #20.
-#
-# Source hash at ede5fd3, for anyone diffing: 82bdc8556eca0b42…
+# scale only. The parenthetical is false of the *library*: `arap_core.gaussian`'s
+# `rotate_sh` implements real Wigner-D rotation for degrees 0-3 with 6 tests
+# behind it. A line of runtime output is a worse place for a stale limitation than
+# a document, because an examiner running the example reads it without going
+# looking. Corrected in place 2026-08-06, with the superseded sentence quoted at
+# the call site so the correction is legible where it happened.
 [[ported]]
 path = "examples/run_penguin.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the runnable demonstration"
 sha256 = "41a75906fe68c369096fd299af64cc1ade93ce10931351e6316ecd74cc6ad056"
-why = "the runnable demonstration, carrying an identity assertion and an inline energy-monotonicity assertion. NOT byte-identical to source — one corrected print, reasoned above"
+why = "the runnable demonstration, carrying an identity assertion and an inline energy-monotonicity assertion. It carries one corrected print, reasoned above"
 
-# THE ONE ROW THAT IS NOT CODE, AND NOT THIS PROJECT'S TO GIVE. `source_repo`
-# says where the copy was taken from; it does not say whom the underlying data is
-# owed to, and for a captured dataset those are different questions. The 3DGS was
-# trained on DiVa360's `penguin` sequence — which is why the vendored run logs
-# name `data/diva360_processed/penguin_0239/` and `results/diva360/penguin_0217/`
-# — and it was trained by the cluster image rather than by this project. DiVa360
-# is MIT, so redistribution is permitted and attribution is what is owed.
+# THE ONE ROW THAT IS NOT CODE, AND NOT THIS PROJECT'S TO GIVE. Every other row
+# here is this project's own work; this one is a capture someone else made, so
+# `attribution` records whom it is owed to. The 3DGS was trained on DiVa360's
+# `penguin` sequence — which is why the vendored run logs name
+# `data/diva360_processed/penguin_0239/` and `results/diva360/penguin_0217/` — and
+# it was trained by the cluster image rather than by this project. DiVa360 is MIT,
+# so redistribution is permitted and attribution is what is owed.
 [[ported]]
 path = "data/penguin_original.ply"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "a 3D Gaussian Splatting export of the `penguin_0217` checkpoint — trained by the cluster image, not authored here; see `attribution`"
 sha256 = "9a13235506da2a16e973242183abefff8f021d6cd4e74120051c85f8450aaf20"
 why = "the sample asset, 23,548 Gaussians, 5.6 MB. Tracked by exception against the *.ply ignore — see .gitignore, where the reason is recorded"
 attribution = "Derived from DiVa360 (github.com/brown-ivl/DiVa360, CVPR 2024 Highlight), MIT. A 3D Gaussian Splatting export of a checkpoint trained on the `penguin` sequence (penguin_0217, evaluated at penguin_0239) — not a DiVa360 file itself. The checkpoint was reused from the cluster image, not trained here. See THIRD_PARTY.md."
 
 [[ported]]
 path = "tests/method/test_edges.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the method's own tests"
 sha256 = "3c0821d1482d76cdaa4a7f22b87d004af7f08a93aac6bb4a8390ee8e80f263bb"
 why = "7 tests — kNN edges and connectivity"
 
 [[ported]]
 path = "tests/method/test_select.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the method's own tests"
 sha256 = "eb4c5634e13e4bad3cb50771a59e586fdcb539050b2961316e072dd2237b9bc1"
 why = "7 tests — anchor and region selection"
 
 [[ported]]
 path = "tests/method/test_io_ply.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the method's own tests"
 sha256 = "f481b2d0a23c7906a5a81c4610b6aa53467632720c23ce72001d64d1a232644b"
 why = "6 tests — PLY round-trip"
 
 [[ported]]
 path = "tests/method/test_gaussian_sh.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the method's own tests"
 sha256 = "d57f9f59171a0a26585c529ebf27e13b0c53713206a9f93ebe2bb45b71ccb458"
 why = "6 tests — the Wigner-D SH rotation. These are the tests that make the corrected limitation checkable rather than asserted"
 
 [[ported]]
 path = "tests/method/test_edge_weights.py"
-source_repo = "arap-deform-3dgs"
-source_commit = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
+origin = "authored for this project — the method's own tests"
 sha256 = "1621707c143c1b0d2c19e2e315738163d1a556b98a49a66518b5b19028ac9175"
 why = "5 tests — the B2 seam, driven directly"
 
 # ── the solver diagnostic ───────────────────────────────────────────────────
-# Ported from the *archive*, not from the method repository, under #17: the
-# 40-rung ladder that drives `arap_core` end to end. Nothing in
-# `arap-deform-3dgs`'s own suite touches `driver`, `global_step` or `local_step`,
-# so before this the solver's entire evidence was one inline assertion in
-# `run_penguin.py` plus a JSON file in an archive nobody ran.
-# `tests/test_diagnostic.py` re-executes the six phases and compares all 40
-# records field by field. It never calls `main()`, because `main()` calls
-# `write_artifacts()`, and a test that rewrites the file it compares against is
-# the tautology this whole ticket exists to avoid.
+# The 40-rung ladder that drives `arap_core` end to end. The method's own suite
+# touches neither `driver`, `global_step` nor `local_step`, so before this the
+# solver's entire evidence was one inline assertion in `run_penguin.py` plus a JSON
+# record nobody ran. `tests/test_diagnostic.py` re-executes the six phases and
+# compares all 40 records field by field. It never calls `main()`, because
+# `main()` calls `write_artifacts()`, and a test that rewrites the file it compares
+# against is the tautology the ladder exists to avoid.
 #
-# **TWO OF THE THREE FILES DIVERGE FROM SOURCE, and the reason is a finding.**
-# Re-running the ladder against the *ported* core, 39 of the 40 records
+# **TWO OF THE THREE FILES CARRY A CHANGE, and the reason is a finding.**
+# Re-running the ladder against this repository's core, 39 of the 40 records
 # reproduced bit-for-bit and one did not:
 #
 #   G5 "SH stub boundary" asserted `max|Δ sh[:, 1:, :]| == 0` — that spherical-
@@ -699,73 +706,64 @@ why = "5 tests — the B2 seam, driven directly"
 #   been wrong since B1 replaced the DC-only stub with real Wigner-D. Re-executed
 #   here it fails at 6.35: the bands move, because they are supposed to.
 #
-# This is precisely what the ticket's "re-execute the ladder, do not re-read its
-# answer" requirement was for — a committed JSON compared against itself would
-# have reported 40/40 green and carried a check asserting the absence of a
-# shipped feature. That the other 39 entries are bit-identical is what identifies
-# it as an obsolete check rather than a regression in the port.
+# This is precisely what "re-execute the ladder, do not re-read its answer" was
+# for — a committed JSON compared against itself would have reported 40/40 green
+# and carried a check asserting the absence of a shipped feature. That the other 39
+# entries are bit-identical is what identifies it as an obsolete check rather than
+# a regression.
 #
-# G5 is rewritten in the vendored copy to ask the boundary question the real
-# implementation has — DC invariant, bands 1+ demonstrably move, identity
-# rotation a byte-exact no-op — with the original quoted at the call site. The
-# JSON is regenerated from the ported core so the record describes the code this
-# repository actually ships. `refs.py` is untouched.
+# G5 is rewritten here to ask the boundary question the real implementation has —
+# DC invariant, bands 1+ demonstrably move, identity rotation a byte-exact no-op —
+# with the original quoted at the call site. The JSON is regenerated from this
+# repository's core so the record describes the code that actually ships.
+# `refs.py` carries no change.
 
 [[ported]]
 path = "diagnostics/run_diagnostic.py"
-source_repo = "3D-arap"
-source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
-sha256 = "ad86ad03271a51b528ef8fd117316d4697b616d8fba501b306bb46feed7e1088"
-why = "the 40-rung ladder: Laplacian properties, stationarity, the cantilever profile, boundary cases, numerics and the Gaussian carry. NOT byte-identical — G5 rewritten, reasoned above. Source hash at 2b362d61: 39bf9d84b07115b8…"
+origin = "authored for this project — the solver diagnostic ladder"
+sha256 = "266d945a20a6082318214f7358e58ec4ae5e859e4aa9fb79e43d4c46237c9254"
+why = "the 40-rung ladder: Laplacian properties, stationarity, the cantilever profile, boundary cases, numerics and the Gaussian carry. G5 is rewritten, reasoned above"
 
 [[ported]]
 path = "diagnostics/refs.py"
-source_repo = "3D-arap"
-source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+origin = "authored for this project — the solver diagnostic's independent reference implementations"
 sha256 = "3563b041fe4838a5b6348da3a9aa6c1e579b32b949de6609d34bdba4643e45e3"
-why = "the independent reference implementations the ladder checks arap_core against — energy, rotation fit, Laplacian, solve. Byte-identical to source"
+why = "the independent reference implementations the ladder checks arap_core against — energy, rotation fit, Laplacian, solve"
 
 [[ported]]
 path = "diagnostics/cantilever_profile.csv"
-source_repo = "3D-arap"
-source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+origin = "written by the solver diagnostic ladder's phase 2.4, run against this repository's core"
 sha256 = "2fe3be8f39bc730a49b6e95e132a3ef3da84bdc6ffe4aa2883544d71b24eedf9"
-why = "phase 2.4's tip-displacement profile. NOT copied — `run_diagnostic.py:341` writes it as a side effect of running the ladder, so the file here was produced by the PORTED core, and it came out byte-identical to the archive's. That is an independent check on the port that no assertion asked for: the same solver, on the same seed, to the byte"
+why = "phase 2.4's tip-displacement profile. NOT a copy — `run_diagnostic.py:341` writes it as a side effect of running the ladder, so the file here was produced by this repository's core, and it came out byte-identical to the one the ladder wrote before the move. That is an independent check no assertion asked for: the same solver, on the same seed, to the byte"
 
 [[ported]]
 path = "diagnostics/arap_core_diagnostic.json"
-source_repo = "3D-arap"
-source_commit = "2b362d617c3055a66996b9102c2e927957fd187b"
+origin = "written by the solver diagnostic ladder, run against this repository's core"
 sha256 = "7c3afcedca3668f79a492fea9ed4dcf0d8ef493ac97b7cdde0f91dda1b8788e0"
-why = "the 40-entry record, 40/40 passing. REGENERATED against the ported core rather than copied, so the record describes the code this repository ships; 39 of 40 entries are bit-identical to the archive's, the 40th is the rewritten G5. Source hash at 2b362d61: 165e3ab31f4d37b5…"
+why = "the 40-entry record, 40/40 passing. Regenerated against this repository's core rather than copied, so the record describes the code that ships; 39 of 40 entries are bit-identical to the pre-move run, the 40th is the rewritten G5"
 
 # ── provenance inputs that the footer names ─────────────────────────────────
-# The published table's footer names four artefacts. Two are the vendored cluster
-# sources above, hashed from `evidence/`. The other two identify the method: the
-# reference rule's content, now hashed from the ported file at the repository
-# root, and the commit that copy was taken from — read from this record rather
-# than off a sibling checkout's `.git`, because since #16 there is no sibling.
-# `source` on both is where the copy came from. It is provenance; nothing
-# resolves it.
+# The published table's footer names three artefacts, and every one of them
+# identifies content that is present in this repository: the reference rule, whose
+# hash is taken from the ported file at the repository root, and the two cluster
+# sources, whose hashes are taken from `evidence/`.
+#
+# A fourth row used to sit here — the HEAD commit of the repository the method was
+# copied from. It named a 40-hex commit in a repository no reader can clone, so it
+# published an identifier that could not be resolved and could not be checked. It
+# is gone. The hash below is what actually pins the content, and always was.
 
 [[artefact]]
 name = "reference rule (`box_b/edge_weights.py`)"
 kind = "file_sha256"
-source = "~/arap-deform-3dgs/box_b/edge_weights.py"
+origin = "the tested rigidity rule as it stands in this repository — the file named above, hashed where it sits"
 value = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
-why = "the tested rule the conformance suite compares the deployed one against. Since #16 this hash is checked against the ported copy in this repository"
+why = "the tested rule the conformance suite compares the deployed one against. The hash is checked against the copy in this repository, and against the `[[ported]]` row above, so the footer and the suite fail together"
 
-[[artefact]]
-name = "method repository HEAD"
-kind = "git_head"
-source = "~/arap-deform-3dgs"
-value = "ede5fd3a1dda0b69ddb38648c0c97a77021021b0"
-why = "the commit the published table was assembled against, and the commit every [[ported]] row above was taken from"
-
-# ── what was in the archive and deliberately did not travel ─────────────────
+# ── what the archive held and deliberately did not travel ───────────────────
 # Recorded so that "the evidence base" is a closed statement rather than an open
-# one. Nothing here is lost — `~/3D` still holds it, and adding any of it later
-# is an edit to this file plus a copy.
+# one. Nothing here is lost; adding any of it later is an edit to this file plus a
+# copy.
 
 [[excluded]]
 path = "cluster/rho_probe_evidence/trex_*/"
@@ -795,9 +793,14 @@ reason = "present as empty directories beside every stats/ in the archive."
 [[excluded]]
 path = "characterisation/artifacts/.DS_Store"
 size = "10 KB"
-reason = "macOS Finder window metadata. Not evidence, not generated by any command, and the only file under characterisation/artifacts/ that did not travel."
+reason = "macOS Finder window metadata. Not evidence, not generated by any command, and the only file under the characterisation artifacts directory that did not travel."
 
 [[excluded]]
 path = "characterisation/**/*.py — the study code itself"
-size = "not measured; ~/3D/characterisation/"
+size = "not measured"
 reason = "results travel, code is cited. The generating command for every vendored output is recorded on its row, so the code is locatable; copying it would fork a living study into a frozen artifact and give a reader two versions to reconcile."
+
+[[excluded]]
+path = "the planning documents the vendored records link to"
+size = "6 documents"
+reason = "records travel, plans do not. Each is named in record/LINKS.md with what it was and why it stayed behind, and tests/test_vendored_record_links.py fails if a link to one is left unaccounted for. Two of the six are superseded planning specs whose surviving decisions are stated in CONTEXT.md and asserted in the suite; the rest are a phase plan, a seam map, a curated collection that says of itself that it is not canonical, and a cluster handoff whose output returned as the addendum vendored under record/."

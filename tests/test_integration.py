@@ -138,8 +138,8 @@ def test_the_console_baseline_world_yields_the_superseded_fractions(
     Renamed from `test_the_archived_fractions_reproduce_the_published_table`. Its
     numbers are right for this world, but its old title asserted something the
     published table no longer says: SSIM here resolves to 72.5%, and the published
-    table reads 72.6%. Neither is a correction of the other — see the retraction in
-    `docs/specs/plan-1-comparison-assembly-spec.md`.
+    table reads 72.6%. Neither is a correction of the other, which is what the next
+    test asserts and why the claim of a correction was retracted.
     """
     fractions = console_baseline_table.row("rho16").fractions
     assert [round(fractions[m].value * 100, 1) for m in METRICS] == [63.6, 72.5, 79.2]

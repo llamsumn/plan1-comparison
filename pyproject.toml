@@ -9,8 +9,8 @@ description = "Assembles the penguin ↔ DeformSplat baseline comparison from ar
 requires-python = ">=3.11"   # tomllib
 # The assembler and the saturation rule remain pure stdlib — the whole decision
 # surface is testable with no third-party runtime. These three are the *method*'s
-# dependencies, which arrived with the port (#16): `arap_core` solves and reads
-# and writes PLY, `box_b` assigns edge weights.
+# dependencies: `arap_core` solves and reads and writes PLY, `box_b` assigns edge
+# weights.
 dependencies = [
     "numpy",
     "scipy",

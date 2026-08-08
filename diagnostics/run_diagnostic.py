@@ -511,7 +511,7 @@ def phase6():
     cov_mat = G.transform_covariances(R, cov_rest)       # matrix route: R Σ Rᵀ
     rel = np.linalg.norm(cov_path - cov_mat, axis=(1, 2)) / np.linalg.norm(cov_mat, axis=(1, 2))
     # Documented tolerance (~5.6e-17) is the TYPICAL per-sample error; use that
-    # regime (guardrail #3). Worst-of-N is a float64-congruence sampling tail.
+    # regime (guardrail 3). Worst-of-N is a float64-congruence sampling tail.
     e1 = float(np.median(rel))
     ulp = rel.max() / np.finfo(np.float64).eps
     rec("6", "G1", "Cov round-trip (rotation)", e1, 1e-15, "rel||ΔΣ|| (median)",
@@ -551,7 +551,8 @@ def phase6():
 
     # G5 SH rotation boundary.
     #
-    # REWRITTEN 2026-08-06, under #17. This check used to read:
+    # REWRITTEN 2026-08-06, when the ladder was brought in beside the solver it
+    # drives and re-executed against it. This check used to read:
     #
     #     rest = np.abs(out[:, 1:, :] - sh[:, 1:, :]).max()
     #     rec(..., "SH stub boundary", max(dc, rest), 0.0, "max|Δsh|",

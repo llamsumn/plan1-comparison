@@ -39,9 +39,9 @@ COMMITTED_TABLE = REPO / "out" / "comparison_table.md"
 #: The tested reference rule the conformance suite drives the deployed one
 #: against. It used to be resolved from a sibling checkout outside this repository,
 #: which is why this table regenerated differently — or not at all — on any
-#: machine that did not have one. The method port brought it in; it is now a file
-#: in this repository, checked against the identity the published table was
-#: assembled with. Nothing here resolves `..` any more.
+#: machine that did not have one. It is now a file in this repository, checked
+#: against the identity the published table was assembled with. Nothing here
+#: resolves `..` any more.
 REFERENCE_RULE = REPO / "box_b" / "edge_weights.py"
 
 #: The two archived cluster sources, now vendored. The manifest cites the second
@@ -83,8 +83,8 @@ def collect_provenance(
     if not reference_path.is_file():
         raise ProvenanceError(
             f"{reference.name} is not present at {reference_path}. The published "
-            f"table cites sha256 {reference.value}; it is recorded in "
-            f"evidence/PROVENANCE.toml as coming from {reference.source}."
+            f"table cites sha256 {reference.value}; evidence/PROVENANCE.toml "
+            f"records it as {reference.origin}."
         )
     actual = sha256_file(reference_path)
     if actual != reference.value:
@@ -95,13 +95,14 @@ def collect_provenance(
         )
     found[reference.name] = f"sha256 {reference.value[:16]}…"
 
-    # The commit the ported copy was taken from. Read out of the record, not off a
-    # sibling checkout's `.git` — that read is what #16 removed, and re-adding it
-    # would reintroduce a footer whose value depends on what else is on the disk.
-    # The hash checked immediately above is what actually pins the content; this
-    # row says where that content came from.
-    head = evidence.artefact("method repository HEAD")
-    found[head.name] = head.value
+    # A fourth row used to print here: the HEAD commit of the repository the method
+    # was copied from, read out of the record. Before that it was read live off a
+    # sibling checkout's `.git`, which made the footer a function of what else was
+    # on the disk. Both are gone. The commit named a repository no reader can clone,
+    # so the footer published a 40-hex identifier that could not be resolved and
+    # could not be checked — decoration in the one table where every line is
+    # supposed to be verifiable. The hash checked immediately above is what pins the
+    # content, and it always was.
 
     for name, relative in VENDORED_ARTEFACTS:
         path = evidence.resolve(relative)

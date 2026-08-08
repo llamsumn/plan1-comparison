@@ -1,19 +1,24 @@
-"""The ported method is auditable against the repository it came from.
+"""The method's own files cannot quietly become something else.
 
 `evidence/PROVENANCE.toml`'s `[[ported]]` rows do for executable code what its
-`[[file]]` rows do for evidence: name the source, the commit, and a hash. The
-discipline has to be the same, because the failure is the same — a copy that has
-quietly become something other than what it claims to be.
+`[[file]]` rows do for evidence: say what each file is, and hash it. The discipline
+has to be the same, because the failure is the same — a file that has stopped being
+what the repository claims it is.
 
 It is asserted in both directions, for the reason `test_vendored_evidence.py`
 gives at greater length: a row whose file changed must fail, and so must a file
 that arrived with no row. The second is the one that lets code accumulate
 unrecorded.
 
-**And the thing this file exists to prevent.** Before the port, three separate
-places resolved a sibling working tree, and the suite silently
-reported a different number depending on what else was checked out beside it. The
-last test here is the guard against that coming back by any route.
+The rows used to name two of this author's unpublished repositories and a commit in
+each, and this module *required* it. They no longer do, and the assertion is
+inverted rather than deleted — see
+`test_no_ported_row_attributes_this_code_to_a_repository_nobody_can_read`.
+
+**And the thing this file exists to prevent.** Three separate places once resolved a
+sibling working tree, and the suite silently reported a different number depending
+on what else was checked out beside it. The last test here is the guard against that
+coming back by any route.
 """
 
 from __future__ import annotations
@@ -24,7 +29,8 @@ from pathlib import Path
 
 import pytest
 
-from plan1.provenance import REPO_ROOT, load_evidence, sha256_file
+from audit import PRIVATE_REPOS, forbidden_references, origin_problems
+from plan1.provenance import REPO_ROOT, PortedFile, load_evidence, sha256_file
 
 RECORD = load_evidence()
 
@@ -36,11 +42,10 @@ RECORD = load_evidence()
 #: "for completeness" would be the single most expensive mistake available here.
 NOT_PORTED = ("box_b/descriptors.py", "box_b/noise.py")
 
-#: Every directory a port writes into. Anything executable outside `plan1/`,
-#: `scripts/` and `tests/` was copied from another repository and needs a row —
-#: `arap_core`, `box_b`, `examples`, `data` and `tests/method` from the method
-#: repository, `diagnostics` from the archive. Both are named per row in
-#: `PROVENANCE.toml`, which is where provenance is recorded.
+#: Every tree the method occupies. Anything executable outside `plan1/`, `scripts/`
+#: and `tests/` is the method rather than the assembler, and needs a row: the six
+#: below, each file identified in `PROVENANCE.toml` by what it is and what it hashes
+#: to.
 PORTED_TREES = (
     "arap_core",
     "box_b",
@@ -71,18 +76,73 @@ def test_every_ported_file_hashes_to_its_recorded_value(entry):
 
 
 @pytest.mark.parametrize("entry", RECORD.ported, ids=lambda e: e.path)
-def test_every_ported_row_names_its_repository_commit_and_reason(entry):
-    """Two repositories supply ported code, and both pin a real commit.
+def test_no_ported_row_attributes_this_code_to_a_repository_nobody_can_read(entry):
+    """The code is this project's own, and this repository is its published home.
 
-    The method repository supplied the method; the archive supplied the solver
-    diagnostic. A 40-hex commit is required of both — "copied from the archive"
-    without a snapshot is not provenance, it is a memory. The two names below are
-    the authoritative record of where this code came from, which is why they are
-    asserted here rather than described in prose.
+    **This assertion used to require the opposite.** It read
+    `assert entry.source_repo in {…}` against two literal repository names, and
+    `assert re.fullmatch(r"[0-9a-f]{40}", entry.source_commit)` — it *mandated* that
+    every row name one of two of this author's unpublished repositories and a commit
+    inside it. 23 rows obliged, and the published table's footer printed one of those
+    commits. None of it could be followed by a reader, and there was nobody to
+    attribute to in any case.
+
+    So the requirement is inverted rather than deleted: the property becomes "names
+    nothing a reader cannot resolve" instead of disappearing. It was watched failing
+    first, on 2026-08-08, 23 times with
+    `AttributeError: 'PortedFile' object has no attribute 'source_repo'`.
+
+    The property itself lives in `audit.origin_problems`, shared with the `[[file]]`
+    row guard. Two assertions used to hold half of it each — this one forbade a
+    repository and a commit, the other forbade a path — and a path is no more
+    resolvable on a ported row than on a vendored one.
+
+    What the rows were *for* is untouched, because it was never the commit.
+    `test_the_vendored_reference_rule_is_the_one_that_was_ported` in the conformance
+    suite checks `box_b/edge_weights.py` against the sha256 on its row and against
+    the value the published footer prints, so all three fail together on an edit.
+    Genuine third-party attribution is a different question and stays in full: see
+    `upstream_repo` on the two cluster sources, and `attribution` below.
     """
-    assert entry.source_repo in {"arap-deform-3dgs", "3D-arap"}, entry.source_repo
-    assert re.fullmatch(r"[0-9a-f]{40}", entry.source_commit), entry.source_commit
-    assert entry.why
+    assert entry.why, f"{entry.path} has no reason for being here"
+    problems = origin_problems(entry.origin)
+    assert not problems, (
+        f"{entry.path}'s origin is {entry.origin!r}:\n  " + "\n  ".join(problems)
+    )
+    assert re.fullmatch(r"[0-9a-f]{64}", entry.sha256), entry.sha256
+
+
+@pytest.mark.parametrize(
+    "bad_origin",
+    [
+        "",
+        "copied from " + PRIVATE_REPOS[1],
+        "ported at ede5fd3a1dda0b69ddb38648c0c97a77021021b0",
+        "ported at ede5fd3",
+        "ported under " + "#" + "16",
+    ],
+    ids=["empty", "private repository", "full commit", "short commit", "ticket"],
+)
+def test_the_origin_guard_fails_on_a_ported_row_that_cites_the_unreachable(bad_origin):
+    """The guard above, driven against a deliberately bad row.
+
+    The inverted assertion has to be able to fail, and the failures that matter are
+    the ones the old assertion *required*: a repository name and a commit. Both are
+    put to it here, in full and abbreviated form, because `ede5fd3` in prose is the
+    same unresolvable citation as the 40-hex version and a guard that caught only
+    the long one would be worked around by habit.
+
+    The real guard is called rather than reimplemented, for the reason
+    `test_vendored_evidence.py` gives at greater length.
+    """
+    bad = PortedFile(
+        path="box_b/edge_weights.py",
+        origin=bad_origin,
+        sha256="0" * 64,
+        why="a reason that is present, so the origin is what fails",
+    )
+    with pytest.raises(AssertionError):
+        test_no_ported_row_attributes_this_code_to_a_repository_nobody_can_read(bad)
 
 
 # ── the one row that is data, and owed to someone else ──────────────────────
@@ -142,11 +202,11 @@ def test_every_ported_file_has_a_provenance_row():
 
 
 def test_the_ported_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
-    """23 = 19 from #16 + 4 from #17.
+    """23 = 19 for the method + 4 for the solver diagnostic.
 
     The 19: 10 `arap_core` modules, 2 `box_b`, the example, the asset, 5 tests.
     The 4: `run_diagnostic.py`, `refs.py`, `arap_core_diagnostic.json`, and
-    `cantilever_profile.csv` — which the ladder writes rather than the port copying.
+    `cantilever_profile.csv` — which the ladder writes rather than anything copying.
 
     Derived by listing the port, not by reading the count back off the record —
     which is the whole difference between an assertion and a restatement.
@@ -224,13 +284,19 @@ def _live_strings_and_parent_climbs(tree: ast.AST) -> list[str]:
 
 
 def test_no_file_in_the_repository_resolves_a_sibling_working_tree():
-    """#16's acceptance criterion, as an executable check rather than a claim.
+    """No module reaches out of the repository, as an executable check.
 
     Three places used to do this — `tests/conftest.py`'s `sys.path` injection,
     `test_conformance.py`'s own resolve, and `build_table.py`'s `METHOD_REPO`
     together with the git-HEAD read behind it. Deleting them is easy; keeping them
     deleted is what this test is for, because each one was added in good faith to
     solve a real problem and the same reasoning will recur.
+
+    **What this catches that the repository-wide audit does not.** `tests/audit.py`
+    reads text and cannot tell prose from an expression; this parses, and looks for
+    a `.parents[2]` subscript, which is a *climb out of the repository* rather than
+    a string. The two overlap on the sibling's name and only this one sees the
+    climb, so both are kept.
 
     This file is exempt from itself. It is the only place that must name the
     forbidden shapes in order to look for them, and it ships no path resolution.
@@ -254,10 +320,11 @@ def test_no_file_in_the_repository_resolves_a_sibling_working_tree():
 
 
 def test_the_published_table_still_names_nothing_outside_the_repository():
-    """The footer used to print a value read off a sibling's `.git`."""
+    """The footer used to print a value read off a sibling's `.git`, and then a
+    commit read out of the record. Both named a repository nobody can clone."""
     from scripts.build_table import render_table
 
     text = render_table()
-    assert "arap-deform-3dgs" not in text
+    assert SIBLING not in text
+    assert not forbidden_references(text)
     assert "../" not in text
-    assert "3D/" not in text

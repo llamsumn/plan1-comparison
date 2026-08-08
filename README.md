@@ -34,22 +34,39 @@ git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **487 passed** and a clean
+working trees present and nothing pre-installed, this reports **627 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
 **The evidence travels with the repository.** Every number in the table resolves under
 `evidence/`. It used to resolve out of a checkout elsewhere on the authoring machine, and
 while it did, three test modules skipped silently on every other machine — 80 of 140 tests
-— and the published table regenerated into something different without saying so. `evidence/PROVENANCE.toml` records
-the source path and sha256 of all 47 copied files, and asserts them in both directions:
-a file that changed fails, and so does one that arrived with no row.
+— and the published table regenerated into something different without saying so.
+`evidence/PROVENANCE.toml` records what each of the 49 copied files *is* and what it hashes
+to, and asserts both in both directions: a file that changed fails, and so does one that
+arrived with no row.
+
+**Nothing here names anything you cannot reach.** No path on the author's machine, no
+unpublished repository, no ticket in a private tracker. `tests/test_source_audit.py` asserts
+that over every tracked text file — including the manifest, the packaging metadata and the
+ignore rules, because the guard that came before it read Python only, and that is exactly how
+55 private paths accumulated inside a `.toml` file while it watched the modules.
 
 **The rules it was assembled under are in here too.** `evidence/record/` holds the
 pre-registration and the verdict, which were cited sixteen times across this repository and
 shipped zero times — including in the published table's own byline, which sent a reader to a
-path in an archive they do not have. A citation that resolves nowhere is worse than none: it
-claims the rules were fixed in advance while making the claim uncheckable.
+path they do not have. A citation that resolves nowhere is worse than none: it claims the
+rules were fixed in advance while making the claim uncheckable.
+
+Those two documents cite two companions of their own — the Phase-B probe verdict and the
+feasibility addendum — and both are now vendored beside them, so those citations resolve too.
+Twenty-one links across the four documents still point outward, at eleven distinct
+targets, and none of them has been rewritten: every byte under `evidence/` is pinned by
+sha256, and that pin is the only thing that lets a reader holding an original audit this
+copy against it. They are classified instead — five targets as redirects, six as documents
+that deliberately did not travel, with the reason for each — in
+`evidence/record/LINKS.md`, and `tests/test_vendored_record_links.py` fails if any of the
+29 links in the four is neither resolvable nor accounted for.
 
 Note what the recorded archive dates do **not** say. Two are recorded, because one alone
 reads backwards. `archive_date` is `2026-08-06` — the revision that travelled, which is
@@ -76,13 +93,18 @@ this repository.
 
 ## The ported method
 
-`arap_core/` (10 modules, 1,709 lines) and `box_b/edge_weights.py` (116 lines) come from
-`arap-deform-3dgs@ede5fd3`. Every ported file records its source repository, source commit
-and sha256 under `[[ported]]` in `evidence/PROVENANCE.toml`, asserted in both directions by
-`tests/test_ported_method.py` — 23 files, one row each, 19 from the method repository and 4
-from the archive with the solver diagnostic. The reference rule's hash is also
-what the published table's footer prints, so editing `box_b/edge_weights.py` fails the
-conformance test, the footer check and the table build together.
+`arap_core/` (10 modules, 1,709 lines) and `box_b/edge_weights.py` (116 lines) are this
+project's own, and this repository is their published home. Every file records what it is
+and its sha256 under `[[ported]]` in `evidence/PROVENANCE.toml`, asserted in both
+directions by `tests/test_ported_method.py` — 23 files, one row each. The reference rule's
+hash is also what the published table's footer prints, so editing `box_b/edge_weights.py`
+fails the conformance test, the footer check and the table build together.
+
+Those rows used to name two unpublished repositories and a commit in each, and the footer
+printed one of the commits. None of it could be followed by a reader, and there was nobody
+to attribute to — so the citations are gone and the integrity pin, which is the part that
+did the work, stays. Genuine third-party attribution is a different question and is intact:
+see `THIRD_PARTY.md`.
 
 **What deliberately stayed behind:** `box_b/descriptors.py`, `box_b/noise.py` and their 47
 tests — the geometry reader, paused on a diagnosed shrinking-ball defect. On the penguin,
@@ -144,8 +166,8 @@ Every figure this project had was a matplotlib plot of a characterisation grid, 
 in the section that carries the contribution. A chapter about deforming a Gaussian splat
 with no picture of a deformed Gaussian splat is a gap a reader notices immediately, and
 the obvious sources were all closed: the nine cluster runs wrote **empty** `renders/`
-directories, and the archive's one render-looking figure is also a plot *and* is built on
-the trex asset this repository excludes.
+directories, and the one render-looking figure that existed anywhere is also a plot *and* is
+built on the trex asset this repository excludes.
 
 ```bash
 python scripts/make_projection_figure.py
@@ -215,7 +237,7 @@ missing `torch` makes the suite **error**, not shrink.
 
 | path | role |
 |---|---|
-| `arap_core/` | the ARAP solver and the 3DGS carry — boxes C and D, ported from `arap-deform-3dgs@ede5fd3` |
+| `arap_core/` | the ARAP solver and the 3DGS carry — boxes C and D |
 | `box_b/edge_weights.py` | the B2 seam, and the conformance test's reference rule |
 | `examples/run_penguin.py` | the runnable demonstration; `--disp 0 0 0` is the identity check |
 | `tests/method/` | the 31 ported method tests, kept separate from the assembler's |
@@ -228,7 +250,9 @@ missing `torch` makes the suite **error**, not shrink.
 | `manifests/penguin_deformsplat.toml` | which run is which row, and what information each arm had |
 | `evidence/` | the vendored run records, cluster sources and run logs — everything the table resolves |
 | `evidence/characterisation/` | the characterisation study's outputs: the grids, the CSVs, the §6.2 figures and the three verdicts that certify them |
-| `evidence/PROVENANCE.toml` | where every copied file came from, what it hashes to, and what deliberately did not travel |
+| `evidence/record/` | the pre-registration and the verdict that govern the table, plus the two companions they cite; `LINKS.md` says where each of their outward links goes |
+| `evidence/PROVENANCE.toml` | what every copied file is, what it hashes to, and what deliberately did not travel |
+| `tests/audit.py` | the repository-wide walk: what counts as a file here, and the three audits over it |
 | `LICENSE` | MIT, and what it does **not** cover |
 | `THIRD_PARTY.md` | the third-party material, its terms, and how the two modified files were changed |
 | `third_party/deformsplat/` | the upstream Apache-2.0 text, and the complete diff of this project's 30 lines against it |
@@ -258,7 +282,10 @@ only thing that exercises the interval arithmetic.
 A published cell printed at coarser precision denotes an interval too, so a comparison
 against one is made **interval to interval**. Comparing it as a point manufactures
 corrections that the evidence does not license — this repository shipped one, and it is
-retracted in the archive's assembly spec.
+retracted. What replaced it is in the suite:
+`tests/test_integration.py::test_the_console_baseline_intervals_cover_the_parent_cells`
+asserts the central fact, that every interval published under the console baseline overlaps
+the cell a correction was claimed against.
 
 **The reported row is selected by a rule declared in advance.** Smallest rigidity whose
 PSNR falls within the replicate band of the sweep maximum; if the largest swept value is
@@ -280,7 +307,8 @@ rule, firing on five injected faults, with each fault attributed to the arm that
 
 The one thing it cannot catch is a label-frame mismatch, and no harness can make it: the
 caller derives its rigid-interior mask from the same label array it passes to the rule. That
-is recorded rather than hidden, and closed by construction in the archive's verdict.
+is recorded rather than hidden — `evidence/record/plan1_verdict.md` §1 states it, and closes
+it by construction.
 
 ## Licence and attribution
 

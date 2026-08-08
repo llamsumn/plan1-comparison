@@ -7,8 +7,8 @@ Every other figure this project publishes is a plot of a characterisation grid. 
 section that carries the contribution had none at all — a chapter about deforming a
 Gaussian splat with no image of a deformed Gaussian splat. The obvious sources were
 checked and are all closed: the nine cluster runs wrote empty `renders/` directories,
-and the archive's one render-looking figure is a plot built on the trex asset this
-repository deliberately excludes.
+and the one render-looking figure that existed anywhere is a plot built on the trex
+asset this repository deliberately excludes.
 
 **This is a projection, not a render, and the distinction is not pedantry.** It scatters
 the Gaussian *means* — 23,548 points — through an orthographic camera. There is no
