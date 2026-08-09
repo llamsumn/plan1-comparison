@@ -73,6 +73,8 @@ from __future__ import annotations
 
 import pytest
 
+from audit import requirement_names
+
 #: Every test in the repository, as collected by a plain `python -m pytest`.
 #:
 #: Derivation, so the number is maintainable rather than magic:
@@ -95,7 +97,7 @@ import pytest
 #: | assertion strength: boundary tests, the mutation record, and its reader | +62 |
 #:
 #: Most of the growth is parametrised provenance: `PROVENANCE.toml` has 49
-#: `[[file]]` rows and 23 `[[ported]]` rows, and several checks run once per row.
+#: `[[file]]` rows and 27 `[[ported]]` rows, and several checks run once per row.
 #: That is why the number moves whenever evidence lands, and why it is asserted
 #: here rather than left to be noticed.
 #:
@@ -144,7 +146,35 @@ import pytest
 #: The last row is the file-count effect again: `scripts/run_mutation.py`,
 #: `mutation/mutation_record.json` and `tests/test_mutation_record.py` are each +1 to
 #: the audit before a single one of their own tests is counted.
-EXPECTED_TESTS = 689
+#:
+#: **The coverage row is the last, and it is +175.** The claim surface — `plan1`,
+#: `box_b`, `arap_core` and the worked example — now reaches 100% branch coverage with
+#: two excluded lines, each carrying its reason beside the marker. Almost all of the
+#: gap it closed was validation guards: code whose whole job is to refuse bad input,
+#: and which had never been shown refusing anything. 157 of the 175 are tests; the
+#: other 18 are the file-count effect:
+#:
+#: | check | tests |
+#: |---|---|
+#: | `build_graph`'s four validators and the Laplacian invariant assertion | +27 |
+#: | the seven anchor validators, the constraint guard, and the soft path | +22 |
+#: | the assembler's lookups, its input refusals, and `display_path` | +23 |
+#: | the claim surface declared, and every marker on it held to a reason | +29 |
+#: | the Gaussian carry's reflection guard and Shepperd's non-trace branches | +10 |
+#: | the renderer's five optional sections, present and absent | +9 |
+#: | both exits of the alternation loop, and the degenerate-vertex fallback | +9 |
+#: | the reader's and writer's remaining refusals in `io_ply` | +6 |
+#: | the SH band structure at every degree, and past the end of it | +10 |
+#: | `select.py`'s three shape guards and its empty-selection warning | +8 |
+#: | the worked example, run end to end on a 125-Gaussian lattice | +4 |
+#: | ten new text files, at one audit test each | +10 |
+#: | four new `[[ported]]` rows, parametrised two ways | +8 |
+#:
+#: The four `[[ported]]` rows are the four test modules written here rather than
+#: ported. Everything under `tests/method/` carries a row, so they arrive with the
+#: record's discipline already applied — which is why `test_ported_method.py` names
+#: the five that travelled instead of counting files.
+EXPECTED_TESTS = 864
 
 
 def test_the_collected_total_matches_the_expected_total(request):
@@ -335,7 +365,7 @@ def test_the_runtime_dependencies_are_declared_and_importable(declared):
     from plan1.provenance import REPO_ROOT
 
     pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
-    assert declared in pyproject["project"]["dependencies"]
+    assert declared in requirement_names(pyproject["project"]["dependencies"])
     assert importlib.import_module(declared)
 
 
@@ -382,6 +412,6 @@ def test_the_test_extra_declares_torch():
     from plan1.provenance import REPO_ROOT
 
     pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
-    extra = pyproject["project"]["optional-dependencies"]["test"]
+    extra = requirement_names(pyproject["project"]["optional-dependencies"]["test"])
     assert "torch" in extra, extra
     assert "pytest" in extra, extra

@@ -16,9 +16,9 @@ Two invariants matter and are tested:
 
 * **ρ ≡ 1 is a byte-exact no-op** — a region with ρ = 1 leaves its edges
   untouched, so an all-ones assignment reproduces the base weighting exactly.
-* **Base-agnostic** — this composes with *any* ``build_graph`` weight_fn (RBF,
-  cotangent, …); it never assumes the study's normalised-RBF base. The core is
-  untouched: box B's output drives C purely as data.
+* **Base-agnostic** — ``make_scoped_weight_fn`` wraps *any* ``build_graph``
+  weight_fn rather than replacing it, so it never assumes the study's
+  normalised-RBF base. The core is untouched: box B drives C purely as data.
 
 Pure NumPy, CPU, float64.
 """

@@ -1,0 +1,140 @@
+# The green gate, run by a machine that is not the author's.
+#
+# WHAT THIS IS FOR. Every claim this repository makes has so far been verified in
+# one place, by one person, on one laptop. That is the weakest form the evidence
+# could take, and it is the form an examiner is entitled to be sceptical of. This
+# workflow runs `scripts/verify.sh` — the same five steps, in the same order — on
+# a machine with nothing pre-installed, from a fresh clone, on Linux rather than
+# macOS.
+#
+# It is deliberately NOT a reimplementation of the gate. `verify.sh` is what a
+# reader is told to run, so it is what runs here; a workflow that inlined the
+# steps would be a second gate that could drift from the first, and then "CI is
+# green" and "the gate passes" would be two different statements.
+#
+# ── THE HAZARD THIS IS EXPECTED TO FIND, IF ANYTHING ────────────────────────
+# The suite has a byte-exact dependency on floating-point reproducibility, and it
+# runs on every `pytest`. `diagnostics/run_diagnostic.py` rewrites
+# `diagnostics/cantilever_profile.csv` on each run, and that file is pinned by
+# sha256 in `evidence/PROVENANCE.toml` and asserted in both directions. So the
+# check is: re-run the solver, and the numbers it writes must come out byte for
+# byte identical. That holds on the author's machine. On a runner with a
+# different BLAS it is not guaranteed, and a second hazard sits beside it —
+# `test_the_values_that_are_exact_by_construction_are_exact` compares integral
+# rungs exactly, and iteration counts are exactly the kind of value that shifts
+# when the linear algebra changes slightly.
+#
+# Note the asymmetry that makes this a real question rather than a worry: the
+# neighbouring JSON comparison was built WITH tolerance for this exact reason
+# (`tests/test_diagnostic.py`, NOISE_FLOOR 1e-9 and RELATIVE_TOLERANCE 1e-6,
+# justified against a 4e-15 worst case observed between BLAS backends). The CSV
+# was given none.
+#
+# If this workflow goes red on either, that is a finding about the repository's
+# central claim and not about the runner, and the fix is to give the CSV the
+# tolerance the JSON already has — not to weaken anything on speculation.
+
+name: verify
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The gate diffs the regenerated table against the committed one with
+          # `git diff --exit-code`, so the checkout has to be a real working tree
+          # rather than an export. `tests/audit.py` also asks git which files
+          # this repository ships, and raises rather than returning nothing when
+          # it cannot answer — an empty list would make every audit pass
+          # vacuously, which is the precise failure shape this repository exists
+          # to be free of.
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          # The version the environment record names. Pinned to a minor rather
+          # than a patch: patch releases are what a runner is entitled to move
+          # under us, and nothing here depends on one.
+          python-version: "3.13"
+
+      - name: Cache the wheel downloads
+        uses: actions/cache@v4
+        with:
+          # `verify.sh` installs `.[test]`, which pulls torch — several hundred
+          # megabytes on every run without this. torch is a hard test dependency
+          # rather than an optional one: without it the conformance test and the
+          # wiring harness used to skip, and a skip is how 80 tests once
+          # disappeared behind a green summary line.
+          path: ${{ runner.temp }}/pip-cache
+          key: pip-${{ runner.os }}-py313-${{ hashFiles('pyproject.toml') }}
+          restore-keys: pip-${{ runner.os }}-py313-
+
+      - name: The green gate
+        # The cache directory is outside the workspace, deliberately, and named
+        # explicitly rather than left to pip's default under the home directory.
+        # Two reasons, and the second is the one that would have bitten:
+        #
+        # `tests/audit.py` asks git which files this repository ships and counts
+        # untracked-but-not-ignored ones — that half is load-bearing, because a
+        # new file is exactly when a private path gets written. A cache
+        # directory inside the workspace would be swept into that walk and
+        # audited as though it were part of the artefact.
+        #
+        # And the audit forbids a tilde-and-separator anywhere in a tracked
+        # file, which is how all 55 of the manifest's sources once recorded
+        # somebody's home directory. pip's default cache path is written that
+        # way, so the default would have tripped it. The rule is blunt on
+        # purpose — this is a runner's path rather than a person's — and naming
+        # the directory outright is cheaper than carving an exemption for a
+        # workflow file. (This comment cannot spell the forbidden string either,
+        # which is the same discipline `tests/audit.py` follows by assembling
+        # its needles from parts.)
+        #
+        # It is set HERE, on the one step that installs anything, rather than on
+        # the job. The `runner` context does not exist in a job-level `env:`
+        # block — only `github`, `needs`, `strategy`, `matrix`, `vars`,
+        # `secrets` and `inputs` do — so a job-level `runner.temp` is rejected
+        # before a runner is allocated at all. That is a zero-second startup
+        # failure, which looks like a red gate but is not a test result: the
+        # suite never runs. The cache step above reads the same value from a
+        # step `with:`, where the context is available.
+        env:
+          PIP_CACHE_DIR: ${{ runner.temp }}/pip-cache
+        run: ./scripts/verify.sh
+
+      # The two standards the gate does not itself run. They are separate steps
+      # rather than folded into `verify.sh` because the gate is what a reader is
+      # told to run to check the *claims*, and these check the *code* — a reader
+      # reproducing the comparison should not need a type checker installed. Both
+      # are declared in the `test` extra, so the install above has already
+      # provided them.
+      - name: Types, at the standard the repository states
+        run: python -m mypy plan1 scripts
+
+      - name: Types, over everything but the vendored sources
+        # The bare `mypy .` reports 33 errors in the two vendored, hash-pinned
+        # DeformSplat sources and always has. They are evidence rather than code
+        # this project may edit, so they are excluded here rather than fixed.
+        run: python -m mypy . --exclude 'evidence/'
+
+      - name: Coverage of the claim surface
+        # Configured in `pyproject.toml`: the surface is plan1 + box_b +
+        # arap_core + the example, branch coverage, and `fail_under = 100`. The
+        # threshold is the assertion — the surface is at 100 with two excluded
+        # lines, both carrying a reason beside the marker, and
+        # `tests/test_coverage_surface.py` fails on a marker that carries none.
+        run: |
+          python -m coverage run -m pytest -q
+          python -m coverage report

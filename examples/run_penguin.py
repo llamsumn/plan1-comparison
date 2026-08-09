@@ -144,5 +144,5 @@ def main() -> None:
           f"iters={result.n_iters}  converged={result.converged}")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover — the script entry point; pytest imports this module rather than executing it, so `main()` is called by tests/test_example.py instead
     main()

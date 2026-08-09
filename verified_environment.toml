@@ -1,0 +1,59 @@
+# The environment this repository's green gate was last verified in.
+#
+# THIS FILE DOCUMENTS. IT DOES NOT ENFORCE, and the distinction is the whole
+# point of it. A test asserting that the running versions match these would fail
+# on every machine that is not this one — including the CI runner, including a
+# reader's — which would make the file an obstacle to reproduction rather than an
+# aid to it. `pyproject.toml` is where the *requirements* live, and they are
+# major-version ceilings rather than pins for the same reason.
+#
+# What this is for: when something here stops working, the first question is
+# "against what did it ever work?" and that question otherwise has no recorded
+# answer. A reader who reproduces a different number, or hits a failure this
+# repository has never seen, can compare against a real, complete, dated
+# environment rather than guessing.
+#
+# Regenerating it is a manual act, deliberately. A file rewritten by a script on
+# every run would record whatever machine last ran the script, which is not the
+# same claim at all.
+
+[verification]
+date = "2026-08-09"
+platform = "macOS 15.3 (Darwin 24.3.0), arm64"
+result = "suite green, mypy clean, table and figure records regenerate byte-identically"
+
+[versions]
+python = "3.13.5"
+setuptools = "82.0.0"
+
+# Runtime dependencies — `pyproject.toml [project] dependencies`.
+numpy = "2.1.3"
+scipy = "1.15.3"
+plyfile = "1.1.4"
+
+# Test dependencies — `pyproject.toml [project.optional-dependencies] test`.
+pytest = "8.3.4"
+torch = "2.10.0"
+matplotlib = "3.10.0"
+coverage = "7.15.4"
+mypy = "1.14.1"
+
+[notes]
+blas = """
+The suite has a byte-exact dependency on floating-point reproducibility that is
+worth naming here rather than discovering later. `diagnostics/run_diagnostic.py`
+rewrites `diagnostics/cantilever_profile.csv` on every test run, and that file is
+pinned by sha256 in `evidence/PROVENANCE.toml` — so the check is: re-run the
+solver, and the numbers it writes must come out byte for byte identical. That is
+a property of this BLAS as much as of this code. The neighbouring JSON comparison
+was built with tolerance for exactly this reason (`tests/test_diagnostic.py`,
+NOISE_FLOOR 1e-9 and RELATIVE_TOLERANCE 1e-6, justified against a 4e-15 worst
+case observed between backends); the CSV has none. If it ever differs on another
+platform, that is a real finding about the check and not about the platform.
+"""
+torch = """
+torch is a hard test dependency rather than an optional one — without it the
+conformance test and the wiring harness used to skip, and a skip is how 80 tests
+once disappeared behind a green summary line. It is also several hundred
+megabytes, which is why the CI workflow caches it.
+"""

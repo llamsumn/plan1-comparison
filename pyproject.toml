@@ -11,10 +11,19 @@ requires-python = ">=3.11"   # tomllib
 # surface is testable with no third-party runtime. These three are the *method*'s
 # dependencies: `arap_core` solves and reads and writes PLY, `box_b` assigns edge
 # weights.
+#
+# EVERY BOUND BELOW IS A MAJOR-VERSION CEILING AND NOT A PIN, deliberately. A
+# pinned wheel that stops being built turns a soft failure — "this was verified
+# against 2.1.3, try it" — into an artefact nobody can install at all, and this
+# repository is meant to still be checkable years after the last commit. The
+# ceiling is where the risk actually is: a major version is where a library is
+# allowed to remove what this code calls. The exact versions everything was
+# verified against are recorded in `verified_environment.toml`, which documents
+# rather than enforces, for the same reason.
 dependencies = [
-    "numpy",
-    "scipy",
-    "plyfile",
+    "numpy>=2,<3",
+    "scipy>=1.15,<2",
+    "plyfile>=1,<2",
 ]
 
 [project.optional-dependencies]
@@ -27,7 +36,18 @@ dependencies = [
 # the claim above — that the decision surface is testable with no third-party
 # runtime — has to stay true, and `verify.sh` installs `.[test]` so the green gate
 # still gets it.
-test = ["pytest", "torch", "matplotlib"]
+#
+# `coverage` and `mypy` were both already in use and declared nowhere. The
+# coverage measurement is what the claim-surface percentage in `README.md` rests
+# on, and `mypy plan1 scripts` is the standard the section below states this
+# repository holds itself to — neither could be reproduced from a fresh checkout.
+test = [
+    "pytest>=8,<9",
+    "torch>=2,<3",
+    "matplotlib>=3,<4",
+    "coverage>=7,<8",
+    "mypy>=1.14,<2",
+]
 
 [tool.setuptools]
 packages = ["plan1", "arap_core", "box_b"]
@@ -35,6 +55,37 @@ packages = ["plan1", "arap_core", "box_b"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]
+
+# ── the claim surface ───────────────────────────────────────────────────────
+# WHAT THIS LIST IS: the code whose coverage this repository makes a claim about.
+# It is `plan1` (the assembler and the pre-registered rule), `box_b` (the B2
+# seam), `arap_core` (the solver) and the worked example. Those four reach 100%,
+# and `tests/test_coverage_surface.py` holds this list and that claim together.
+#
+# WHAT IS OUTSIDE IT, AND WHY THAT IS A REASON RATHER THAN AN EXCUSE:
+# `scripts/`, `diagnostics/` and the mutation tool are not measured here.
+# Everything that computes a published number is covered by tests. Everything
+# that *generates an artefact* is covered by regenerate-and-diff — the gate
+# rebuilds the comparison table and the figure's data record from scratch and
+# fails on a single differing byte. That is a stricter check than line coverage,
+# not a weaker one, because it constrains the output rather than the path taken
+# to it.
+#
+# The example is the one member of the surface that neither computes a published
+# number nor generates a diffed artefact, which is exactly why it is in: "does it
+# still run?" was otherwise unchecked, and `README.md` quotes a number it printed.
+[tool.coverage.run]
+branch = true
+source = ["plan1", "box_b", "arap_core", "examples"]
+
+[tool.coverage.report]
+show_missing = true
+# 100 rather than a softer number, because the two lines that cannot be reached
+# both carry a `# pragma: no cover` with the reason written beside it, and
+# `tests/test_coverage_surface.py` fails on a marker that carries no reason. A
+# threshold below 100 would let an unexplained gap open without anyone deciding
+# to open it — which is the only thing a coverage number is good for.
+fail_under = 100
 
 [tool.mypy]
 # `mypy plan1 scripts` is the standard this repository holds itself to, and it was

@@ -55,6 +55,6 @@ Evaluation step 501; 23548 primitives in every row.
 
 | artefact | identity |
 |---|---|
-| reference rule (`box_b/edge_weights.py`) | `sha256 38e1a661ded4552e…` |
+| reference rule (`box_b/edge_weights.py`) | `sha256 d9cbf9014fe8dc30…` |
 | deployed rule (`cluster/sources_20260729/helper.py`) | `sha256 e83bb80d99e725b7…` |
 | patched call site, ρ = 32/64 rows (`cluster/sources_20260805_patched/deform_splat.py`) | `sha256 e2ca10cf4ef7ae00…` |

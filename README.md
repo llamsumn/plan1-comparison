@@ -34,9 +34,19 @@ git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **689 passed** and a clean
+working trees present and nothing pre-installed, this reports **864 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
+
+**Read that number with its composition, not on its own.** 484 of the 864 — 56% — are
+bookkeeping: the audits over this repository's own text, the vendored record checked
+against what is on disk, the port's rows, the mutation record read back, the coverage
+surface held to its rule. The other 380 test the method, the assembler, the figure and the
+solver diagnostic. That ratio is not an accident or an embarrassment; it is what it costs
+to make an artefact that can be checked by someone who does not trust it, and this
+repository exists because an earlier one could not be. But a reader comparing this total
+against a conventional project's is comparing two different things, and saying so here is
+cheaper than letting them find out.
 
 **The evidence travels with the repository.** Every number in the table resolves under
 `evidence/`. It used to resolve out of a checkout elsewhere on the authoring machine, and
@@ -97,9 +107,13 @@ A green suite says the tests ran. It does not say they constrain anything, and h
 two came apart at the worst available place: the comparison that selects the published
 row could be changed from inclusive to exclusive and every test still passed. So could
 the predicate that decides whether any row may be published at all. Coverage did not
-predict it and in fact ran against it — the module with the surviving mutants reported
-**100%** line coverage; the module whose every mutant died reported **86%**. A line can
-be executed and still constrain nothing.
+predict it and in fact ran against it — **at the time that was measured**, the module with
+the surviving mutants reported 100% line coverage while the module whose every mutant died
+reported 86%. Both modules read 100% now, which is why the observation is dated rather
+than restated in the present tense: it was evidence about the relationship between the two
+measurements, not a standing fact about these files. The point it made survives intact. A
+line can be executed and still constrain nothing, and that is the reason the coverage
+number below is reported alongside a mutation score rather than instead of one.
 
 `scripts/run_mutation.py` answers the question by measuring it: change one token in the
 claim surface, run the whole suite, and see whether anything notices. It tokenises rather
@@ -130,6 +144,39 @@ notice.
 It is deliberately **not** in `./scripts/verify.sh`. The run takes about twenty minutes,
 and a gate nobody waits for is not a gate.
 
+## And how much of the code do they reach?
+
+**100%**, on a declared surface, with branch coverage rather than line coverage.
+
+The surface is `plan1`, `box_b`, `arap_core` and the worked example, declared in
+`pyproject.toml` where the measurement actually reads it. `fail_under` is 100, so a gap
+cannot open without someone deciding to open it, and
+`tests/test_coverage_surface.py::test_the_declared_surface_is_the_one_this_repository_claims`
+asserts the declaration against the claim — shrinking the surface is the cheapest way to
+raise a percentage and it otherwise leaves no trace.
+
+It was 90%, and almost all of the difference was **validation guards**: code whose only job
+is to refuse bad input, and which had never once been shown refusing anything. A guard with
+no test can be deleted by accident and leave the suite green; the failure it was written to
+catch then arrives later, somewhere else, as an error naming nothing. `arap_core` alone had
+four unexercised validators in `build_graph`, seven in the anchor check, and a
+soft-constraint path that every call site in the repository declined to use.
+
+Two lines on the surface are excluded, and **each carries its reason on the same line as
+the marker**: an interval guard in the assembler that is unreachable while the invariant
+above it holds, and the example's script entry point, which pytest imports rather than
+executes. That rule is itself a test — a `# pragma: no cover` with nothing beside it fails,
+and the rule is driven against one to show it can.
+
+`scripts/`, `diagnostics/` and the mutation tool sit outside the surface, and the reason is
+a positive one rather than an excuse. Everything that computes a published number is
+covered by tests. Everything that *generates an artefact* is covered by
+regenerate-and-diff: the gate rebuilds the comparison table and the figure's data record
+from scratch and fails on a single differing byte, which constrains the output rather than
+the path taken to it. The example is on the surface precisely because it is the one file
+with neither — it computes no published number and generates nothing that gets diffed, so
+"does it still run?" was genuinely unchecked, and this README quotes a number it printed.
+
 Two things the record states rather than leaving to be inferred. **What was not mutated**
 — rendering, the entry-point scripts, the solver diagnostic and the ported solver are out
 of scope and the record names them, because an unqualified score invites a reader to take
@@ -144,12 +191,21 @@ doing it.
 
 ## The ported method
 
-`arap_core/` (10 modules, 1,709 lines) and `box_b/edge_weights.py` (116 lines) are this
+`arap_core/` (10 modules, 1,631 lines) and `box_b/edge_weights.py` (116 lines) are this
 project's own, and this repository is their published home. Every file records what it is
 and its sha256 under `[[ported]]` in `evidence/PROVENANCE.toml`, asserted in both
-directions by `tests/test_ported_method.py` — 23 files, one row each. The reference rule's
+directions by `tests/test_ported_method.py` — 27 files, one row each. The reference rule's
 hash is also what the published table's footer prints, so editing `box_b/edge_weights.py`
 fails the conformance test, the footer check and the table build together.
+
+`arap_core/` is 78 lines shorter than it was, and the deletion is worth naming because it
+was the only dead code here. `cotangent_weights` computed mesh Laplacian weights, and this
+repository has no mesh — the one asset is a point cloud, so nothing called it and nothing
+could. It survived as long as it did by being cited: three separate pieces of prose used it
+as the evidence that `build_graph`'s weight function is genuinely injected rather than
+decorative. That evidence is now `box_b.edge_weights.make_scoped_weight_fn`, which is a
+second weight function that actually exists, is actually injected, and is driven through a
+full solve in `tests/method/test_edge_weights.py`.
 
 Those rows used to name two unpublished repositories and a commit in each, and the footer
 printed one of the commits. None of it could be followed by a reader, and there was nobody
@@ -291,7 +347,7 @@ missing `torch` makes the suite **error**, not shrink.
 | `arap_core/` | the ARAP solver and the 3DGS carry — boxes C and D |
 | `box_b/edge_weights.py` | the B2 seam, and the conformance test's reference rule |
 | `examples/run_penguin.py` | the runnable demonstration; `--disp 0 0 0` is the identity check |
-| `tests/method/` | the method's own 37 tests, kept separate from the assembler's: 31 came with the port, 6 were added here when mutation found both of the edge-weight seam's validation guards undriven |
+| `tests/method/` | the method's own 129 tests in 9 modules, kept separate from the assembler's. 31 came with the port in 5 modules; the rest were added here — 6 when mutation found both of the edge-weight seam's validation guards undriven, and the remainder when the coverage work found the solver core's guards, both exits of its loop and its soft-constraint path undriven too |
 | `diagnostics/` | the 40-rung solver ladder. `tests/test_diagnostic.py` **re-runs** it and compares all 40 records — it does not re-read the committed answer |
 | `plan1/assemble.py` | **the seam** — manifest + records → validated table. Gating and gap arithmetic sit behind it |
 | `plan1/saturation.py` | the pre-registered rule that selects the reported rigidity |
@@ -307,6 +363,9 @@ missing `torch` makes the suite **error**, not shrink.
 | `scripts/run_mutation.py` | the assertion-strength measurement — one token changed, the whole suite run. Not in the gate; it takes about twenty minutes |
 | `mutation/mutation_record.json` | what it measured: the target set, the score, and every survivor with the reason it is acceptable |
 | `tests/test_mutation_record.py` | reads that record back. Fails if a survivor carries no argument, or if the line it names has moved |
+| `tests/test_coverage_surface.py` | the claim surface, read out of `pyproject.toml`, and the rule that every coverage marker on it carries a reason |
+| `verified_environment.toml` | the exact versions the gate was last verified against. Documents; does not enforce, because a test asserting them would fail on every machine that is not this one |
+| `.github/workflows/verify.yml` | the same five-step gate, run on Linux by a machine that is not the author's |
 | `LICENSE` | MIT, and what it does **not** cover |
 | `THIRD_PARTY.md` | the third-party material, its terms, and how the two modified files were changed |
 | `third_party/deformsplat/` | the upstream Apache-2.0 text, and the complete diff of this project's 30 lines against it |

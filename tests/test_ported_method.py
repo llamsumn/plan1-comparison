@@ -202,16 +202,24 @@ def test_every_ported_file_has_a_provenance_row():
 
 
 def test_the_ported_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
-    """23 = 19 for the method + 4 for the solver diagnostic.
+    """27 = 23 for the method + 4 for the solver diagnostic.
 
-    The 19: 10 `arap_core` modules, 2 `box_b`, the example, the asset, 5 tests.
+    The 23: 10 `arap_core` modules, 2 `box_b`, the example, the asset, 9 tests.
     The 4: `run_diagnostic.py`, `refs.py`, `arap_core_diagnostic.json`, and
     `cantilever_profile.csv` — which the ladder writes rather than anything copying.
+
+    The tests were 5 and are 9. Four modules were authored here rather than
+    ported, covering the solver core's guards: `build_graph`'s validators, the
+    anchor validators and the soft-constraint path, both exits of the alternation
+    loop, and the Gaussian carry's reflection guard. They carry rows because the
+    tree carries rows, not because anything was copied — which is why
+    `test_no_method_test_module_arrived_without_a_decision` names the five that
+    travelled rather than counting files.
 
     Derived by listing the port, not by reading the count back off the record —
     which is the whole difference between an assertion and a restatement.
     """
-    assert len(RECORD.ported) == len(ported_files_on_disk()) == 23
+    assert len(RECORD.ported) == len(ported_files_on_disk()) == 27
 
 
 # ── what deliberately did not come ──────────────────────────────────────────
@@ -224,16 +232,42 @@ def test_the_paused_geometry_reader_did_not_travel(path):
     )
 
 
-def test_the_five_method_test_modules_are_all_of_the_method_test_modules():
-    """47 of the method repository's 78 tests belong to the paused track. 31 came.
+#: The five test modules that travelled from the method repository. 47 of that
+#: repository's 78 tests belong to the paused track and did not come; these five
+#: files carried the 31 that did.
+PORTED_METHOD_TESTS = frozenset(
+    {
+        "test_edge_weights.py",
+        "test_edges.py",
+        "test_gaussian_sh.py",
+        "test_io_ply.py",
+        "test_select.py",
+    }
+)
 
-    The count of *files* is what is asserted, not of tests: `test_edge_weights.py`
-    has since grown from 5 tests to 11, because mutation found both of the
-    edge-weight seam's validation guards undriven, so the method's tests now number
-    37 rather than the 31 that travelled. A sixth module appearing here would mean
-    something was ported without a decision, which is what this guards.
+
+def test_no_method_test_module_arrived_without_a_decision():
+    """A sixth *ported* module appearing is what this guards.
+
+    **It used to assert a file count of five, and that was the wrong shape.** The
+    property is about the port — something copied in from the paused track
+    without anyone deciding to — and a count cannot tell a port from a test
+    written here. It failed the moment this repository wrote its own tests for
+    `arap_core`'s solver, which is not the event it exists to catch, and the only
+    ways to satisfy it were to raise the number every time (making it a
+    restatement) or to put new tests somewhere they do not belong.
+
+    So the five are named. Anything else under `tests/method/` is authored here,
+    is covered by the same `[[ported]]` row discipline as every other file in the
+    tree, and is fine; one of the five *vanishing* is not, and that direction is
+    asserted too.
     """
-    assert len(list((REPO_ROOT / "tests" / "method").glob("test_*.py"))) == 5
+    present = {path.name for path in (REPO_ROOT / "tests" / "method").glob("test_*.py")}
+
+    assert PORTED_METHOD_TESTS <= present, PORTED_METHOD_TESTS - present
+    assert not {
+        name for name in present - PORTED_METHOD_TESTS if "descriptor" in name or "noise" in name
+    }, "a test for the paused geometry reader arrived without a decision"
 
 
 # ── nothing resolves a sibling any more ─────────────────────────────────────

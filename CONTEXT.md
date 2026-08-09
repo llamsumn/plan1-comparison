@@ -130,6 +130,19 @@ Stated fully in `README.md`; named here so the orientation is complete.
   as a total one; and which tests are withheld from the kill criterion, because
   `box_b/edge_weights.py` is hash-pinned and eight tests fail there on a byte changing
   rather than on behaviour changing.
+- **A coverage number is only worth reading beside what was measured and what was allowed
+  not to count.** Both are written down. The claim surface — `plan1`, `box_b`, `arap_core`
+  and the worked example — is declared in `pyproject.toml`, reaches 100% branch coverage,
+  and carries `fail_under = 100`; `tests/test_coverage_surface.py` asserts the declaration
+  against the claim, because shrinking the surface is the cheapest way to raise a
+  percentage and otherwise leaves no trace. Exactly one kind of exclusion is permitted: a
+  `# pragma: no cover` with its reason on the same line. "This line is not covered" is a
+  fact and settles nothing; "unreachable while the interval invariant above holds" is an
+  argument someone can disagree with. Two lines are excluded and both carry one. What sits
+  *outside* the surface is stated with its reason rather than left as an omission:
+  everything that computes a published number is covered by tests, and everything that
+  generates an artefact is covered by regenerate-and-diff, which constrains the output
+  rather than the path taken to it.
 - **Attribution is owed to other people, not to other repositories of one's own.**
   `PROVENANCE.toml`'s `[[ported]]` rows used to name two unpublished repositories of this
   author's and a commit in each, and the published table's footer printed one of the commits.

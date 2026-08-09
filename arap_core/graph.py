@@ -4,14 +4,14 @@ graph.py — weighted graph construction for the scope-conditioned ARAP core.
 The graph is the single seam where edit *scope* is decided: the edge weights
 w_ij (rigidity / support falloff) and, downstream, which vertices are anchored
 are exactly the quantities the scope estimator will eventually predict. Nothing
-here is hard-coded — the weight function is *injected*, so a mesh (cotangent
-weights) and a Gaussian point graph (RBF weights) traverse the identical code
-path with a different `weight_fn`.
+here is hard-coded — the weight function is *injected*, so a bare distance
+weighting (`rbf_weights`) and box B's region-scaled one
+(`box_b.edge_weights.make_scoped_weight_fn`, which wraps any base weighting)
+traverse the identical code path with a different `weight_fn`.
 
 Module contents
 ---------------
 build_graph(positions, edges, weight_fn)  -> Graph   # the public entry point
-cotangent_weights(positions, edges, faces)-> (E,)    # mesh weight_fn factory input
 rbf_weights(positions, edges, gamma)      -> (E,)    # Gaussian-graph weight_fn input
 assemble_laplacian(N, edges, weights)     -> csr     # pure L = D - W assembly
 
@@ -56,7 +56,7 @@ def build_graph(
         ``functools.partial`` to bind parameters, e.g.::
 
             wf = partial(rbf_weights, gamma=50.0)
-            wf = partial(cotangent_weights, faces=faces)
+            wf = make_scoped_weight_fn(wf, region_of_vertex, rho_of_region)
 
     Returns
     -------
@@ -74,9 +74,9 @@ def build_graph(
 
     Notes
     -----
-    This is the only place the mesh-vs-points distinction is made, and the only
-    place neighbour-count vs. weighting trades off — consistent with the
-    empirical finding that distance weighting, not K, governs effective support.
+    This is the only place the weighting scheme is chosen, and the only place
+    neighbour-count vs. weighting trades off — consistent with the empirical
+    finding that distance weighting, not K, governs effective support.
     """
     positions = np.asarray(positions, dtype=np.float64)
     edges = np.asarray(edges, dtype=np.int64)
@@ -132,79 +132,6 @@ def rbf_weights(
     d = positions[edges[:, 0]] - positions[edges[:, 1]]      # (E, 3)
     sq_dist = np.einsum("ij,ij->i", d, d)                    # (E,) squared length
     return np.exp(-gamma * sq_dist)
-
-
-def cotangent_weights(
-    positions: np.ndarray,
-    edges: np.ndarray,
-    faces: np.ndarray,
-) -> np.ndarray:
-    """Cotangent edge weights for a triangle mesh.
-
-        w_ij = 1/2 * (cot(alpha_ij) + cot(beta_ij))
-
-    where alpha, beta are the angles opposite edge (i, j) in the (up to two)
-    triangles sharing it. These are the standard discrete-Laplacian weights;
-    they make the global step a discrete Poisson solve on the mesh.
-
-    Parameters
-    ----------
-    positions : (N, 3) float64
-    edges     : (E, 2) int   (i < j, de-duplicated)
-    faces     : (F, 3) int   triangle vertex indices (CCW)
-
-    Returns
-    -------
-    (E,) float64, clamped to >= 0.
-
-    Notes
-    -----
-    Obtuse triangles can yield negative cotangents and hence a negative,
-    indefinite Laplacian. We clamp negatives to 0 so L stays PSD — the standard
-    pragmatic guard. (Intrinsic-Delaunay reweighting is the principled fix;
-    out of scope for the core.)
-    """
-    faces = np.asarray(faces, dtype=np.int64)
-    if faces.ndim != 2 or faces.shape[1] != 3:
-        raise ValueError(f"cotangent_weights: faces must be (F, 3), got {faces.shape}")
-
-    # Accumulate cotangent contributions per undirected vertex pair, then read
-    # them off for the requested edge list.
-    cot_sum: dict[tuple[int, int], float] = {}
-
-    # For each triangle (a, b, c), the angle at vertex `a` is opposite edge (b, c).
-    # Its cotangent contributes to the weight of edge (b, c). Cycle over corners.
-    for tri in faces:
-        a, b, c = int(tri[0]), int(tri[1]), int(tri[2])
-        for opp, (u, v) in (
-            (a, (b, c)),
-            (b, (c, a)),
-            (c, (a, b)),
-        ):
-            cot = _cotangent_at(positions[opp], positions[u], positions[v])
-            key = (u, v) if u < v else (v, u)
-            cot_sum[key] = cot_sum.get(key, 0.0) + 0.5 * cot
-
-    out = np.empty(edges.shape[0], dtype=np.float64)
-    for e, (i, j) in enumerate(edges):
-        key = (int(i), int(j)) if i < j else (int(j), int(i))
-        out[e] = cot_sum.get(key, 0.0)
-
-    return np.clip(out, 0.0, None)
-
-
-def _cotangent_at(p_opp: np.ndarray, p_u: np.ndarray, p_v: np.ndarray) -> float:
-    """cot of the angle at ``p_opp`` in triangle (p_opp, p_u, p_v).
-
-    cot(theta) = cos / sin = (e1 . e2) / ||e1 x e2||, with e1, e2 the two edges
-    emanating from p_opp.
-    """
-    e1 = p_u - p_opp
-    e2 = p_v - p_opp
-    cross = np.linalg.norm(np.cross(e1, e2))
-    if cross < 1e-12:           # degenerate / collinear triangle
-        return 0.0
-    return float(np.dot(e1, e2) / cross)
 
 
 # --------------------------------------------------------------------------- #
@@ -311,8 +238,3 @@ def _assert_laplacian_invariants(L: sp.csr_matrix, tol: float = 1e-9) -> None:
 def make_rbf_weight_fn(gamma: float) -> WeightFn:
     """Return an rbf weight_fn with ``gamma`` bound — sugar over functools.partial."""
     return partial(rbf_weights, gamma=gamma)
-
-
-def make_cotangent_weight_fn(faces: np.ndarray) -> WeightFn:
-    """Return a cotangent weight_fn with ``faces`` bound."""
-    return partial(cotangent_weights, faces=faces)

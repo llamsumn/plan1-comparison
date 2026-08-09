@@ -11,6 +11,7 @@ Convention-agnostic properties that pin ``rotate_sh`` as a correct real-SH
 """
 
 import numpy as np
+import pytest
 
 from arap_core.gaussian import rotate_sh, _sh_basis, _quat_to_R
 
@@ -74,3 +75,60 @@ def test_deterministic():
     c = rng.standard_normal((5, 16, 3))
     R = _rand_rotations(5, 12)
     assert np.array_equal(rotate_sh(R, c, 3), rotate_sh(R, c, 3))
+
+
+# ── the band structure, at every degree and past the end of it ──────────────
+# The five properties above all run at degree 3, which is the maximum and the
+# only degree that builds every block of the basis. That left the lower degrees
+# unexercised: `_sh_basis` accumulates its columns behind three `degree >= n`
+# tests, and a basis truncated at the wrong band would still satisfy every
+# property above when asked for the full one.
+@pytest.mark.parametrize("degree, width", [(0, 1), (1, 4), (2, 9), (3, 16)])
+def test_the_basis_has_one_column_per_coefficient_at_each_degree(degree, width):
+    """`(degree + 1)²` columns, which is the identity that lets `rotate_sh` slice
+    band `n` out at a fixed offset. Getting this wrong shifts every band above
+    the mistake."""
+    rng = np.random.default_rng(13)
+    dirs = rng.standard_normal((20, 3))
+
+    Y = _sh_basis(dirs, degree)
+
+    assert Y.shape == (20, (degree + 1) ** 2)
+    assert Y.shape[1] == width
+
+
+@pytest.mark.parametrize("degree", [0, 1, 2])
+def test_a_lower_degree_basis_is_a_prefix_of_a_higher_one(degree):
+    """The property that makes the offsets in `rotate_sh` correct: bands are
+    appended, never reordered, so the first `(d+1)²` columns of the degree-3
+    basis are exactly the degree-`d` basis. Asserted rather than assumed, because
+    the coefficient order has to match what `io_ply` stores and a renderer
+    evaluates."""
+    rng = np.random.default_rng(14)
+    dirs = rng.standard_normal((12, 3))
+
+    full = _sh_basis(dirs, 3)
+    truncated = _sh_basis(dirs, degree)
+
+    np.testing.assert_allclose(truncated, full[:, : (degree + 1) ** 2], atol=1e-12)
+
+
+def test_a_degree_above_the_3dgs_maximum_is_refused():
+    """3DGS stores at most degree 3, and the constants above stop there. A
+    degree-4 request would otherwise return a degree-3 basis and be silently one
+    band short."""
+    with pytest.raises(ValueError, match="degree 4 > 3 not supported"):
+        _sh_basis(np.array([[0.0, 0.0, 1.0]]), 4)
+
+
+@pytest.mark.parametrize("degree", [1, 2])
+def test_rotate_sh_refuses_a_degree_that_contradicts_the_coefficients(degree):
+    """`degree` and the coefficient count are two statements of the same fact, so
+    disagreement means one of them is wrong and there is no way to tell which.
+    The array here holds 16 coefficients — degree 3 — and is offered as
+    something else."""
+    rng = np.random.default_rng(15)
+    c = rng.standard_normal((3, 16, 3))
+
+    with pytest.raises(ValueError, match=f"degree {degree} implies"):
+        rotate_sh(_rand_rotations(3, 16), c, degree=degree)

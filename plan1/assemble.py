@@ -287,7 +287,14 @@ def _gap_fraction(
         for b in baseline.interval
         if (b - n) != 0.0
     ]
-    if not corners:
+    # `corners` is empty only if every (b − n) is zero, which needs both rounding
+    # intervals to be single points *and* identical — and that makes the two values
+    # equal, which the `denominator == 0.0` check above has already refused. So this
+    # is unreachable by *invariant*, not by construction: it holds because of how
+    # intervals are built, not because of anything on this line. If interval
+    # construction ever changes, this guard is the difference between a stated error
+    # and a bare `min() arg is an empty sequence` from four lines below.
+    if not corners:  # pragma: no cover — unreachable while the interval invariant above holds; kept so a future change to interval construction fails loudly here rather than in min()
         raise AssemblyError(
             "the baseline and the null row overlap across their whole rounding "
             "intervals, so no gap fraction is defined"

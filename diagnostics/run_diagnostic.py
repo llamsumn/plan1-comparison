@@ -317,7 +317,7 @@ def _cantilever(X, edges, anc):
                        options=dict(maxiter=200, ftol=1e-14, gtol=1e-10))
         moved = np.abs(out.x.reshape(-1, 3) - p[free]).max()
         scipy_note = f"scipy: ΔE={out.fun - E_core:.2e} moved={moved:.2e}"
-    except Exception as ex:  # pragma: no cover
+    except Exception as ex:
         scipy_note = f"scipy skipped: {ex!r}"
 
     rec("2.4", "2.4-anchor", "Cantilever zero-at-anchor", zero_at_anchor, 1e-9,

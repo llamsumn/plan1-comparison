@@ -558,7 +558,7 @@ why = "the figure↔CSV cross-check. It is what makes the two §6.2 figures cita
 [[ported]]
 path = "arap_core/__init__.py"
 origin = "authored for this project — the ARAP core's public surface, boxes C and D"
-sha256 = "346ab8491f2239b4d999537eab154f468d7c2d3df2a3faa467747c4cfa2931d4"
+sha256 = "572f2bffa0a7cd81c84d8988af95d2bdc140a6cd2169689f5231688293737661"
 why = "the public surface of box C+D"
 
 [[ported]]
@@ -570,8 +570,8 @@ why = "Graph, Anchors, Solver, ARAPResult — the data the B→C seam passes"
 [[ported]]
 path = "arap_core/graph.py"
 origin = "authored for this project — the ARAP core, boxes C and D"
-sha256 = "057860e4db3234c4bfdf7772648f6fa81147bdec322395091f643171586adc9b"
-why = "graph construction and the injected weight functions — the seam design principle that made this port possible"
+sha256 = "7adf27c57179cb0bc97a0d62495208a2c0724df9a5714670a865496d43bb3712"
+why = "graph construction and the injected weight seam — the design principle that made this port possible. `build_graph` takes the weighting as an argument, which is why box B reaches the solver as data: `box_b.edge_weights.make_scoped_weight_fn` is a second WeightFn, injected here and driven through a full solve in tests/method/test_edge_weights.py"
 
 [[ported]]
 path = "arap_core/edges.py"
@@ -624,7 +624,7 @@ why = "package marker"
 [[ported]]
 path = "box_b/edge_weights.py"
 origin = "authored for this project — the B2 seam, box B"
-sha256 = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
+sha256 = "d9cbf9014fe8dc305de10e36d577674e0bcc41c47d8518a88f607d0eaf1267e4"
 why = "THE B2 SEAM and the conformance suite's reference rule. numpy-only, no heavy imports. This hash is also the value the published table's footer prints, and tests/test_conformance.py asserts the two agree — editing this file fails the suite in three places"
 
 # THE ONE FILE HERE THAT CARRIES A CORRECTION RATHER THAN ONLY A COPY. At the
@@ -640,8 +640,8 @@ why = "THE B2 SEAM and the conformance suite's reference rule. numpy-only, no he
 [[ported]]
 path = "examples/run_penguin.py"
 origin = "authored for this project — the runnable demonstration"
-sha256 = "41a75906fe68c369096fd299af64cc1ade93ce10931351e6316ecd74cc6ad056"
-why = "the runnable demonstration, carrying an identity assertion and an inline energy-monotonicity assertion. It carries one corrected print, reasoned above"
+sha256 = "b04523dfde502ce770f384f43e3a23a5420081fab826421feeaf18d23fdde6bf"
+why = "the runnable demonstration, carrying an identity assertion and an inline energy-monotonicity assertion. It carries one corrected print, reasoned above, and one `# pragma: no cover` on the script entry point — `tests/test_example.py` drives `main()` on a 125-Gaussian lattice instead, so \"does it still run?\" is checked without paying the 19-second penguin solve on every run"
 
 # THE ONE ROW THAT IS NOT CODE, AND NOT THIS PROJECT'S TO GIVE. Every other row
 # here is this project's own work; this one is a capture someone else made, so
@@ -666,26 +666,56 @@ why = "7 tests — kNN edges and connectivity"
 [[ported]]
 path = "tests/method/test_select.py"
 origin = "authored for this project — the method's own tests"
-sha256 = "eb4c5634e13e4bad3cb50771a59e586fdcb539050b2961316e072dd2237b9bc1"
-why = "7 tests — anchor and region selection"
+sha256 = "784ce7f061f9ab3d0301848c9d96daddd78d12dacb8a09c6dd7386bd0d0c9426"
+why = "15 tests — anchor and region selection, and every refusal in it. The 7 that travelled grew by 8: the two shape guards on a box corner and a radius centre, the empty-selection warning, and the duplicate-index guard driven over both handle sets"
 
 [[ported]]
 path = "tests/method/test_io_ply.py"
 origin = "authored for this project — the method's own tests"
-sha256 = "f481b2d0a23c7906a5a81c4610b6aa53467632720c23ce72001d64d1a232644b"
-why = "6 tests — PLY round-trip"
+sha256 = "d1b131cf2d33db1a0120ba319226aaca00dc6ef48b1b47bf55f94d53c9459fcd"
+why = "12 tests — PLY round-trip, and the reader's and writer's refusals. This is where a file somebody else produced meets this repository's assumptions, so what it refuses is the whole statement of what a 3DGS .ply is taken to be"
 
 [[ported]]
 path = "tests/method/test_gaussian_sh.py"
 origin = "authored for this project — the method's own tests"
-sha256 = "d57f9f59171a0a26585c529ebf27e13b0c53713206a9f93ebe2bb45b71ccb458"
-why = "6 tests — the Wigner-D SH rotation. These are the tests that make the corrected limitation checkable rather than asserted"
+sha256 = "307db6d3662b37f1e6b210baf919491cf67ec917b6d98942799f9a32202080c6"
+why = "16 tests — the Wigner-D SH rotation. These are the tests that make the corrected limitation checkable rather than asserted; the band structure is now pinned at every degree rather than only at the maximum"
 
 [[ported]]
 path = "tests/method/test_edge_weights.py"
 origin = "authored for this project — the method's own tests"
 sha256 = "63972033c279aa19b403e4d8ce0741d78853a124f10e74152ddbe59ad6f4767f"
 why = "11 tests — the B2 seam, driven directly, including both validation guards at the boundary of what each refuses"
+
+# The four modules below were authored in this repository rather than ported. They
+# carry rows for the same reason every file under `tests/method/` does — the tree is
+# the method, and what the method ships is identified by what it is and what it
+# hashes to. `test_ported_method.py` names the five that travelled separately, so
+# "arrived without a decision" stays a question a test can answer.
+
+[[ported]]
+path = "tests/method/test_graph.py"
+origin = "authored for this project — the ARAP core's guard tests"
+sha256 = "b8258310bb45280e8dd89794070f2a9017520e4fe2f46c7e593cd85524c75946"
+why = "27 tests — what `build_graph` refuses. Four validators and the Laplacian invariant assertion, none of which had a test: a validator with no test can be deleted by accident and leave the suite green, and the failure it was written to catch then arrives later as a linear algebra error naming nothing"
+
+[[ported]]
+path = "tests/method/test_global_step.py"
+origin = "authored for this project — the ARAP core's guard tests"
+sha256 = "b0895b6fcdbe86449d11427fc37a5a99393afe01e0087b6775186cf838f69938"
+why = "22 tests — the seven anchor validators, and the soft-constraint path. `constraint=\"soft\"` is supported and documented and every call site passes \"hard\", which made it the one branch of the core a reader could reasonably suspect had never run. It has now run, and the property that distinguishes it from \"hard\" is pinned"
+
+[[ported]]
+path = "tests/method/test_solver_loop.py"
+origin = "authored for this project — the ARAP core's guard tests"
+sha256 = "3de2d8202c5bfb4589e38aa27494e78c1a454af634423a4ff6209990e9ae8240"
+why = "9 tests — both exits of the alternation loop and the degenerate-vertex fallback. The unconverged exit returns a result that looks like every other result and is not converged, so `converged` being a field rather than an exception is the thing worth pinning. The fallback is driven at weights below the noise floor rather than at zero: `svd` of the zero matrix returns identity factors anyway, so a zero-weight test passes with the fallback deleted"
+
+[[ported]]
+path = "tests/method/test_gaussian_carry.py"
+origin = "authored for this project — the ARAP core's guard tests"
+sha256 = "372193cf68004cbd5eb1447f9834ad51f3edbb47e79d6506217bee0b06398251"
+why = "10 tests — the affine carry's reflection guard, both sides of it, and Shepperd's non-trace branches. `eigh` returns a reflection half the time and a reflection stored as a quaternion is silently the nearest rotation, so the Gaussian would come back mirrored. Asserted by reconstructing the covariance rather than by checking the determinant, which cannot fail after a quaternion round trip"
 
 # ── the solver diagnostic ───────────────────────────────────────────────────
 # The 40-rung ladder that drives `arap_core` end to end. The method's own suite
@@ -721,7 +751,7 @@ why = "11 tests — the B2 seam, driven directly, including both validation guar
 [[ported]]
 path = "diagnostics/run_diagnostic.py"
 origin = "authored for this project — the solver diagnostic ladder"
-sha256 = "266d945a20a6082318214f7358e58ec4ae5e859e4aa9fb79e43d4c46237c9254"
+sha256 = "d1d2d688d60746d6ad254cd2455fab86550e1db9cf0cdfe1de591a5666183920"
 why = "the 40-rung ladder: Laplacian properties, stationarity, the cantilever profile, boundary cases, numerics and the Gaussian carry. G5 is rewritten, reasoned above"
 
 [[ported]]
@@ -757,7 +787,7 @@ why = "the 40-entry record, 40/40 passing. Regenerated against this repository's
 name = "reference rule (`box_b/edge_weights.py`)"
 kind = "file_sha256"
 origin = "the tested rigidity rule as it stands in this repository — the file named above, hashed where it sits"
-value = "38e1a661ded4552e80631bda89a1597ebe4a5e9d18e200098ab497a9fdf25fa4"
+value = "d9cbf9014fe8dc305de10e36d577674e0bcc41c47d8518a88f607d0eaf1267e4"
 why = "the tested rule the conformance suite compares the deployed one against. The hash is checked against the copy in this repository, and against the `[[ported]]` row above, so the footer and the suite fail together"
 
 # ── what the archive held and deliberately did not travel ───────────────────

@@ -72,3 +72,50 @@ def test_out_of_range_raises(lattice):
     with pytest.raises(ValueError, match="out of range"):
         make_anchors(lattice, np.array([200]), [0.1, 0, 0],
                      fixed_idx=np.array([0]))
+
+
+# ── the remaining refusals ──────────────────────────────────────────────────
+# The four guards below had no test. Three are shape refusals on arguments a
+# caller writes by hand — `lo`, `hi` and `centre` are the sort of thing typed as
+# a literal, and a 2-vector typo would otherwise broadcast against the (N, 3)
+# cloud and silently select the wrong region. The fourth is a warning rather than
+# an error, and it is the only place in `select.py` where nothing is raised, so
+# it is the one a reader is most likely to assume is unreachable.
+@pytest.mark.parametrize(
+    "lo, hi",
+    [([0, 0], [1, 1, 1]), ([0, 0, 0], [1, 1]), ([0, 0, 0, 0], [1, 1, 1, 1])],
+    ids=["lo-too-short", "hi-too-short", "both-too-long"],
+)
+def test_a_box_corner_that_is_not_a_3_vector_is_refused(lattice, lo, hi):
+    with pytest.raises(ValueError, match="lo/hi must be 3-vectors"):
+        select_box(lattice, lo=lo, hi=hi)
+
+
+@pytest.mark.parametrize("centre", [[0, 0], [0, 0, 0, 0]], ids=["short", "long"])
+def test_a_radius_centre_that_is_not_a_3_vector_is_refused(lattice, centre):
+    with pytest.raises(ValueError, match="centre must be a 3-vector"):
+        select_radius(lattice, centre=centre, r=1.0)
+
+
+def test_an_empty_moving_set_warns_that_no_edit_is_happening(lattice):
+    """A selection that matched nothing is the quiet failure this warns about:
+    the solve runs, converges, and returns the rest pose, because the region the
+    caller meant to move was outside the box they typed."""
+    fixed = select_box(lattice, [0, 0, 0], [0, 4, 4])
+    with pytest.warns(UserWarning, match="no edit is being applied"):
+        make_anchors(lattice, np.empty(0, dtype=np.int64), [0.5, 0, 0],
+                     fixed_idx=fixed)
+
+
+@pytest.mark.parametrize("which", ["moving_idx", "fixed_idx"])
+def test_a_repeated_handle_index_is_refused(lattice, which):
+    """Parametrised over both sets because the guard is written once and applied
+    to each in a loop — testing one would leave the loop itself unexercised, and
+    the loop is where a future edit could drop a set."""
+    repeated = np.array([1, 1])
+    other = np.array([20, 21])
+    moving, fixed = (
+        (repeated, other) if which == "moving_idx" else (other, repeated)
+    )
+    with pytest.raises(ValueError, match=f"{which} contains duplicate indices"):
+        make_anchors(lattice, moving, [0.1, 0, 0], fixed_idx=fixed)

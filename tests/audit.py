@@ -377,6 +377,30 @@ def link_classifications(note: str) -> dict[str, str]:
     return found
 
 
+# ── declared dependencies ───────────────────────────────────────────────────
+#: Everything that can end a distribution's name in a requirement string. The
+#: name is what the three tests below care about; the specifier is what
+#: `pyproject.toml` carries beside it.
+_SPECIFIER = re.compile(r"[<>=!~\[; ]")
+
+
+def requirement_names(requirements: Sequence[str]) -> set[str]:
+    """The distribution names in a list of requirement strings, specifiers dropped.
+
+    Three tests ask "is X declared here?" and all three used to ask it as
+    ``"numpy" in dependencies`` — an exact match against the whole entry. That
+    was true only while every entry was a bare name, and version bounds made all
+    three false at once.
+
+    One of the three was worse than false: `test_projection_figure.py` asserts
+    matplotlib is **not** a runtime dependency, and an exact match answers "not
+    there" for ``"matplotlib>=3,<4"`` just as readily as for a genuine absence.
+    A negative assertion that a version bound can satisfy is not an assertion, so
+    the name is parsed out here once rather than three times.
+    """
+    return {_SPECIFIER.split(entry, 1)[0].strip() for entry in requirements}
+
+
 # ── coverage pragmas ────────────────────────────────────────────────────────
 #: A coverage pragma, and whatever was written after it as a reason.
 _PRAGMA = re.compile(r"#\s*pragma:\s*no cover\b[\s\-—:]*(?P<reason>.*)")

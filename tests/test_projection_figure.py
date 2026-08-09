@@ -262,12 +262,23 @@ def test_matplotlib_is_a_test_dependency_and_not_a_runtime_one():
     """The pyproject comment claims the decision surface is pure stdlib and the
     runtime needs only numpy, scipy and plyfile. A plotting library in `dependencies`
     would quietly make that false, so the placement is asserted rather than trusted.
+
+    The names are parsed out of the requirement strings rather than matched
+    whole. This is the assertion that made that necessary: it is a *negative*
+    one, and an exact match reports `matplotlib>=3,<4` as absent from
+    `dependencies` exactly as confidently as it reports a genuine absence — so
+    adding a version bound would have switched this guard off without failing.
     """
     import tomllib
 
+    from audit import requirement_names
+
     pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
-    assert "matplotlib" not in pyproject["project"]["dependencies"]
-    assert "matplotlib" in pyproject["project"]["optional-dependencies"]["test"]
+    runtime = requirement_names(pyproject["project"]["dependencies"])
+    extra = requirement_names(pyproject["project"]["optional-dependencies"]["test"])
+
+    assert "matplotlib" not in runtime, runtime
+    assert "matplotlib" in extra, extra
 
 
 def test_the_figure_module_does_not_import_matplotlib_at_module_scope():
