@@ -174,7 +174,23 @@ from audit import requirement_names
 #: ported. Everything under `tests/method/` carries a row, so they arrive with the
 #: record's discipline already applied — which is why `test_ported_method.py` names
 #: the five that travelled instead of counting files.
-EXPECTED_TESTS = 864
+#:
+#: **The last row is +5, and it is the first one CI paid for.** The first run this
+#: repository ever had on a machine that is not the author's came back `863 passed,
+#: 1 failed`: `3-delta` reads 1.68e-2 apart between this Mac and ubuntu-latest,
+#: against a comparison tolerance of 1e-6. The tolerance was calibrated on residuals
+#: and spent on all forty rungs; `3-delta` is a ratio of differences between
+#: separately converged solves of a non-convex energy, and nothing about it is
+#: bounded by machine epsilon. No file count moved — the tests are added to
+#: `tests/test_diagnostic.py`, which already exists and is already audited.
+#:
+#: | check | tests |
+#: |---|---|
+#: | the tolerance policy at the value CI measured, and at a collapse it must still refuse | +2 |
+#: | widening one rung leaves the other thirty-nine on the old constant | +1 |
+#: | no widened tolerance can admit a value that flips its rung's verdict | +1 |
+#: | every widened rung is a real rung and says why it is widened | +1 |
+EXPECTED_TESTS = 869
 
 
 def test_the_collected_total_matches_the_expected_total(request):

@@ -34,14 +34,14 @@ git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **864 passed** and a clean
+working trees present and nothing pre-installed, this reports **869 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
-**Read that number with its composition, not on its own.** 484 of the 864 — 56% — are
+**Read that number with its composition, not on its own.** 484 of the 869 — 56% — are
 bookkeeping: the audits over this repository's own text, the vendored record checked
 against what is on disk, the port's rows, the mutation record read back, the coverage
-surface held to its rule. The other 380 test the method, the assembler, the figure and the
+surface held to its rule. The other 385 test the method, the assembler, the figure and the
 solver diagnostic. That ratio is not an accident or an embarrassment; it is what it costs
 to make an artefact that can be checked by someone who does not trust it, and this
 repository exists because an earlier one could not be. But a reader comparing this total

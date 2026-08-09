@@ -33,6 +33,7 @@ import io
 import json
 import sys
 from types import ModuleType
+from typing import Any
 
 import pytest
 
@@ -98,11 +99,83 @@ def test_the_ladder_produces_forty_records(executed, committed):
 #: comparing them to each other is comparing rounding noise.
 NOISE_FLOOR = 1e-9
 
-#: Above the floor, agreement is required to this relative tolerance. The widest
-#: real gap observed between two BLAS backends on the same numpy and scipy was
-#: about 4e-15 relative (`3-delta`, 0.1599935921759021 against …15), so 1e-6
-#: leaves six orders of headroom and would still catch a genuine regression.
+#: Above the floor, agreement is required to this relative tolerance. It is
+#: calibrated on *residuals* — the 29 of 40 rungs whose recorded value is at or
+#: below 1e-8, 13 of them exactly zero, because the quantity is supposed to
+#: vanish and the digits that remain are rounding. The widest gap observed among
+#: those between two BLAS backends on the same numpy and scipy was about 4e-15
+#: relative, so 1e-6 leaves six orders of headroom and would still catch a
+#: genuine regression. The other 11 are not residuals, and this constant was
+#: never measured against them — see `WIDER_TOLERANCE`.
 RELATIVE_TOLERANCE = 1e-6
+
+
+#: Rungs that are **not** residuals, with the tolerance each one's construction
+#: supports and the reason it needs one. Every entry is here because it was
+#: *observed* to move, never on speculation — `.github/workflows/verify.yml`
+#: says so in as many words, and `B2` (2.74, also a converged-solve output) is
+#: deliberately absent because it reproduced on Linux and has earned nothing.
+#:
+#: `3-delta` is `‖delta_soln − uniform_soln‖ / ‖uniform_soln − X‖`: a ratio of
+#: differences between two *separately converged* solves of a non-convex energy,
+#: each stopped when `max‖p_new − p‖ < 1e-11` — a bound on the last *step*,
+#: which is not a bound on the distance to the limit point. ARAP's local step
+#: takes an SVD per vertex, and where a configuration is near-degenerate the
+#: branch LAPACK picks can send the alternation to a different — equally valid —
+#: local minimum. Nothing about that is bounded by machine epsilon. Measured:
+#: this Mac reads 0.1599935921759021 and the ubuntu-latest runner
+#: 0.16272343632353745, 1.68e-2 apart, both clearing the 0.1 threshold and
+#: reaching the same verdict. 5e-2 admits that with three times the headroom and
+#: still cannot reach the threshold — which is not a matter of taste but the
+#: property `test_no_widened_tolerance_can_admit_a_value_that_flips_the_verdict`
+#: enforces, against a margin of 0.375.
+WIDER_TOLERANCE: dict[str, tuple[float, str]] = {
+    "3-delta": (
+        5e-2,
+        "ratio of differences between three separately converged solves of a "
+        "non-convex energy; reproducibility is bounded by the alternation's "
+        "choice of local minimum, not by machine epsilon",
+    ),
+}
+
+
+def relative_tolerance_for(rung_id: str) -> float:
+    """The tolerance this rung's *kind of quantity* actually supports.
+
+    `RELATIVE_TOLERANCE` was measured on residuals and then applied to all forty
+    rungs, which is this project's recurring mistake in its mildest form yet: a
+    constant calibrated in one place and assumed to generalise. It does not
+    generalise to a rung whose value is an O(1) output of a converged solve.
+    """
+    widened = WIDER_TOLERANCE.get(rung_id)
+    return RELATIVE_TOLERANCE if widened is None else widened[0]
+
+
+def disagreements(
+    committed: list[dict[str, Any]], executed: list[dict[str, Any]]
+) -> list[tuple[Any, ...]]:
+    """Every rung whose re-run value does not agree with the recorded one.
+
+    Pulled out of the test below so the *policy* can be exercised directly, on
+    values chosen to sit either side of it. Driving it only through a live run
+    of the ladder means it is tested at exactly one point per rung — the point
+    this machine happens to produce — which is how the tolerance came to be
+    calibrated on one class of rung and applied to all of them.
+    """
+    found: list[tuple[Any, ...]] = []
+    for c, f in zip(committed, executed, strict=True):
+        want, got = c["value"], f["value"]
+        if not isinstance(want, (int, float)) or not isinstance(got, (int, float)):
+            if want != got:  # "nan", "inf", None, or a string — compare exactly
+                found.append((c["id"], want, got))
+            continue
+        if abs(want) <= NOISE_FLOOR and abs(got) <= NOISE_FLOOR:
+            continue
+        scale = max(abs(want), abs(got))
+        tolerance = relative_tolerance_for(c["id"])
+        if abs(want - got) > tolerance * scale:
+            found.append((c["id"], want, got, abs(want - got) / scale))
+    return found
 
 
 def test_the_ladder_has_the_same_shape_as_the_committed_record(executed, committed):
@@ -151,20 +224,104 @@ def test_every_measured_value_agrees_with_the_committed_one(executed, committed)
     * above it, they must agree to `RELATIVE_TOLERANCE`, which is six orders
       wider than the widest observed platform gap and still tight enough that a
       real regression cannot hide in it.
+
+    **And it was wrong a second time, one level up.** 2026-08-09, the first CI
+    run this repository ever had: 863 passed and `3-delta` failed, 1.68e-2 apart
+    between this Mac and ubuntu-latest. The rewrite above fixed the comparison
+    and left the *calibration* unexamined — 1e-6 was measured on residuals and
+    then spent on all forty rungs. `WIDER_TOLERANCE` is where that assumption
+    now has to be stated per rung and argued for.
     """
-    mismatches = []
-    for c, f in zip(committed, executed, strict=True):
-        want, got = c["value"], f["value"]
-        if not isinstance(want, (int, float)) or not isinstance(got, (int, float)):
-            if want != got:  # "nan", "inf", None, or a string — compare exactly
-                mismatches.append((c["id"], want, got))
-            continue
-        if abs(want) <= NOISE_FLOOR and abs(got) <= NOISE_FLOOR:
-            continue
-        scale = max(abs(want), abs(got))
-        if abs(want - got) > RELATIVE_TOLERANCE * scale:
-            mismatches.append((c["id"], want, got, abs(want - got) / scale))
-    assert not mismatches, mismatches
+    assert not (found := disagreements(committed, executed)), found
+
+
+# ── the tolerance policy, exercised away from this machine's one data point ──
+def _one_rung(rung_id, want, got, threshold=0.1):
+    """A committed/executed pair carrying a single rung, for driving the policy."""
+    base = {"phase": "3", "id": rung_id, "name": rung_id, "unit": "rel", "notes": ""}
+    return (
+        [{**base, "value": want, "threshold": threshold, "passed": True}],
+        [{**base, "value": got, "threshold": threshold, "passed": True}],
+    )
+
+
+#: What ubuntu-latest measured for `3-delta` on 2026-08-09, against what this Mac
+#: records. Transcribed from the failing run rather than re-derived, which is why
+#: it is a literal here and not a computation. The run is identified by the line
+#: it printed — `AssertionError: [('3-delta', 0.1599935921759021,
+#: 0.16272343632353745, 0.01677597406563921)]`, workflow `verify`, job `gate`,
+#: `1 failed, 863 passed in 14.48s` — and not by a URL: a link into the Actions
+#: tab is exactly the kind of reference `tests/audit.py` refuses, and it would rot
+#: long before the number does.
+CI_OBSERVED = ("3-delta", 0.1599935921759021, 0.16272343632353745)
+
+
+def test_the_policy_admits_the_value_ci_measured_on_another_platform():
+    """The failure this change exists to fix, pinned as a value rather than a story.
+
+    Watched failing first, with `WIDER_TOLERANCE` empty: `[('3-delta',
+    0.1599935921759021, 0.16272343632353745, 0.01677597406563921)]`.
+    """
+    assert not disagreements(*_one_rung(*CI_OBSERVED))
+
+
+def test_the_policy_still_rejects_a_collapse_in_the_weight_response():
+    """Widening is only defensible if it still refuses the thing worth catching.
+
+    `3-delta` says a delta-shaped weight moves the solution by more than 10% of
+    the uniform one. A wiring break drives that toward zero, and 0.12 is a
+    quarter of the recorded response gone while *still passing the rung's own
+    threshold* — exactly the regression the rung cannot see on its own and the
+    value comparison has to.
+    """
+    found = disagreements(*_one_rung("3-delta", 0.1599935921759021, 0.12))
+    assert [f[0] for f in found] == ["3-delta"]
+
+
+def test_widening_one_rung_does_not_widen_any_other():
+    """The old constant still governs the 39 rungs nothing was measured about.
+
+    A 1e-3 gap on a residual is seven orders past its floor and stays a failure;
+    the same gap on `3-delta` is inside what the platform is entitled to move it.
+    """
+    assert relative_tolerance_for("L3") == RELATIVE_TOLERANCE
+    assert disagreements(*_one_rung("L3", 1.0, 1.001, threshold=1e-9))
+    assert not disagreements(*_one_rung("3-delta", 1.0, 1.001))
+
+
+def test_no_widened_tolerance_can_admit_a_value_that_flips_the_verdict(committed):
+    """The property that makes the number above a derivation rather than a taste.
+
+    A value tolerance wide enough to reach a rung's own threshold would let this
+    test pass while `test_every_rung_reaches_the_same_verdict…` fails — the
+    suite contradicting itself about the same run. So each widened tolerance is
+    required to keep its entire accepted band on one side of the boundary.
+
+    For a tolerance `t` against a recorded `want`, the band the comparison
+    accepts is exactly `[want*(1-t), want/(1-t)]`: below `want` the scale is
+    `want`, above it the scale is `got`. `3-delta` at 5e-2 accepts
+    [0.152, 0.168] against a threshold of 0.1.
+    """
+    by_id = {c["id"]: c for c in committed}
+    for rung_id, (tolerance, _reason) in WIDER_TOLERANCE.items():
+        assert 0 < tolerance < 1, (rung_id, tolerance)
+        record = by_id[rung_id]
+        want, threshold = record["value"], record["threshold"]
+        assert isinstance(threshold, (int, float)), (rung_id, threshold)
+        lo, hi = sorted((want * (1 - tolerance), want / (1 - tolerance)))
+        assert not lo <= threshold <= hi, (rung_id, tolerance, lo, threshold, hi)
+
+
+def test_every_widened_rung_is_real_and_says_why_it_is_widened(committed):
+    """A bare number here would be indistinguishable from having given up.
+
+    The same rule `tests/test_coverage_surface.py` applies to an exclusion
+    marker: the reason travels with the thing it excuses.
+    """
+    ids = {c["id"] for c in committed}
+    for rung_id, (_tolerance, reason) in WIDER_TOLERANCE.items():
+        assert rung_id in ids, rung_id
+        assert len(reason.split()) >= 10, (rung_id, reason)
 
 
 def test_the_values_that_are_exact_by_construction_are_exact(executed, committed):
