@@ -65,7 +65,7 @@ identifiable: a reader can always tell *which* bytes this table was built from.
 
 | not here | why |
 |---|---|
-| `box_b/descriptors.py`, `box_b/noise.py` and their 47 tests | the geometry reader. Paused on a diagnosed shrinking-ball defect, so nothing here rests on it. The B2 seam (`box_b/edge_weights.py`) is complete and standing, and it is the only part that travels. |
+| `box_b/descriptors.py`, `box_b/noise.py` and their 47 tests | the geometry reader. Nothing in the published table reads geometry, so nothing here rests on it. The B2 seam (`box_b/edge_weights.py`) is complete and standing, and it is the only part that travels. An earlier version of this row said the reader was paused on a shrinking-ball defect; that defect was found and fixed, and the shell claim it produced is withdrawn — see `README.md`. |
 | the characterisation study's **code** | results travel, code is cited. Its outputs are under `evidence/characterisation/` with the command that wrote each one; forking a living study into a frozen artifact would hand a reader two versions to reconcile. |
 | a second asset's (trex) sweep, ~1.4 MB | no manifest row binds it, no published number derives from it. Recorded as an exclusion with a reason, not silently absent. |
 | the assembly spec that governs this work, and its parent — 869 lines between them | planning documents, superseded by their own outputs. What they decided that still binds — the comparability gate, the precision policy and the saturation rule — is stated below and asserted in the suite; the pre-registration and verdict they produced are vendored verbatim at `evidence/record/`. |

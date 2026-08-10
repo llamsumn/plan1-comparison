@@ -214,10 +214,15 @@ did the work, stays. Genuine third-party attribution is a different question and
 see `THIRD_PARTY.md`.
 
 **What deliberately stayed behind:** `box_b/descriptors.py`, `box_b/noise.py` and their 47
-tests — the geometry reader, paused on a diagnosed shrinking-ball defect. On the penguin,
-which is a surface shell, thickness is not a local property, so the estimator's premise does
-not hold there. That is the risk this repository exists to be safe from, and a test asserts
-the two files are absent rather than trusting that nobody copies them in later.
+tests — the geometry reader. Nothing in the published table reads geometry, so it is out of
+scope for an evidence chain behind that table, and a test asserts the two files are absent
+rather than trusting that nobody copies them in later.
+
+An earlier version of this note gave a different reason: that thickness is not a local
+property on a surface shell, so the reader's premise fails on this asset. **That claim is
+withdrawn.** It was measured with an estimator whose shrinking-ball iteration had a defect,
+and the fixed estimator recovers analytic thickness on a clean synthetic shell. Why it still
+does not recover it here is a separate result, and not one this repository carries.
 
 Deform the sample asset — with zero displacement, this is the identity check that guards the
 whole read → solve → carry → write chain:
