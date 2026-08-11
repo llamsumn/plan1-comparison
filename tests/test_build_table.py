@@ -22,11 +22,19 @@ REPO = Path(__file__).resolve().parents[1]
 
 from scripts.build_table import (  # noqa: E402
     COMMITTED_TABLE,
+    DEFAULT_MANIFEST,
     ProvenanceError,
     collect_provenance,
     render_table,
 )
 from audit import forbidden_references  # noqa: E402
+from plan1.assemble import assemble  # noqa: E402
+from plan1.manifest import load_manifest, load_records  # noqa: E402
+
+# `_HEADS` is the column head the published table prints per metric. The README's
+# rows are keyed against it rather than against a second copy of "PSNR", so the two
+# surfaces cannot come to disagree about what a column is called.
+from plan1.render import _HEADS, format_fraction, format_measurement  # noqa: E402
 
 
 def test_the_committed_table_regenerates_byte_identically():
@@ -95,6 +103,84 @@ def test_an_edited_reference_rule_raises_rather_than_publishing_a_new_hash(tmp_p
 
     with pytest.raises(ProvenanceError, match="does not match the recorded"):
         collect_provenance(reference_rule=edited)
+
+
+# ── the front page, bound to the assembly ───────────────────────────────────
+README = REPO / "README.md"
+
+
+def readme_absolute_values() -> tuple[list[str], dict[str, list[str]]]:
+    """`README.md`'s absolute-value table, as its header cells and its rows.
+
+    Located by its first column head rather than by line number, so editing the
+    prose around it cannot quietly point this at nothing — and asserted to be the
+    only table of that shape, so a second one cannot be added and left unchecked.
+    """
+
+    def cells(line: str) -> list[str]:
+        return [cell.strip() for cell in line.strip().strip("|").split("|")]
+
+    lines = README.read_text().splitlines()
+    heads = [index for index, line in enumerate(lines) if line.startswith("| metric |")]
+    assert len(heads) == 1, (
+        f"expected exactly one table in README.md whose first column is `metric`; "
+        f"found {len(heads)}"
+    )
+
+    rows: dict[str, list[str]] = {}
+    for line in lines[heads[0] + 2 :]:  # + 2 skips the alignment row
+        if not line.startswith("|"):
+            break
+        cell = cells(line)
+        rows[cell[0]] = cell[1:]
+    return cells(lines[heads[0]]), rows
+
+
+def test_the_readme_publishes_the_absolute_values_the_assembler_produces():
+    """The percentages are the front page's claim; these are what they are of.
+
+    `README.md` is what GitHub renders when the repository is opened, and it
+    published `63.6% / 72.6% / 80.4%` with no absolute metric value anywhere in it.
+    A reader who wanted to know what was recovered, and from what, had to find
+    `out/comparison_table.md` and read the endpoints out themselves.
+
+    A fraction quoted without its endpoints is the transcription risk this
+    repository refuses everywhere else, one level up: three percentages typed into
+    a second document, free to stay there while the runs behind them move. So the
+    front page's cells are asserted against the **assembly** rather than against a
+    copy of the rendered table — same manifest, same records, and the same
+    formatters the published table prints through, so the front page cannot show a
+    digit its source does not have either.
+
+    Both the heads and the cells are checked. The heads are the assembled table's
+    own row labels, so the README cannot carry the right numbers under the wrong
+    description — and if the pre-registered rule ever selects a different rigidity,
+    the middle column's head fails here rather than going stale.
+    """
+    manifest = load_manifest(DEFAULT_MANIFEST)
+    assembled = assemble(manifest, load_records(manifest))
+    selected = assembled.selected_row
+    assert selected is not None and selected.fractions is not None, (
+        "the rule published no row, so there is nothing for the README to quote"
+    )
+
+    header, published = readme_absolute_values()
+    assert header == [
+        "metric",
+        assembled.row("vanilla").label,
+        selected.label,
+        assembled.row("baseline").label,
+        "gap closed",
+    ], header
+
+    for metric, head in _HEADS.items():
+        assert head in published, f"README.md publishes no row for {head}"
+        assert published[head] == [
+            format_measurement(assembled.row("vanilla").metrics[metric], metric),
+            format_measurement(selected.metrics[metric], metric),
+            format_measurement(assembled.row("baseline").metrics[metric], metric),
+            format_fraction(selected.fractions[metric]),
+        ], head
 
 
 def test_the_footer_names_every_recorded_artefact():

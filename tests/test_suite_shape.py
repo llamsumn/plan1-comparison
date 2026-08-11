@@ -190,7 +190,15 @@ from audit import requirement_names
 #: | widening one rung leaves the other thirty-nine on the old constant | +1 |
 #: | no widened tolerance can admit a value that flips its rung's verdict | +1 |
 #: | every widened rung is a real rung and says why it is widened | +1 |
-EXPECTED_TESTS = 869
+#:
+#: **And the last is +1, for the front page.** `README.md` published the three
+#: gap-recovered percentages with no absolute value anywhere behind them, so a reader
+#: could not see what was recovered or from what without opening `out/`. The
+#: endpoints are now beside them and asserted against the assembly. It is one test
+#: walking all three metrics rather than three parametrised cases, so the total moves
+#: by exactly what was added; and no file count moved either, because it lives in
+#: `tests/test_build_table.py`, which already exists and is already audited.
+EXPECTED_TESTS = 870
 
 
 def test_the_collected_total_matches_the_expected_total(request):

@@ -414,7 +414,29 @@ selecting ρ = 16.
 ## Status
 
 **Complete.** The table publishes 63.6% / 72.6% / 80.4% at ρ = 16, and every number traces
-to a named run.
+to a named run. Those three are fractions of a gap, so the values they are fractions *of* are
+here rather than only in `out/comparison_table.md` — the two endpoints and the selected row,
+per metric, each at the precision its own source recorded:
+
+| metric | none (grouping off, unit rigidity) | imposed, ρ = 16 | inferred groups (baseline, as published) | gap closed |
+|---|---|---|---|---|
+| PSNR | 19.277 | 22.953 | 25.055 | 63.6% |
+| SSIM | 0.9199 | 0.9443 | 0.9535 | 72.6% |
+| LPIPS | 0.0916 | 0.0634 | 0.0565 | 80.4% |
+
+**LPIPS falls where the other two rise, and no column has to be inverted mentally.** The
+fraction is (row − null) / (baseline − null) on all three, so inverting a metric flips
+numerator and denominator together and *more recovered* already means the same thing in every
+row. The column heads are the published table's own row labels, so a row here can be found
+there — with the frame that table carries in a column of its own: the baseline observes the
+object's motion and this method does not, so exceeding it is neither a goal nor a claim.
+
+**These cells are not typed in either.**
+`tests/test_build_table.py::test_the_readme_publishes_the_absolute_values_the_assembler_produces`
+re-assembles the table from the manifest and the run records and asserts every one of them —
+heads included — against what comes out, through the same formatters the published table
+prints with. Same reason as the verdict counts above: a number is published where a reader
+lands, so that is where it has to be checked.
 
 Both halves of the wiring gate pass. The conformance test: the deployed cluster rule and
 the method repository's tested reference agree edge-for-edge across ρ = 0.0625…64,
