@@ -198,7 +198,24 @@ from audit import requirement_names
 #: walking all three metrics rather than three parametrised cases, so the total moves
 #: by exactly what was added; and no file count moved either, because it lives in
 #: `tests/test_build_table.py`, which already exists and is already audited.
-EXPECTED_TESTS = 870
+#:
+#: **And the last is +80, for the second asset.** The trex ρ-probe sweep's seven run
+#: directories were vendored, `manifests/trex_deformsplat.toml` was written to bind
+#: them, and the pre-registered saturation rule was applied to them for the first
+#: time. Most of the growth is the parametrised-provenance effect again — fifteen new
+#: `[[file]]` rows at three checks each is +45 before one new test is written:
+#:
+#: | check | tests |
+#: |---|---|
+#: | `test_trex_assembly.py` — the gate, the band, the bindings, and the verdict | +33 |
+#: | fifteen new `[[file]]` rows, parametrised three ways | +45 |
+#: | two new audited text files: the manifest and the module | +2 |
+#:
+#: No table was generated and `scripts/verify.sh` is unchanged. The rule was run in
+#: order to decide whether further sweep points were needed; publishing what it
+#: selected is separate work, and keeping it out is what made running the rule first
+#: cheap enough to be worth doing.
+EXPECTED_TESTS = 950
 
 
 def test_the_collected_total_matches_the_expected_total(request):

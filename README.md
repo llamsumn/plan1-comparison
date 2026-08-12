@@ -279,7 +279,8 @@ in the section that carries the contribution. A chapter about deforming a Gaussi
 with no picture of a deformed Gaussian splat is a gap a reader notices immediately, and
 the obvious sources were all closed: the nine cluster runs wrote **empty** `renders/`
 directories, and the one render-looking figure that existed anywhere is also a plot *and* is
-built on the trex asset this repository excludes.
+built on trex artifacts that did not travel — the trex **run records** are vendored here, its
+renders and figures are not.
 
 ```bash
 python scripts/make_projection_figure.py

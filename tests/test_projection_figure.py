@@ -6,8 +6,9 @@ a chapter about deforming a Gaussian splat with no image of a deformed Gaussian 
 
 The escape routes were checked and are closed: the nine cluster runs' `renders/`
 directories were empty (recorded in `evidence/PROVENANCE.toml`), and
-`fig_render_corroboration.png` in the archive is also a plot *and* is built on the trex
-asset that `CONTEXT.md` deliberately excludes. Nothing in reach is a rendering.
+`fig_render_corroboration.png` in the archive is also a plot *and* is built on trex
+artifacts that did not travel — the trex run records are vendored now, its renders and
+figures are not, and `CONTEXT.md` says which. Nothing in reach is a rendering.
 
 So this is a **CPU orthographic projection of the Gaussian means** — 23,548 points
 scattered on a plane, before and after the solve. It is not a splat render: no

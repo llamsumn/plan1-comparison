@@ -141,18 +141,27 @@ def test_every_file_under_evidence_has_a_provenance_row():
 def test_the_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
     """Both checks above pass trivially against an empty directory.
 
-    49 = 24 run/cluster + 21 characterisation + 4 documents. The 24: nine run
-    directories × two stats files = 18, three run logs, two archived cluster
-    sources, one spike console. The 21: every characterisation artifact except a
-    `.DS_Store` — seventeen were scoped up front, and the four beyond them are each
-    the input a named document asserts against, so they travelled too. The 4: the
+    64 = 39 run/cluster + 21 characterisation + 4 documents. The 39: **sixteen** run
+    directories × two stats files = 32, four run logs, two archived cluster sources,
+    one spike console. The 21: every characterisation artifact except a `.DS_Store` —
+    seventeen were scoped up front, and the four beyond them are each the input a
+    named document asserts against, so they travelled too. The 4: the
     pre-registration and the verdict, cited sixteen times and shipped zero times,
     plus the two companions those two cite by name — the Phase-B probe verdict and
     the feasibility addendum, whose sibling-relative citations resolved nowhere
     until the documents landed beside them. All departures are on the record in
     `PROVENANCE.toml`.
+
+    **It was 49, over nine run directories and three logs.** The second asset's seven
+    directories were excluded on the stated grounds that no manifest row bound them
+    and no published number derived from them; `manifests/trex_deformsplat.toml` now
+    binds all seven, so both halves of that reason expired at once and the exclusion
+    was deleted rather than left standing beside the rows it denies. The fourth log
+    travelled with them: it is the only surviving record of what command produced
+    that sweep, and it was excluded for precisely that reason back when the rows it
+    describes were not here.
     """
-    assert len(RECORD.files) == len(vendored_files()) == 49
+    assert len(RECORD.files) == len(vendored_files()) == 64
 
 
 # ── the characterisation outputs carry what a derived artefact needs ────────
@@ -387,8 +396,15 @@ def test_every_recorded_artefact_identifies_content_that_is_in_this_repository()
 # ── exclusions are stated, not left as an absence ───────────────────────────
 def test_what_did_not_travel_is_recorded_with_a_reason():
     """"The evidence base" has to be a closed statement. The archive directory
-    also held a second asset's sweep and 1.4 MB of its logs; that they are absent
-    is a decision, and a decision has to be readable."""
+    also held 1.4 MB of a second asset's logs; that they are absent is a decision,
+    and a decision has to be readable.
+
+    **That asset's sweep used to be on this list and is not any more.** It was
+    excluded because no manifest row bound it; one does now, so the row was deleted
+    rather than left contradicting the fourteen files it denies. An exclusion whose
+    reason has expired is worse than no exclusion at all — it reads as a considered
+    decision while describing a state of affairs that ended.
+    """
     assert RECORD.excluded
     for entry in RECORD.excluded:
         assert entry.path and entry.reason

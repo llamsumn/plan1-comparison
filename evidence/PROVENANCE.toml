@@ -29,10 +29,12 @@
 [vendoring]
 # When the copies were taken. The bulk travelled on the first date; the two
 # companion documents under `record/` followed on the second, when the citations
-# inside the records they accompany were made to resolve.
-dates = ["2026-08-06", "2026-08-08"]
+# inside the records they accompany were made to resolve. On the third, the second
+# asset's seven run directories travelled — they had been excluded on the grounds
+# that no manifest row bound them, and a manifest now does.
+dates = ["2026-08-06", "2026-08-08", "2026-08-12"]
 
-# ── the nine run directories the manifest binds ─────────────────────────────
+# ── the penguin manifest's nine run directories ─────────────────────────────
 # Every row of the published table resolves to a pair of these. `ckpts/`,
 # `renders/` and `tb/` sat beside `stats/` in the archive and were empty in all
 # nine, so nothing under them travelled.
@@ -152,11 +154,128 @@ origin = "DeformSplat baseline finetune `penguin_0217_0239` — validation pass 
 sha256 = "73c7bf3aef1b019f2c356979b58f32d6549664f0555c5c5a13705d58f4972042"
 why = "row `baseline` — the DeformSplat run's own statistics record, recovered 2026-08-05"
 
+# ── the seven trex run directories ──────────────────────────────────────────
+# The second asset, `trex_0135_0250`: the elongated bar-analog, PCA aspect 4.27,
+# against the penguin's compact 2.53. These are bound by `manifests/trex_deformsplat.toml`
+# and by nothing else — the two assets get separate manifests and separate tables,
+# because the comparability gate keys on the step-0 triple and mixing them would
+# make it raise, correctly.
+#
+# All seven carry the same step-0 fingerprint at full precision — PSNR
+# 18.714893341064453, SSIM 0.8961969614028931, LPIPS 0.10315407812595367, 17,779
+# primitives. Six are the ρ-probe sweep of 2026-07-26; the seventh is the native
+# DeformSplat baseline of 2026-08-12, which was run precisely to find out whether a
+# fresh run could reproduce that fingerprint from the same checkpoint. It did,
+# exactly, and that is the only reason the seven can sit in one table.
+#
+# THE 17,779 IS NOT THE ONLY PRIMITIVE COUNT THIS ASSET HAS, and the distinction is
+# load-bearing. `ckpt_best_psnr.pt` was written at training step 2999 with 17,779
+# primitives while training ran on to 33,623 — one run, two moments, two correct
+# numbers describing two different files. Every row here consumed the first. A row
+# that arrived carrying 33,623 would be a different model, and the gate refuses it.
+#
+# These directories were EXCLUDED until now, on the stated grounds that no manifest
+# row bound them and no published number derived from them. Both halves of that
+# reason have expired, so they travel and the exclusion is deleted rather than left
+# to contradict the rows below.
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_vanilla/stats/val_step0000.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_vanilla` — validation pass at step 0"
+sha256 = "48baccc7af35ed77103cde0298c39e213b939bac90cdc1f12e6cccd65745ba6d"
+why = "row `vanilla` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_vanilla/stats/val_step0501.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_vanilla` (grouping off, unit rigidity) — validation pass at step 501"
+sha256 = "5fc3db3525b4d9f0691c086b45cba6b9e0e10af50cdbfc7326561d8337339f7c"
+why = "row `vanilla` — the no-rigidity row, denominator base for every fraction, and one of the three runs the replicate band is derived from"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho1a/stats/val_step0000.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho1a` — validation pass at step 0"
+sha256 = "0f5d9337886ccaa72895ad7283fceabb4f658855c832398d691e22b9c4d934a3"
+why = "row `rho1a` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho1a/stats/val_step0501.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho1a` (ρ = 1) — validation pass at step 501"
+sha256 = "3e2d97019b0405be6d2aa65f676bfdb2032235b2078a18aa670a4014176d8b84"
+why = "row `rho1a` — unit-rigidity replicate; feeds the replicate band, and is deliberately NOT fed to the saturation rule"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho1b/stats/val_step0000.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho1b` — validation pass at step 0"
+sha256 = "9fc8dfd9e2fae804b739cdda0f0b07ed670b8cdf20d7445a04471a010d7d4a00"
+why = "row `rho1b` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho1b/stats/val_step0501.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho1b` (ρ = 1, second replicate) — validation pass at step 501"
+sha256 = "359190f1fbfbb2225abecb54227922b73bdb4283b877b10375c57af90461f4bb"
+why = "row `rho1b` — the third run the replicate band is derived from"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho025/stats/val_step0000.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho025` — validation pass at step 0"
+sha256 = "7e2978bb6157734e3fded8a2538a3b727917a3276f7b280c3090d3749c0850e0"
+why = "row `rho025` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho025/stats/val_step0501.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho025` (ρ = 0.25) — validation pass at step 501"
+sha256 = "c91767e17ca8ee83a3f8cb8b517860574f065cacc820dc4ffbd2de58edef5270"
+why = "row `rho025` — imposed-rigidity sweep point, fed to the saturation rule"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho4/stats/val_step0000.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho4` — validation pass at step 0"
+sha256 = "d132990b1f7000ac1d0d08562d7d14f4f14772e8b92de740716cec8498a0c90a"
+why = "row `rho4` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho4/stats/val_step0501.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho4` (ρ = 4) — validation pass at step 501"
+sha256 = "eb1360bf2c9a40757309cdea39e2e2009931bb8b525b88a2ba58c74c59ea0566"
+why = "row `rho4` — imposed-rigidity sweep point, fed to the saturation rule"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho16/stats/val_step0000.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho16` — validation pass at step 0"
+sha256 = "56d819e5f900d994b70de7212a11ea1b007bdb736b32ad8a586e59fd40f52c34"
+why = "row `rho16` — step-0 comparability fingerprint"
+
+[[file]]
+path = "cluster/rho_probe_evidence/trex_rho16/stats/val_step0501.json"
+origin = "trex ρ-probe sweep of 2026-07-26, run `trex_rho16` (ρ = 16) — validation pass at step 501"
+sha256 = "78b6994b18e59f9d29ecc93a185be5cd008bf849de6bdab30eb62241efd63b8f"
+why = "row `rho16` — the largest imposed rigidity that exists for this asset; whether it is the last one is the question the saturation rule was run to answer"
+
+[[file]]
+path = "cluster/rho_probe_evidence/baseline_trex_0135_0250/stats/val_step0000.json"
+origin = "native DeformSplat baseline finetune `trex_0135_0250`, run 2026-08-12 — validation pass at step 0"
+sha256 = "7e505025f68b42cb5733eb1184ed2fc5dbacd19e4a621832cdf6a1f291bdc826"
+why = "row `baseline` — the pre-registered gate: all four fields matched the six sweep rows at full precision, exact equality rather than agreement to display precision"
+
+[[file]]
+path = "cluster/rho_probe_evidence/baseline_trex_0135_0250/stats/val_step0501.json"
+origin = "native DeformSplat baseline finetune `trex_0135_0250`, run 2026-08-12 — validation pass at step 501"
+sha256 = "9817d321dd7bb6027f90a5603c49b7d6e0220c6aa599d6c716fd270fdd08c980"
+why = "row `baseline` — the arm that has seen the object move, and the far endpoint of every gap fraction"
+
 # ── the run logs ────────────────────────────────────────────────────────────
 # Not read by any reader. They are what makes the verdict's §1 checkable: the
 # saturation runs recorded both source hashes inline, and no AssertionError
 # appears anywhere in either console — which is the silence the wiring harness
 # exists to interpret.
+#
+# The fourth is the odd one out and travelled with the trex rows. The trex sweep
+# consoles carry no inline source hashes — the practice of echoing them started
+# with the 2026-08-05 saturation runs, after that sweep — so the only record of
+# what actually produced those rows is the container listing below. It is here
+# because the alternative is a set of published rows whose launch command exists
+# nowhere a reader can see, and because what it shows does not match the recipe
+# the phase-B plan documents.
 
 [[file]]
 path = "cluster/rho_probe_evidence/_logs/penguin_rho32.log"
@@ -175,6 +294,12 @@ path = "cluster/rho_probe_evidence/_logs/plan1_preflight_20260805.txt"
 origin = "transcript of the 2026-08-05 preflight pass, observation only"
 sha256 = "1680df59cffc13664a2ef3ebb9f4dcb622f096651c53f75b6464e72bcaeff746"
 why = "the preflight that recovered the baseline record and compared 6/6 source hashes; cited by the manifest's baseline row, and summarised by the addendum at record/plan1_feasibility_addendum.md"
+
+[[file]]
+path = "cluster/rho_probe_evidence/_logs/hare_me_20260729.txt"
+origin = "cluster container listing taken 2026-07-29, carrying the launch lines of three of the six trex sweep runs"
+sha256 = "a1bf1525f94f75b756e5ecb6ce161b74033d0215e5779308ff0b7952178ba732"
+why = "the only surviving launch record for the trex sweep. It shows the runs were issued through `sweep_rho.py` with `--group_override 0 --rho_override N --rho_enabled_override 1 --scale_reg 0.1` — NOT the `deform_splat.py --without_group True` recipe the phase-B plan documents, which will therefore not reproduce these runs as written. Excluded until the trex rows travelled, on the grounds that its launch lines were theirs; that is now the reason it is here"
 
 # ── the four documents the whole artefact argues from ───────────────────────
 # THE FIRST TWO WERE CITED SIXTEEN TIMES AND SHIPPED ZERO — including in the
@@ -796,24 +921,14 @@ why = "the tested rule the conformance suite compares the deployed one against. 
 # copy.
 
 [[excluded]]
-path = "cluster/rho_probe_evidence/trex_*/"
-size = "12 files, ~48 KB"
-reason = "a second asset's sweep. No manifest row binds it and no published number derives from it. Vendoring it would put unreferenced evidence in a submission artifact."
-
-[[excluded]]
 path = "cluster/rho_probe_evidence/_logs/train_trex.log"
 size = "1.3 MB"
-reason = "trex training console. It is 87% of the archive directory's bulk and supports nothing in this repository."
+reason = "the 3DGS training console for `ckpt_best_psnr.pt`, the checkpoint every trex row starts from. It is 87% of the archive directory's bulk, and it is not what ties the rows to that checkpoint — their shared step-0 fingerprint is, and that is vendored seven times over."
 
 [[excluded]]
 path = "cluster/rho_probe_evidence/_logs/tx_{025,1b,4}.log"
 size = "3 files, 103 KB"
-reason = "trex sweep consoles, as above."
-
-[[excluded]]
-path = "cluster/rho_probe_evidence/_logs/hare_me_20260729.txt"
-size = "1.8 KB"
-reason = "the 2026-07-29 cluster container listing. Its launch lines are the trex runs'; the penguin saturation runs record their own in penguin_rho{32,64}.log."
+reason = "run consoles for three of the six trex sweep runs. They carry no inline source hashes, unlike the penguin saturation consoles, and no number the manifest binds — the statistics records are what the rows resolve to. The launch lines these were the only record of travelled instead, in the container listing under _logs/."
 
 [[excluded]]
 path = "cluster/rho_probe_evidence/*/{ckpts,renders,tb}/"

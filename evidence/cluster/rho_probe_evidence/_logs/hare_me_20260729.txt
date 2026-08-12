@@ -1,0 +1,29 @@
+containers:
+  train_trex | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline bash scripts/train_diva360.sh 0 trex 0135'
+  tx_1b | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline CUDA_VISIBLE_DEVICES=0 python sweep_rho.py default --data_dir data/diva360_processed/trex_0250/ --ckpt results/diva360/trex_0135/ckpts/ckpt_best_psnr.pt --data_factor 1 --data_name diva360 --single_finetune --scale_reg 0.1 --disable_viewer --cam_idx 0 --object_name trex_0135_0250 --group_override 0 --result_dir results/rho_probe/trex_rho1b --rho_override 1 --rho_enabled_override 1'
+  tx_025 | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline CUDA_VISIBLE_DEVICES=0 python sweep_rho.py default --data_dir data/diva360_processed/trex_0250/ --ckpt results/diva360/trex_0135/ckpts/ckpt_best_psnr.pt --data_factor 1 --data_name diva360 --single_finetune --scale_reg 0.1 --disable_viewer --cam_idx 0 --object_name trex_0135_0250 --group_override 0 --result_dir results/rho_probe/trex_rho025 --rho_override 0.25 --rho_enabled_override 1'
+  tx_4 | clll20/deformsplat:sweep-20260705 | bash -c 'WANDB_MODE=offline CUDA_VISIBLE_DEVICES=0 python sweep_rho.py default --data_dir data/diva360_processed/trex_0250/ --ckpt results/diva360/trex_0135/ckpts/ckpt_best_psnr.pt --data_factor 1 --data_name diva360 --single_finetune --scale_reg 0.1 --disable_viewer --cam_idx 0 --object_name trex_0135_0250 --group_override 0 --result_dir results/rho_probe/trex_rho4 --rho_override 4 --rho_enabled_override 1'
+    = 4
+
+ports:
+    = 0
+
+mounts:
+  /mnt/fast0/clll20 | expire = 2026-08-26 07:52:09 (27 days, 23:55:12)
+  /homes/clll20 | permanent
+    = 2
+
+scratch storage:
+  /mnt/fast0
+  /mnt/faster0
+    = 2
+
+public data:
+  /mnt/calabash/public
+    = 1
+
+private data:
+  /mnt/calabash/private
+  /mnt/calabash/registered
+    = 2
+

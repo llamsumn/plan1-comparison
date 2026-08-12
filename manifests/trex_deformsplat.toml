@@ -1,0 +1,205 @@
+# The trex ↔ DeformSplat comparison — row binding.
+#
+# The second asset, and a deliberately different one: trex is the elongated
+# bar-analog, PCA aspect 4.27, against the penguin's compact blob at 2.53. A second
+# data point on the same shape would have been an extra measurement; a second data
+# point on a different shape is a test of whether the result depends on the shape.
+#
+# IT GETS ITS OWN MANIFEST AND ITS OWN TABLE. Trex rows are never added to
+# `penguin_deformsplat.toml`. The comparability gate keys on the step-0 triple, the
+# primitive count and the evaluation step, so a mixed manifest would make it raise —
+# correctly, and only after somebody had already merged two sets of rows that were
+# never comparable. The penguin's table stays byte-identical and its manifest is not
+# touched.
+#
+# Every published number traces to a row here, and rows are bound to sources
+# explicitly — never inferred from directory names and never from the numbers
+# themselves. On the penguin, `vanilla` and `rho1b` differ by less than 0.0001 dB,
+# carry different roles, and are separable only on the secondary metrics; any
+# heuristic binding would eventually swap them and produce a table wrong in a way
+# that looks entirely plausible. Whether trex's replicates are that close is not
+# assumed either way. The binding is explicit regardless.
+#
+# `information` is the frame of the comparison, not a footnote: the baseline has
+# seen the object move. It is a column so it travels with the table.
+#
+# Adding a run is an edit here. No number is ever retyped into a chapter.
+
+asset = "trex_0135_0250"
+eval_step = 501
+
+# When this manifest was assembled and the pre-registered rule applied to it.
+# Declared rather than stamped at render time: a `date.today()` made the penguin's
+# committed table a different file every day, so the claim that it regenerates was
+# true only on the day it was published. Adding or rebinding a row means changing
+# this line too.
+assembled = "2026-08-12"
+
+[roots]
+# Resolved relative to this file. The evidence is vendored into this repository —
+# see evidence/PROVENANCE.toml for what each file is and what it hashes to. A
+# published number may not depend on a sibling checkout an examiner does not have,
+# and these seven run directories travelled on 2026-08-12 for exactly that reason.
+archive = "../evidence"
+
+# ── the replicate band is NOT in this file, and that is the rule ─────────────
+# The band is derived by the assembler at run time from the three null-family rows
+# below — max minus min of their step-501 PSNR — and never typed into a manifest, a
+# document or a chapter. Typing it is how a band drifts away from the runs it
+# describes.
+#
+# THE PENGUIN'S BAND DOES NOT GOVERN TREX and may not be substituted. A band
+# measured on one asset selecting another asset's reported row is precisely the
+# drift the derive-at-run-time rule exists to prevent, and it would be invisible in
+# the output. If the derivation cannot run — a replicate record missing, unreadable,
+# or failing the gate — there is no band and therefore no row. No fallback, no
+# widening.
+#
+# Carried across from the penguin unchanged: the band is measured at unit rigidity
+# and applied at high rigidity, which assumes replicate noise does not grow with the
+# parameter. That is an assumption, not a measurement, and it is stated wherever the
+# band is invoked — including in any published table.
+
+# ── the wiring evidence, and how far it transfers to these rows ─────────────
+# The trex rows inherit the wiring discharge only if the sources that produced them
+# hash to the six values recorded in evidence/record/plan1_prereg.md §10.1. That was
+# checked rather than assumed, and the answer is partial. Both halves are here
+# because the honest version of this is owed to the table's caption.
+#
+# ESTABLISHED. The archived source snapshot taken from the node on 2026-07-29 hashes
+# 6/6 to those values — helper.py, deform_splat.py, config.py, roma.py, sweep_rho.py
+# and measure_rho.py — hashed directly rather than transcribed, and matching content
+# for content despite the snapshot flattening two of them out of a `util` directory.
+# One of the six, helper.py, is vendored here and carries the deployed rigidity rule
+# the conformance suite drives; a reader can re-check that one without leaving this
+# repository.
+#
+# NOT ESTABLISHED, AND OWED TO THE CAPTION. The snapshot postdates the sweep by
+# three days, and the trex consoles carry no inline source hashes — echoing them
+# inline started with the 2026-08-05 saturation runs, after this sweep had already
+# run. So the snapshot BRACKETS these runs rather than pinning them: that the
+# sources were unchanged from 2026-07-29 through the 2026-08-05 preflight is
+# measured, and that they were unchanged from 2026-07-26 to 2026-07-29 is not.
+#
+# The penguin's own six sweep rows sit in exactly this position — run 2026-07-25,
+# same snapshot, same three-day gap — and §10.1 accepted the transfer on that basis.
+# So trex is no weaker on this axis than the row it sits beside. The limitation is
+# stated rather than glossed because it applies to both, and stating it for one and
+# not the other would be the misleading version.
+#
+# THE BASELINE ROW IS THE EXCEPTION, AND IT IS STRONGER. Its console echoes all six
+# hashes inline. Five match §10.1; deform_splat.py reads e2ca10cf…, which is the
+# patched call site the penguin's ρ = 32 and ρ = 64 rows also ran under, vendored at
+# cluster/sources_20260805_patched/deform_splat.py. It cannot have touched this run:
+# the patch is wholly inside `if getattr(self.cfg, 'rho_enabled', False):`, only the
+# sweep wrapper ever sets that flag, the baseline arm does not go through it, and
+# step 0 is evaluated upstream of the block in any case.
+
+# ── the no-rigidity row ─────────────────────────────────────────────────────
+# The mechanism-off run alone. Denominator base for every reported fraction, and one
+# of the three runs the band is derived from. NOT a sweep point: it is the null row,
+# and feeding it to the saturation rule would put a rigidity value on a run that has
+# none.
+[[row]]
+key = "vanilla"
+label = "none (grouping off, unit rigidity)"
+role = "null"
+information = "—"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/trex_vanilla"
+
+# ── the two unit-rigidity replicates ────────────────────────────────────────
+# Same configuration as `vanilla` by code inspection — the scaling helper
+# early-returns its input at ρ = 1 — and not by measurement: the gate that would
+# have established the identity end to end is the one that failed. Reported together
+# beneath the table, and the source of the derived replicate band. NOT fed to the
+# saturation rule: they would duplicate ρ = 1 in the sweep, and choosing between them
+# is exactly the arbitrary decision this manifest exists to prevent.
+[[row]]
+key = "rho1a"
+label = "unit rigidity (replicate a)"
+role = "null_replicate"
+rigidity = 1.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/trex_rho1a"
+
+[[row]]
+key = "rho1b"
+label = "unit rigidity (replicate b)"
+role = "null_replicate"
+rigidity = 1.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/trex_rho1b"
+
+# ── the imposed-rigidity sweep ──────────────────────────────────────────────
+# These three, and only these three, are what the pre-registered saturation rule is
+# fed. The rule compares the largest swept rigidity against its predecessor — so
+# ρ = 16 is measured against ρ = 4 here, not against a hypothetical ρ = 32, and a
+# curve that has turned over satisfies the same predicate as one that has flattened.
+#
+# ρ = 32 AND ρ = 64 ARE DELIBERATELY ABSENT. They exist for the penguin because the
+# penguin's own application of the rule returned `continue` and demanded them. Whether
+# trex needs them is the question the rule is run to answer, and writing the rows in
+# advance would encode the answer.
+[[row]]
+key = "rho025"
+label = "imposed, ρ = 0.25"
+role = "imposed"
+rigidity = 0.25
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/trex_rho025"
+
+[[row]]
+key = "rho4"
+label = "imposed, ρ = 4"
+role = "imposed"
+rigidity = 4.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/trex_rho4"
+
+[[row]]
+key = "rho16"
+label = "imposed, ρ = 16"
+role = "imposed"
+rigidity = 16.0
+information = "static asset + one handle"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/trex_rho16"
+
+# ── the baseline ────────────────────────────────────────────────────────────
+# The authors' unmodified pipeline, run natively on this asset 2026-08-12 and
+# recorded at full precision in its own statistics record. Unlike the penguin's
+# baseline it was never a console line, so nothing here inherits a rounding interval
+# and every fraction drawn from it is exact.
+#
+# It exists as a separate step because of what it had to prove. A fresh run only
+# qualifies as the baseline arm if its step-0 record reproduces the six sweep rows
+# EXACTLY — PSNR 18.714893341064453, SSIM 0.8961969614028931, LPIPS
+# 0.10315407812595367, 17,779 primitives — and that gate was fixed in writing before
+# the run existed, together with the consequence of failing it: no trex row by this
+# route, no retrain to manufacture a matching state, no relaxing to display
+# precision to rescue a near-miss. All four fields matched at full precision.
+#
+# The checkpoint question that made this the likeliest failure is settled rather than
+# open. `ckpt_best_psnr.pt` was written at training step 2999 carrying 17,779
+# primitives while training ran on to 33,623 — one run, two moments, two correct
+# numbers for two different files. The whole sweep and this baseline consumed the
+# first, confirmed from the files themselves rather than from a log.
+[[row]]
+key = "baseline"
+label = "inferred groups (baseline, as published)"
+role = "baseline"
+information = "observed before/after motion"
+kind = "stats_json"
+root = "archive"
+path = "cluster/rho_probe_evidence/baseline_trex_0135_0250"
