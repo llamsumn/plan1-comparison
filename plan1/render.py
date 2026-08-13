@@ -41,11 +41,16 @@ def render_markdown(table: ComparisonTable, provenance: dict[str, str] | None = 
     # resolves nowhere is worse than no citation: it claims the rules were written
     # down in advance while making the claim uncheckable. The pre-registration is
     # now vendored, and this names where it actually is.
+    #
+    # Which document that is comes from the manifest rather than from a constant
+    # here. Two assets, two pre-registrations: naming one of them for both tables
+    # would send a reader of the second to a file that declares neither its band nor
+    # its gate values — the same defect one level along.
     out(
         f"_Assembled {table.assembled} by `plan1.assemble` from the manifest "
         f"at `{display_path(table.manifest_source)}`. Every number below traces to a "
         f"named run; see Provenance. Rules pre-registered in "
-        f"`evidence/record/plan1_prereg.md`._"
+        f"`{table.prereg}`._"
     )
     out("")
 

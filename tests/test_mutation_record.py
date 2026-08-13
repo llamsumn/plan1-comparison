@@ -138,8 +138,16 @@ def test_the_record_names_what_was_not_mutated_and_why(record):
 
 def test_the_record_discloses_the_tests_withheld_from_the_kill_criterion(record):
     """Two sets of tests do not count as kills, and hiding either would inflate the
-    score: the ones that fail on a pinned file's bytes changing, and the two that
-    are about the harness rather than about the code under mutation."""
+    score: the ones that fail on a pinned file's bytes changing, and the ones that
+    are about the harness rather than about the code under mutation.
+
+    The second set grew from two to five, and the growth is why this test asserts
+    the list against `SELF_EXCLUDED` rather than against a copy. Three tests that
+    count the session's collected items were added to the suite and not withheld,
+    and the next run returned a perfect 135 of 135 with all three recorded
+    equivalent mutants apparently dead — every mutant "caught" by three tests whose
+    only complaint was that a deselected module had stopped being collected.
+    """
     integrity = record["integrity_checks_excluded"]
     assert integrity["applies_to"] == ["box_b/edge_weights.py"]
     assert len(integrity["tests"]) >= 1

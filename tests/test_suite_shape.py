@@ -71,9 +71,13 @@ carries it.
 
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 import pytest
 
 from audit import requirement_names
+from plan1.provenance import REPO_ROOT
 
 #: Every test in the repository, as collected by a plain `python -m pytest`.
 #:
@@ -215,7 +219,29 @@ from audit import requirement_names
 #: order to decide whether further sweep points were needed; publishing what it
 #: selected is separate work, and keeping it out is what made running the rule first
 #: cheap enough to be worth doing.
-EXPECTED_TESTS = 950
+#:
+#: **And the last is +45, for publishing what it selected.** The second table is
+#: rendered, committed and diffed by the gate; its pre-registration is vendored with
+#: its outcomes written; and the front page's counts are bound to what they count.
+#: The `[[file]]` effect is small this time — one new row — and the link effect is
+#: the large one, because a vendored document arrives with its citations:
+#:
+#: | check | tests |
+#: |---|---|
+#: | `test_vendored_record_links.py` — fifteen new links, a fifth document, and the front page's six link counts | +17 |
+#: | `test_build_table.py` — both tables' byte-identity, bylines and footers, the published-manifest registry, and the front page's trex cells | +11 |
+#: | `test_trex_assembly.py` — the published fractions, P1 against its pre-committed bar, P2, P3, and the caption | +7 |
+#: | `test_vendored_evidence.py` — one new `[[file]]` row three ways, both tables' bylines, and the front page's file count | +5 |
+#: | this module — the module partition, and the front page's two suite numbers | +3 |
+#: | `out/trex_comparison_table.md`, audited and its links resolved | +2 |
+#:
+#: The last row is the file-count effect once more, and it is +2 rather than +1
+#: because the new file is Markdown: every tracked text file is audited for
+#: references, and every audited Markdown file is additionally checked for links
+#: that resolve. The vendored pre-registration adds nothing here — everything under
+#: `evidence/` is exempt from the reference audit, which is what its provenance row
+#: and `LINKS.md` exist to replace.
+EXPECTED_TESTS = 995
 
 
 def test_the_collected_total_matches_the_expected_total(request):
@@ -231,6 +257,185 @@ def test_the_collected_total_matches_the_expected_total(request):
         f"update EXPECTED_TESTS and its derivation table above. If tests "
         f"VANISHED, find out why before touching this number — a smaller green "
         f"suite is the exact failure this assertion exists to catch."
+    )
+
+
+# ── the front page's copy of this number ────────────────────────────────────
+#: The modules whose tests are **bookkeeping** — the audits over this repository's
+#: own text, the vendored record checked against what is on disk, the port's rows,
+#: the mutation record read back, the coverage surface held to its rule, the
+#: third-party attribution guard, and this module. Everything else tests the method,
+#: the assembler, the figure or the solver diagnostic.
+#:
+#: `README.md` states this split in prose and has done since the total was 869,
+#: where it read 484 bookkeeping and 385 method. Those two numbers are exactly what
+#: this partition produces at that total, which is why the partition is written as a
+#: set of modules rather than as a fresh judgement: it is the *same* split the front
+#: page already made, recovered so that it can be recomputed instead of retyped.
+#:
+#: **Named positively, not as a residue.** A partition declared by listing one side
+#: and taking the rest cannot tell a new module apart from a mis-sorted one, so both
+#: sides are named and `test_every_collected_module_is_on_one_side_of_the_split`
+#: fails on a module that is on neither — which is what makes adding a test file a
+#: decision rather than a default.
+BOOKKEEPING_MODULES = frozenset(
+    {
+        "tests/test_source_audit.py",
+        "tests/test_vendored_evidence.py",
+        "tests/test_vendored_record_links.py",
+        "tests/test_ported_method.py",
+        "tests/test_mutation_record.py",
+        "tests/test_coverage_surface.py",
+        "tests/test_upstream_diff.py",
+        "tests/test_suite_shape.py",
+    }
+)
+
+METHOD_MODULES = frozenset(
+    {
+        "tests/test_assemble.py",
+        "tests/test_assembler_guards.py",
+        "tests/test_build_table.py",
+        "tests/test_conformance.py",
+        "tests/test_diagnostic.py",
+        "tests/test_example.py",
+        "tests/test_integration.py",
+        "tests/test_projection_figure.py",
+        "tests/test_records.py",
+        "tests/test_render_shapes.py",
+        "tests/test_saturation.py",
+        "tests/test_trex_assembly.py",
+        "tests/test_wiring_assertion.py",
+        "tests/method/test_edge_weights.py",
+        "tests/method/test_edges.py",
+        "tests/method/test_gaussian_carry.py",
+        "tests/method/test_gaussian_sh.py",
+        "tests/method/test_global_step.py",
+        "tests/method/test_graph.py",
+        "tests/method/test_io_ply.py",
+        "tests/method/test_select.py",
+        "tests/method/test_solver_loop.py",
+    }
+)
+
+
+def collected_modules(request) -> dict[str, int]:
+    """How many tests each module contributed, keyed by repository-relative path."""
+    from plan1.provenance import REPO_ROOT
+
+    counts: dict[str, int] = {}
+    for item in request.session.items:
+        name = str(Path(item.path).resolve().relative_to(REPO_ROOT))
+        counts[name] = counts.get(name, 0) + 1
+    return counts
+
+
+def test_every_collected_module_is_on_one_side_of_the_split(request):
+    """A new test file lands on neither side until somebody says which it is.
+
+    The alternative — one side listed and the other taken as whatever is left —
+    reads the same and silently absorbs anything new into the residue, so the
+    front page's ratio would drift by exactly the amount nobody classified.
+    """
+    unclassified = sorted(
+        set(collected_modules(request)) - BOOKKEEPING_MODULES - METHOD_MODULES
+    )
+    assert not unclassified, (
+        f"these modules are on neither side of the bookkeeping/method split: "
+        f"{unclassified}. README.md publishes the ratio, so a module nobody sorted "
+        f"would move a published number by an unexplained amount. Add each to "
+        f"BOOKKEEPING_MODULES or METHOD_MODULES."
+    )
+    stale = sorted((BOOKKEEPING_MODULES | METHOD_MODULES) - set(collected_modules(request)))
+    assert not stale, (
+        f"these modules are classified but collected nothing: {stale}. Either they "
+        f"were deleted — in which case remove them here — or they stopped being "
+        f"collected, which is the direction this file exists to catch."
+    )
+
+
+def readme_suite_counts() -> dict[str, int]:
+    """The four numbers `README.md` publishes about the suite, as it publishes them.
+
+    Read out of the prose rather than out of a data file beside it, because the
+    prose is what a reader on GitHub actually meets — and a second copy kept in
+    step by hand is one more thing to go stale, which is the defect this whole
+    function exists because of.
+    """
+    text = " ".join((REPO_ROOT / "README.md").read_text().split())
+
+    reported = re.search(r"this reports \*\*(\d+) passed\*\*", text)
+    assert reported, "README.md no longer states what a fresh clone reports"
+
+    split = re.search(
+        r"\*\*(\d+)\*\* of the \*\*(\d+)\*\* — (\d+)% — are\s+bookkeeping", text
+    )
+    assert split, "README.md no longer states the bookkeeping split"
+
+    other = re.search(r"The other \*\*(\d+)\*\* test the method", text)
+    assert other, "README.md no longer states how many tests reach the method"
+
+    return {
+        "reported": int(reported.group(1)),
+        "bookkeeping": int(split.group(1)),
+        "of": int(split.group(2)),
+        "percent": int(split.group(3)),
+        "method": int(other.group(1)),
+    }
+
+
+def test_the_front_page_reports_the_total_this_suite_actually_collects(request):
+    """`README.md:37` said 869 while the suite collected 950, on the public default
+    branch, with the README's own cross-reference to this module as the thing that
+    made the claim checkable.
+
+    It went stale because **nothing asserted it**. The count was published where a
+    reader lands, cross-referenced to a test that pinned a different number, and no
+    check compared the two — so a reader following the instruction got a number the
+    document had promised would not happen. `README.md`'s counts have now gone stale
+    three times in this repository; this is the first time one of them can.
+    """
+    published = readme_suite_counts()
+    collected = len(request.session.items)
+    assert published["reported"] == collected, (
+        f"README.md tells a reader a fresh clone reports {published['reported']} "
+        f"passed; this run collected {collected}. The front page is where the "
+        f"claim is made, so that is where it has to be true."
+    )
+    assert published["of"] == collected, (
+        f"README.md reads the total back as {published['of']} when it splits it; "
+        f"this run collected {collected}."
+    )
+
+
+def test_the_front_page_composition_is_the_split_this_suite_actually_has(request):
+    """The two halves and the percentage, recomputed rather than trusted.
+
+    `484 of the 869 — 56%` was true when it was written and survived two totals
+    afterwards, because the numbers were prose and prose does not fail. Deriving
+    them from the collected items is what makes the sentence a claim about this run
+    instead of about a run in the past.
+    """
+    published = readme_suite_counts()
+    counts = collected_modules(request)
+
+    bookkeeping = sum(n for module, n in counts.items() if module in BOOKKEEPING_MODULES)
+    method = sum(n for module, n in counts.items() if module in METHOD_MODULES)
+
+    assert published["bookkeeping"] == bookkeeping, (
+        f"README.md publishes {published['bookkeeping']} bookkeeping tests; the "
+        f"partition collects {bookkeeping}."
+    )
+    assert published["method"] == method, (
+        f"README.md publishes {published['method']} tests reaching the method; the "
+        f"partition collects {method}."
+    )
+    assert bookkeeping + method == len(request.session.items), (
+        "the two halves do not add up to the collected total"
+    )
+    assert published["percent"] == round(bookkeeping / (bookkeeping + method) * 100), (
+        f"README.md publishes {published['percent']}%; the split is "
+        f"{bookkeeping}/{bookkeeping + method}."
     )
 
 

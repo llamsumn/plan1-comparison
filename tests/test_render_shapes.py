@@ -49,6 +49,7 @@ def table(*, rows, saturation=None, band=None, band_source=()):
         asset="penguin_0217_0239",
         manifest_source="fixture://manifest",
         assembled="2026-08-08",
+        prereg="evidence/record/plan1_prereg.md",
         eval_step=501,
         num_primitives=23548,
         start=dict(TRIPLE),

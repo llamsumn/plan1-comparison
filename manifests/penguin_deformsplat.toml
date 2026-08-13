@@ -21,6 +21,12 @@ eval_step = 501
 # Adding or rebinding a row means changing this line too.
 assembled = "2026-08-06"
 
+# The pre-registration this table's byline cites. Declared here rather than fixed
+# in the renderer because there are now two tables governed by two documents, and a
+# renderer naming one of them for both would send a reader of the other to a file
+# that declares neither its band nor its gate values.
+prereg = "evidence/record/plan1_prereg.md"
+
 [roots]
 # Resolved relative to this file. The evidence is vendored into this repository —
 # see evidence/PROVENANCE.toml for where each file came from and what it hashes

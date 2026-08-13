@@ -1,21 +1,29 @@
 # plan1-comparison
 
-Assembles the penguin ↔ DeformSplat baseline comparison from archived run records,
-under rules pre-registered before any of it ran.
+Assembles the penguin ↔ DeformSplat and trex ↔ DeformSplat baseline comparisons from
+archived run records, under rules pre-registered before any of it ran.
 
-This repository is the **evidence chain behind one published table**, kept as a single
+This repository is the **evidence chain behind two published tables**, kept as a single
 reviewable unit — and, since the method was ported in, the code that produced the
-deformation as well. The pre-registration and the verdict that govern it are vendored
+deformation as well. The pre-registrations and the verdict that govern them are vendored
 verbatim at `evidence/record/`; where copied code came from is recorded per file in
 `evidence/PROVENANCE.toml`. Nothing here resolves anything outside this directory at
 run time.
+
+**Two assets, one rule, and the second was run blind.** The trex sweep is the elongated
+bar-analog against the penguin's compact blob — PCA aspect 4.27 against 2.53 — and its
+comparison was pre-registered before its baseline arm ran and before its author read any
+of its sweep metrics. The same unmodified saturation rule forced two extra cluster runs
+on the penguin and forbade them on trex.
 
 ```
 arap_core/            the ARAP solver and the 3DGS carry — ported, box C + D
 box_b/edge_weights.py the B2 seam: (mode, magnitude) → per-edge weights
 examples/             a runnable demonstration on a real 5.6 MB asset
 evidence/             the run records, cluster sources and characterisation outputs
-.                     the assembler, the manifest, the tests
+manifests/            which run is which row, one manifest per asset
+out/                  the two published tables, and the §6.4 figure
+.                     the assembler, the tests
 ```
 
 **Nothing here resolves anything outside this directory.** No sibling working tree, no
@@ -25,34 +33,47 @@ parses every module and fails on a string naming a sibling or a `parents[2]` cli
 
 ## Verify it — the green gate
 
-One command. It installs the repository, runs the whole suite, regenerates the published
-table and diffs it against the committed copy, then rebuilds the §6.4 figure and diffs its
-data record. Anything less than all five is not the claim being made.
+One command. It installs the repository, runs the whole suite, regenerates both published
+tables and diffs them against the committed copies, then rebuilds the §6.4 figure and diffs
+its data record. Anything less than all five is not the claim being made.
 
 ```bash
 git clone <url> plan1-comparison && cd plan1-comparison && python3 -m venv .venv && . .venv/bin/activate && ./scripts/verify.sh
 ```
 
 Run on a fresh clone at a scratch path, in a fresh virtual environment, with no sibling
-working trees present and nothing pre-installed, this reports **869 passed** and a clean
+working trees present and nothing pre-installed, this reports **995 passed** and a clean
 table diff. That count is asserted by `tests/test_suite_shape.py`, so a run that reported
 fewer would fail rather than look like success.
 
-**Read that number with its composition, not on its own.** 484 of the 869 — 56% — are
-bookkeeping: the audits over this repository's own text, the vendored record checked
+**Read that number with its composition, not on its own.** **558** of the **995** — 56% —
+are bookkeeping: the audits over this repository's own text, the vendored record checked
 against what is on disk, the port's rows, the mutation record read back, the coverage
-surface held to its rule. The other 385 test the method, the assembler, the figure and the
-solver diagnostic. That ratio is not an accident or an embarrassment; it is what it costs
-to make an artefact that can be checked by someone who does not trust it, and this
-repository exists because an earlier one could not be. But a reader comparing this total
-against a conventional project's is comparing two different things, and saying so here is
-cheaper than letting them find out.
+surface held to its rule, the third-party attribution guard, and the suite's own shape.
+The other **437** test the method, the assembler, the figure and the solver diagnostic.
+That ratio is not an accident or an embarrassment; it is what it costs to make an artefact
+that can be checked by someone who does not trust it, and this repository exists because an
+earlier one could not be. But a reader comparing this total against a conventional
+project's is comparing two different things, and saying so here is cheaper than letting
+them find out.
+
+**All four of those numbers are derived, not typed.** They went stale on this page three
+times — `679 passed` twice inside a single session, then `869 passed` across two commits
+on the public default branch, where the suite collected first 870 and then 950, with this
+paragraph's own cross-reference to `tests/test_suite_shape.py` as the thing that was
+supposed to make the claim checkable. Nothing compared the two. Now
+`test_the_front_page_reports_the_total_this_suite_actually_collects` and
+`test_the_front_page_composition_is_the_split_this_suite_actually_has` read these four
+numbers back out of this prose and recompute them from the collected items, so the
+sentence is a claim about the run in front of you rather than about a run in the past.
+The split itself is a declared partition of the test modules — both sides named, so a
+module nobody sorted fails rather than quietly joining the larger half.
 
 **The evidence travels with the repository.** Every number in the table resolves under
 `evidence/`. It used to resolve out of a checkout elsewhere on the authoring machine, and
 while it did, three test modules skipped silently on every other machine — 80 of 140 tests
 — and the published table regenerated into something different without saying so.
-`evidence/PROVENANCE.toml` records what each of the 49 copied files *is* and what it hashes
+`evidence/PROVENANCE.toml` records what each of the **65** copied files *is* and what it hashes
 to, and asserts both in both directions: a file that changed fails, and so does one that
 arrived with no row.
 
@@ -68,15 +89,22 @@ shipped zero times — including in the published table's own byline, which sent
 path they do not have. A citation that resolves nowhere is worse than none: it claims the
 rules were fixed in advance while making the claim uncheckable.
 
-Those two documents cite two companions of their own — the Phase-B probe verdict and the
-feasibility addendum — and both are now vendored beside them, so those citations resolve too.
-Twenty-one links across the four documents still point outward, at eleven distinct
-targets, and none of them has been rewritten: every byte under `evidence/` is pinned by
-sha256, and that pin is the only thing that lets a reader holding an original audit this
-copy against it. They are classified instead — five targets as redirects, six as documents
-that deliberately did not travel, with the reason for each — in
-`evidence/record/LINKS.md`, and `tests/test_vendored_record_links.py` fails if any of the
-29 links in the four is neither resolvable nor accounted for.
+Three of the five govern a published table; the other two are companions the first two
+cite by name — the Phase-B probe verdict and the feasibility addendum — vendored beside
+them so that those citations resolve. **32** links across the **5** documents still point
+outward, at **19** distinct targets, and none of them has been rewritten: every byte under
+`evidence/` is pinned by sha256, and that pin is the only thing that lets a reader holding
+an original audit this copy against it. They are classified instead — **8** targets as
+redirects, **11** as documents that deliberately did not travel, with the reason for each —
+in `evidence/record/LINKS.md`, and `tests/test_vendored_record_links.py` fails if any of
+the **44** links in the five is neither resolvable nor accounted for.
+
+Two of the eleven exclusions are genuine *records* rather than plans, which is the category
+that normally travels. They stay out because what they establish is here in a stronger
+form than a copy would be: the baseline arm's four gate values and its 17,779-primitive
+count are not quoted from those documents but **enforced** against the vendored run records
+by the assembler's comparability gate, with a test driving that gate against the wrong
+checkpoint's 33,623 to watch it refuse.
 
 Note what the recorded archive dates do **not** say. Two are recorded, because one alone
 reads backwards. `archive_date` is `2026-08-06` — the revision that travelled, which is
@@ -171,7 +199,7 @@ and the rule is driven against one to show it can.
 `scripts/`, `diagnostics/` and the mutation tool sit outside the surface, and the reason is
 a positive one rather than an excuse. Everything that computes a published number is
 covered by tests. Everything that *generates an artefact* is covered by
-regenerate-and-diff: the gate rebuilds the comparison table and the figure's data record
+regenerate-and-diff: the gate rebuilds both comparison tables and the figure's data record
 from scratch and fails on a single differing byte, which constrains the output rather than
 the path taken to it. The example is on the surface precisely because it is the one file
 with neither — it computes no published number and generates nothing that gets diffed, so
@@ -315,10 +343,10 @@ independent measurements, and a test asserts they agree.
 
 ## Why the table is not just typed out
 
-Nine archived runs feed the table. Reading numbers off nine files and typing them into a
-chapter repeats the transcription risk on every re-run, checks nothing about whether the
-rows are comparable, and leaves a reader no way to trace a published number back to the
-run that produced it.
+Sixteen archived runs feed the two tables — nine for the penguin, seven for trex. Reading
+numbers off sixteen files and typing them into a chapter repeats the transcription risk on
+every re-run, checks nothing about whether the rows are comparable, and leaves a reader no
+way to trace a published number back to the run that produced it.
 
 So: **one assembler**, a pure function from a declared manifest plus the run records to a
 validated comparison table. Adding a run is a manifest edit, never a retyped number.
@@ -361,9 +389,10 @@ missing `torch` makes the suite **error**, not shrink.
 | `plan1/manifest.py` | the row-to-source binding |
 | `plan1/render.py` | Markdown. Above the seam; decides nothing |
 | `manifests/penguin_deformsplat.toml` | which run is which row, and what information each arm had |
+| `manifests/trex_deformsplat.toml` | the same, for the second asset — plus the pre-registration its byline cites and the wiring limitation its caption owes |
 | `evidence/` | the vendored run records, cluster sources and run logs — everything the table resolves |
 | `evidence/characterisation/` | the characterisation study's outputs: the grids, the CSVs, the §6.2 figures and the three verdicts that certify them |
-| `evidence/record/` | the pre-registration and the verdict that govern the table, plus the two companions they cite; `LINKS.md` says where each of their outward links goes |
+| `evidence/record/` | the two pre-registrations and the verdict that govern the tables, plus the two companions they cite; `LINKS.md` says where each of their outward links goes |
 | `evidence/PROVENANCE.toml` | what every copied file is, what it hashes to, and what deliberately did not travel |
 | `tests/audit.py` | the repository-wide walk: what counts as a file here, and the three audits over it |
 | `scripts/run_mutation.py` | the assertion-strength measurement — one token changed, the whole suite run. Not in the gate; it takes about twenty minutes |
@@ -375,7 +404,8 @@ missing `torch` makes the suite **error**, not shrink.
 | `LICENSE` | MIT, and what it does **not** cover |
 | `THIRD_PARTY.md` | the third-party material, its terms, and how the two modified files were changed |
 | `third_party/deformsplat/` | the upstream Apache-2.0 text, and the complete diff of this project's 30 lines against it |
-| `out/comparison_table.md` | the published table. Regenerates byte-identically; `tests/test_build_table.py` asserts it |
+| `out/comparison_table.md` | the published penguin table. Regenerates byte-identically; `tests/test_build_table.py` asserts it |
+| `out/trex_comparison_table.md` | the published trex table, from its own manifest and evidence. Same guarantee, same guard |
 | `scripts/make_projection_figure.py` | the §6.4 figure — an orthographic projection of Gaussian means, **not** a splat render |
 | `out/fig_64_penguin_projection.{png,json}` | that figure, and the display values it was drawn from |
 | `out/penguin_deformed.ply` | the deformed asset the figure is drawn from, written by `run_penguin.py` |
@@ -409,21 +439,75 @@ the cell a correction was claimed against.
 **The reported row is selected by a rule declared in advance.** Smallest rigidity whose
 PSNR falls within the replicate band of the sweep maximum; if the largest swept value is
 still gaining more than the band, the curve has not saturated and *no row is published*.
-With ρ = 32 and ρ = 64 run, the curve turned over and the rule returns **SATURATED**,
-selecting ρ = 16.
+On the penguin, with ρ = 32 and ρ = 64 run, the curve turned over and the rule returns
+**SATURATED**, selecting ρ = 16.
+
+**The same rule, unmodified, decided the second asset the other way — and that is the
+strongest thing either table says about it.** Applied to trex's ρ = 0.25 / 4 / 16 it
+returned SATURATED at ρ = 4 and asked for nothing further, so the ρ = 32 and ρ = 64 runs
+the penguin needed were never run on trex. The consequence was declared in writing before
+the rule was applied, precisely because "no more runs needed" is the verdict an appetite
+for extra data would want to re-derive; the first application's `reason` string is pinned
+verbatim in `tests/test_trex_assembly.py`. A rule that forced work on one asset and
+forbade it on the other is a rule doing something.
+
+Each asset's replicate band is derived at run time from its **own** three null-family
+runs, never typed into a document — trex's is 0.0193 dB against the penguin's 0.0841, and
+a test asserts the two are not the same number. A band measured on one asset selecting
+another asset's reported row would be invisible in the output, which is the whole reason
+the derivation happens where it does.
 
 ## Status
 
-**Complete.** The table publishes 63.6% / 72.6% / 80.4% at ρ = 16, and every number traces
-to a named run. Those three are fractions of a gap, so the values they are fractions *of* are
-here rather than only in `out/comparison_table.md` — the two endpoints and the selected row,
-per metric, each at the precision its own source recorded:
+**Complete, on two assets.** The penguin table publishes 63.6% / 72.6% / 80.4% at ρ = 16;
+the trex table publishes 69.2% / 69.0% / 74.9% at ρ = 4. Every number traces to a named
+run. Those are fractions of a gap, so the values they are fractions *of* are here rather
+than only in `out/` — the two endpoints and the selected row, per metric, each at the
+precision its own source recorded:
 
 | metric | none (grouping off, unit rigidity) | imposed, ρ = 16 | inferred groups (baseline, as published) | gap closed |
 |---|---|---|---|---|
 | PSNR | 19.277 | 22.953 | 25.055 | 63.6% |
 | SSIM | 0.9199 | 0.9443 | 0.9535 | 72.6% |
 | LPIPS | 0.0916 | 0.0634 | 0.0565 | 80.4% |
+
+And the second asset, from its own manifest, its own evidence and its own pre-registration:
+
+| trex metric | none (grouping off, unit rigidity) | imposed, ρ = 4 | inferred groups (baseline, as published) | gap closed |
+|---|---|---|---|---|
+| PSNR | 22.615 | 24.111 | 24.777 | 69.2% |
+| SSIM | 0.9305 | 0.9390 | 0.9428 | 69.0% |
+| LPIPS | 0.0662 | 0.0571 | 0.0541 | 74.9% |
+
+**69.2% clears a bar that was set before the number was read.** `trex_comparison_prereg.md`
+§8 pre-committed three branches on the PSNR gap closed — **> 50%** the penguin result
+reproduces, **25–50%** equivocal *and published as equivocal*, **< 25%** fails to reproduce
+— and fixed them relative to the penguin's 63.6% while its author had read none of trex's
+sweep metrics. The first branch is the one that happened. The document's §11 and §12 record
+how every declared branch resolved, including one the falsification clause got wrong.
+
+**The same document predicted the three would differ, and they do.** A second asset landing
+on the first's percentages would have been surprising rather than reassuring — it is the
+shape that means two supposedly independent comparisons are reading each other's numbers —
+so a close match was pre-declared as grounds to go looking. They differ in pattern as well
+as in value: the penguin's three ascend PSNR → SSIM → LPIPS, where trex's first two sit
+within 0.2 points of each other.
+
+**Every trex cell is exact; no bracket appears anywhere in that table.** The penguin's
+baseline began life as a three-decimal console line and its fractions carried rounding
+intervals until preflight recovered the full-precision record. Trex's baseline arm was run
+natively into its own statistics record, and it had to reproduce the six existing sweep
+rows' step-0 state *exactly* — PSNR 18.714893341064453, SSIM 0.8961969614028931, LPIPS
+0.10315407812595367 and 17,779 primitives — with the consequence of failing fixed in
+advance: no row by that route, no retrain to manufacture a matching state, no relaxing to
+display precision to rescue a near-miss. All four matched at full precision.
+
+**What `n = 2` here does and does not mean.** It is two assets on *this comparison table*.
+It is not a claim about any other result this project reports on the same asset, it is not
+a claim that the trex table's own limitations are smaller than the penguin's — its wiring
+evidence is weaker, and the table says so in its own Limitations list — and trex is
+elongated only *relative to* the penguin. It was never a synthetic bar, and no claim is
+made that a bar/blob split has been reproduced on a canonical one.
 
 **LPIPS falls where the other two rise, and no column has to be inverted mentally.** The
 fraction is (row − null) / (baseline − null) on all three, so inverting a metric flips

@@ -35,6 +35,29 @@ eval_step = 501
 # this line too.
 assembled = "2026-08-12"
 
+# The pre-registration this table's byline cites, and it is NOT the penguin's.
+# `trex_comparison_prereg.md` declares trex's own band rule, its baseline gate
+# values, its branches and its prediction; it *binds to* plan1_prereg.md for the
+# saturation rule, the comparability gate and the precision policy rather than
+# restating them, so a restatement cannot drift. Its §2 fixes the precedence: where
+# the two appear to differ, the penguin's governs the rule and this one governs only
+# the trex-specific bindings, and it may not weaken an inherited rule.
+prereg = "evidence/record/trex_comparison_prereg.md"
+
+# ── the limitation this table's caption owes its reader ─────────────────────
+# Declared as a value rather than left in the comments below, because a caption is
+# what a reader of the published table actually meets and a limitation stated only
+# in a manifest comment never reaches them. It is rendered into the table's own
+# Limitations list beside the two the assembler derives.
+#
+# Required by the pre-registration rather than chosen here: §2.1 declares that if
+# the source hashes for the pre-existing trex rows cannot be established, "the
+# limitation goes in the table's caption under the honesty condition of §6.1 rather
+# than being glossed". They were established only partially. This is that caption.
+limitations = [
+    "The wiring discharge BRACKETS these runs rather than pinning them. The archived source snapshot hashes 6/6 to the values recorded in `evidence/record/plan1_prereg.md` §10.1, but it was taken 2026-07-29 — three days after this sweep ran on 2026-07-26 — and the trex sweep consoles carry no inline source hashes, because echoing them inline only began with the 2026-08-05 saturation runs. That the sources were unchanged from 2026-07-29 through the 2026-08-05 preflight is measured; that they were unchanged from 2026-07-26 to 2026-07-29 is not. The penguin's own six sweep rows sit in exactly this position — run 2026-07-25, same snapshot, same three-day gap — and §10.1 accepted the transfer on that basis, so this table is no weaker on this axis than the one it sits beside. The baseline row is the exception and is stronger: its console echoes all six hashes inline.",
+]
+
 [roots]
 # Resolved relative to this file. The evidence is vendored into this repository —
 # see evidence/PROVENANCE.toml for what each file is and what it hashes to. A

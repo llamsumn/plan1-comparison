@@ -155,20 +155,33 @@ INTEGRITY_CHECKS: tuple[str, ...] = (
 #: withheld for.
 HASH_PINNED: frozenset[str] = frozenset({"box_b/edge_weights.py"})
 
-#: Withheld for every target, and neither of them is a judgement call.
+#: Withheld for every target, and none of them is a judgement call.
 #:
 #: `test_mutation_record.py` reads the file this script is writing, so during a run
 #: its verdict is about the previous record rather than about the mutant.
 #:
-#: `test_the_collected_total_matches_the_expected_total` counts the session's items,
-#: and pytest removes a deselected test from that count — so *any* deselection makes
-#: it fail, on every mutant, for a reason that has nothing to do with the mutant. It
-#: can only be a genuine killer if a mutation changes how many tests exist, which a
-#: change inside a decision module cannot do without raising at collection, and a
-#: collection error fails the run anyway.
+#: **The other four all count the session's items**, and pytest removes a deselected
+#: test from that count — so *any* deselection makes them fail, on every mutant, for
+#: a reason that has nothing to do with the mutant. They can only be genuine killers
+#: if a mutation changes how many tests exist, which a change inside a decision
+#: module cannot do without raising at collection, and a collection error fails the
+#: run anyway.
+#:
+#: **Three of the four were added after this list was first written, and leaving
+#: them out produced a measurably wrong answer rather than a slightly generous one.**
+#: The run that first included them came back `135 of 135 killed, 0 survivors` — a
+#: perfect score, up from 132 of 135, with all three of the previously recorded
+#: *equivalent* mutants apparently dead. Nothing had got better. Every mutant was
+#: being "caught" by three tests whose only complaint was that the module deselected
+#: on the line above had stopped being collected. A mutation score inflated by its
+#: own harness is the same defect as a checksum reported as test strength, one level
+#: along, and it flatters in the same direction.
 SELF_EXCLUDED: tuple[str, ...] = (
     "tests/test_mutation_record.py",
     "tests/test_suite_shape.py::test_the_collected_total_matches_the_expected_total",
+    "tests/test_suite_shape.py::test_every_collected_module_is_on_one_side_of_the_split",
+    "tests/test_suite_shape.py::test_the_front_page_reports_the_total_this_suite_actually_collects",
+    "tests/test_suite_shape.py::test_the_front_page_composition_is_the_split_this_suite_actually_has",
 )
 
 #: How a survivor may be accounted for. Anything outside these three is a finding to
@@ -476,10 +489,15 @@ def run(targets: tuple[str, ...], record_path: Path) -> dict:
                 "their verdict is about the previous record rather than about the "
                 "mutant; it is deselected whole rather than by node so the list "
                 "cannot drift as tests are added to it, which withholds the two "
-                "that do not read the record as well. The second counts the "
+                "that do not read the record as well. The other four all count the "
                 "session's collected tests, and pytest removes a deselected test "
-                "from that count, so any deselection fails it on every mutant for "
-                "a reason unrelated to the mutant."
+                "from that count, so any deselection fails them on every mutant for "
+                "a reason unrelated to the mutant. Three of the four were added "
+                "later, and the run that first included them returned a perfect "
+                "135 of 135 with all three previously recorded equivalent mutants "
+                "apparently dead — a score inflated by the harness rather than "
+                "earned by the tests, which is the same defect as reporting a "
+                "checksum as test strength and flatters in the same direction."
             ),
         },
         "kill_criterion": (

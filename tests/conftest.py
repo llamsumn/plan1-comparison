@@ -116,6 +116,7 @@ def make_manifest(rows, *, asset="penguin_0217_0239", eval_step=501):
         rows=tuple(rows),
         source="fixture://manifest",
         assembled="2026-08-06",
+        prereg="evidence/record/plan1_prereg.md",
     )
 
 

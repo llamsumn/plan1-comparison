@@ -365,6 +365,24 @@ why = "the pre-registration. It declares the saturation rule, the comparability 
 # cannot, and neither field should be asked to. The proof is the test named above.
 
 [[file]]
+path = "record/trex_comparison_prereg.md"
+origin = "the trex comparison pre-registration, authored 2026-08-12 before the native baseline arm ran and before any trex sweep metric was read by its author; its sections 11 and 12 were filled on publication"
+sha256 = "d11f997f53526a3ce9cebea2888473833c9006f2409e829fa7bb9088022ad364"
+why = "the pre-registration the SECOND table's byline cites. It declares trex's own replicate-band rule, its baseline gate values, its three saturation branches and its numbered prediction, and BINDS to the penguin's for the rules it inherits rather than restating them — so the two cannot drift. `plan1/render.py` prints this path in `out/trex_comparison_table.md`, and a byline citing a document this repository does not ship is the uncheckable citation the front page argues against"
+# NO ARCHIVE COMMIT, AND THE REASON IS WORTH MORE THAN THE FIELD WOULD BE. The
+# penguin's row carries `archive_commit` and two dates because its authoring
+# repository could be read for them. This document's cannot: that repository is not
+# published, so a commit recorded here would be a 40-hex identifier no reader can
+# resolve — the exact decoration deleted from the table's footer.
+#
+# What carries precedence instead is a test that predates this file. Sections 4 and
+# 5.3 were pinned in `tests/test_trex_assembly.py` as GATE_START, GATE_PRIMITIVES
+# and FIRST_VERDICT_REASON, committed BEFORE any table was rendered and before any
+# gap fraction was read — so an edit to either section would put this document out
+# of agreement with an assertion that came first. Sections 11 and 12 were written
+# afterwards, in one pass, and say so on their face.
+
+[[file]]
 path = "record/plan1_verdict.md"
 origin = "the Plan 1 verdict — how every declared branch actually resolved, written after the sweep completed"
 sha256 = "c27cf2b593cc48223ef366ad0f7867d332ef95e28b6fd3e4e76ab8b8b4c10185"

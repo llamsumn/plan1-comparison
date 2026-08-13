@@ -96,6 +96,10 @@ class ComparisonTable:
     #: The manifest's declared assembly date, carried through so the renderer never
     #: has to ask the clock what day it is.
     assembled: str
+    #: The pre-registration the byline cites, carried from the manifest for the same
+    #: reason: which document declared these rules is a fact about the table, not
+    #: something presentation may decide.
+    prereg: str
     eval_step: int
     num_primitives: int
     #: The shared starting values, printed so a reader can verify at a glance that
@@ -172,11 +176,18 @@ def assemble(manifest: Manifest, records: Mapping[str, RunRecord]) -> Comparison
     band, band_source, notes = _derive_band(rows, records)
     saturation = _saturation(rows, records, band)
 
+    # The manifest's own limitations go **last**, after the two derived ones. They
+    # are the asset-specific qualifications — what the evidence for *these* rows
+    # does and does not establish — so they read as the specific case following the
+    # general ones rather than as an unexplained interruption between them.
+    notes.extend(manifest.limitations)
+
     first = ordered[0][1]
     return ComparisonTable(
         asset=manifest.asset,
         manifest_source=manifest.source,
         assembled=manifest.assembled,
+        prereg=manifest.prereg,
         eval_step=manifest.eval_step,
         num_primitives=first.num_primitives,
         start=first.start,

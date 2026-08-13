@@ -160,8 +160,33 @@ def test_the_record_is_not_empty_in_a_way_that_would_make_this_vacuous():
     travelled with them: it is the only surviving record of what command produced
     that sweep, and it was excluded for precisely that reason back when the rows it
     describes were not here.
+
+    **And the 4 documents are 5.** Publishing the second table brought its
+    pre-registration across, per that document's own §7: it declares trex's replicate
+    band rule, its baseline gate values, its saturation branches and its numbered
+    prediction, and `out/trex_comparison_table.md` names it in the byline. A byline
+    citing a document this repository does not ship is the defect the other four were
+    vendored to close.
     """
-    assert len(RECORD.files) == len(vendored_files()) == 64
+    assert len(RECORD.files) == len(vendored_files()) == 65
+
+
+def test_the_front_page_states_the_copied_file_count_this_record_actually_has():
+    """`README.md` published `49` while this record held 64, for two commits.
+
+    It went stale the same way every other count on that page has: it was typed
+    where a reader lands, cross-referenced to the file it describes, and compared to
+    it by nothing. The number moves whenever evidence is vendored, which is exactly
+    when nobody is looking at the front page — fifteen rows landed with the second
+    asset's run directories and one more with its pre-registration.
+    """
+    text = " ".join((EVIDENCE_ROOT.parent / "README.md").read_text().split())
+    stated = re.search(r"records what each of the \*\*(\d+)\*\* copied files", text)
+    assert stated, "README.md no longer states how many files are recorded here"
+    assert int(stated.group(1)) == len(RECORD.files), (
+        f"README.md says {stated.group(1)} copied files; PROVENANCE.toml records "
+        f"{len(RECORD.files)}."
+    )
 
 
 # ── the characterisation outputs carry what a derived artefact needs ────────
@@ -316,8 +341,15 @@ def test_the_published_byline_cites_a_path_that_exists_in_this_repository():
     module that implements the pre-registered rule, which is the file most likely to
     be opened. A guard that covers one instance of a defect the repository claims to
     have closed is how the other three survived being fixed.
+
+    **The byline is no longer a constant in `render.py`.** With two tables governed
+    by two pre-registrations, a fixed byline would mis-cite one of them, so each
+    manifest declares which document governs it. This checks the declarations rather
+    than the renderer, which is where the paths now are — and it checks every one of
+    them, so a third manifest cannot arrive naming a file that is not here.
     """
     from plan1 import render
+    from plan1.manifest import load_manifest
 
     # `render.py` keeps the old path in a comment that explains why it moved. That
     # sentence is the record of the fix, so it is whitelisted by exact text rather
@@ -335,17 +367,34 @@ def test_the_published_byline_cites_a_path_that_exists_in_this_repository():
         f"can reach; it is vendored at evidence/record/plan1_prereg.md: {offenders}"
     )
 
-    cited = "evidence/record/plan1_prereg.md"
-    assert cited in Path(render.__file__).read_text()
-    assert (EVIDENCE_ROOT.parent / cited).is_file()
+    manifests = sorted((EVIDENCE_ROOT.parent / "manifests").glob("*.toml"))
+    assert len(manifests) == 2, [p.name for p in manifests]
+    for path in manifests:
+        cited = load_manifest(path).prereg
+        assert cited.startswith("evidence/record/"), (path.name, cited)
+        assert (EVIDENCE_ROOT.parent / cited).is_file(), (path.name, cited)
 
 
-def test_the_committed_table_cites_the_vendored_pre_registration():
+@pytest.mark.parametrize(
+    "table,cited",
+    [
+        pytest.param(
+            "comparison_table.md", "evidence/record/plan1_prereg.md", id="penguin"
+        ),
+        pytest.param(
+            "trex_comparison_table.md",
+            "evidence/record/trex_comparison_prereg.md",
+            id="trex",
+        ),
+    ],
+)
+def test_the_committed_table_cites_the_vendored_pre_registration(table, cited):
     """The rendered artefact, not just the renderer. `out/comparison_table.md` is
-    what a reader actually opens."""
-    table = (EVIDENCE_ROOT.parent / "out" / "comparison_table.md").read_text()
-    assert "evidence/record/plan1_prereg.md" in table
-    assert "all_record/" not in table
+    what a reader actually opens — and there are two of them now, each naming the
+    document that actually declares its rules."""
+    text = (EVIDENCE_ROOT.parent / "out" / table).read_text()
+    assert cited in text
+    assert "all_record/" not in text
 
 
 # ── the published citation, checked against the copy ────────────────────────

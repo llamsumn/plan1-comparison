@@ -47,7 +47,7 @@ This was traded away deliberately, for self-containment, and the reason is speci
 work rather than general:
 
 > Divergence detection protects a **living** codebase — it tells you that something you still
-> depend on has moved underneath you. **This evidence is frozen.** It is nine archived runs
+> depend on has moved underneath you. **This evidence is frozen.** It is sixteen archived runs
 > that will never be re-run, a deployed cluster source fixed at a cited hash, and a reference
 > rule as it stood at the commit that produced the evidence. "Notice if upstream moves"
 > protects nothing about that claim, because nothing upstream moving could make the claim
@@ -88,26 +88,47 @@ Stated fully in `README.md`; named here so the orientation is complete.
    guard that replaced it compares interval to interval.
 3. **The reported row is selected by a rule declared in advance** — smallest rigidity whose
    PSNR falls within the replicate band of the sweep maximum, or no row is published at all.
-   The rule is vendored at `evidence/record/plan1_prereg.md`.
+   The rule is vendored at `evidence/record/plan1_prereg.md`. It has now been applied to two
+   assets and decided them differently: the penguin's sweep was unsaturated and the rule
+   forced ρ = 32 and ρ = 64 before anything could be published; trex's saturated at ρ = 4 and
+   the rule forbade the extra runs. Each asset's replicate band is derived at run time from
+   its own three null-family runs and never typed into a document.
+4. **The second table has its own pre-registration**, vendored at
+   `evidence/record/trex_comparison_prereg.md`. It declares trex's band rule, its baseline
+   gate values, its saturation branches and a numbered prediction with pre-committed
+   thresholds, and it *binds to* the penguin's for everything it inherits rather than
+   restating it — where the two appear to differ, the penguin's governs the rule and the
+   trex document governs only the trex-specific bindings.
 
 ## Conventions
 
-- **`out/comparison_table.md` is generated, never hand-edited.** It regenerates
-  byte-identically and `tests/test_build_table.py` asserts exactly that. Adding a run is a
-  manifest edit; no number is ever retyped.
+- **Both tables under `out/` are generated, never hand-edited.** `comparison_table.md` and
+  `trex_comparison_table.md` each regenerate byte-identically from their own manifest, and
+  `tests/test_build_table.py` asserts exactly that for both. Adding a run is a manifest edit;
+  no number is ever retyped. The penguin's is rebuilt on every gate run *because* the second
+  asset landed: publishing trex moved the byline's pre-registration and the caption's
+  limitations out of the renderer and into the manifests, and both changes ran through the
+  code path the first table is built by.
+- **Trex rows are never added to the penguin's manifest, and the reverse.** The comparability
+  gate keys on the step-0 triple, the primitive count and the evaluation step, so a mixed
+  manifest would raise — correctly, but only after two sets of rows that were never
+  comparable had already been merged. A test asserts the two manifests are assembled from
+  disjoint evidence, which catches it at the useful moment instead.
 - **Nothing under `evidence/` is edited.** Copying is not editing; anything else breaks the
   hash that makes the copy auditable. Two files there are exceptions, and both for the same
   reason — this repository *wrote* them, so there is no original to audit them against:
   `PROVENANCE.toml`, the manifest, and `record/LINKS.md`, the note that classifies the
   vendored records' dead links. `tests/audit.py` names both in one place, which is also what
   decides which files the source audit reads and which need a provenance row.
-- **A dead link inside a vendored record is worked around, never written over.** Eleven
-  targets, over twenty-one of the four documents' 29 links, point out of this repository.
+- **A dead link inside a vendored record is worked around, never written over.** Nineteen
+  targets, over thirty-two of the five documents' 44 links, point out of this repository.
   Rewriting one would change bytes that are pinned by sha256, and that pin is the only
-  thing letting a reader audit the copy against an original. So five targets are redirects
-  and six are exclusions, all of them written down in `evidence/record/LINKS.md`, and
+  thing letting a reader audit the copy against an original. So eight targets are redirects
+  and eleven are exclusions, all of them written down in `evidence/record/LINKS.md`, and
   `tests/test_vendored_record_links.py` fails if a link is neither resolvable nor accounted
-  for.
+  for. Two of the eleven exclusions are genuine records rather than plans; they stay out
+  because what they establish is enforced here against the run records themselves rather
+  than quoted from a copied document.
 - **No file names something a reader cannot reach.** No home directory, no unpublished
   repository, no ticket in a private tracker. `tests/test_source_audit.py` asserts it over
   every tracked text file — the manifest and the packaging metadata included, because the

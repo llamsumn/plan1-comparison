@@ -15,23 +15,31 @@ So the links are **worked around, never written over**. Two of the eleven resolv
 *placement*: the Phase-B probe verdict and the feasibility addendum, the two
 companions these records cite by name, are now vendored beside them, so those
 citations resolve with nothing edited. Both of those documents arrived with dead links
-of their own, which is why the final tally is over four documents rather than two:
+of their own, which is why the tally runs over five documents rather than two:
 
-| of 29 links in the four documents | targets | instances |
+| of 44 links in the five documents | targets | instances |
 |---|---|---|
-| resolve as written | 3 | 8 |
-| redirects — the same content under `evidence/` | 5 | 9 |
-| exclusions — documents that deliberately did not travel | 6 | 12 |
+| resolve as written | 3 | 12 |
+| redirects — the same content under `evidence/` | 8 | 12 |
+| exclusions — documents that deliberately did not travel | 11 | 20 |
 
 `evidence/record/LINKS.md` is where a reader meets that classification. This module
 is what keeps it complete: a link nobody classified fails here rather than reaching
 an examiner as a 404, and so does a document dropped into this directory with links
 of its own — which is the failure that vendoring two more records could otherwise
 have introduced.
+
+**The fifth document is what this module was written for.** Publishing the second
+asset vendored `trex_comparison_prereg.md`, which arrived carrying fifteen links, ten
+of them to targets that are not here. Every one failed this module until it was
+classified — including two that are genuine *records* rather than plans, and which
+`LINKS.md` argues out on the ground that what they establish is present as enforced
+evidence rather than as a copied claim.
 """
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -187,9 +195,9 @@ def test_the_note_is_not_vacuous():
     exactly what goes quietly wrong.
     """
     kinds = sorted(CLASSIFIED.values())
-    assert kinds.count("redirect") == 5, kinds
-    assert kinds.count("exclusion") == 6, kinds
-    assert len(vendored_records()) == 4, [p.name for p in vendored_records()]
+    assert kinds.count("redirect") == 8, kinds
+    assert kinds.count("exclusion") == 11, kinds
+    assert len(vendored_records()) == 5, [p.name for p in vendored_records()]
 
     instances = {"resolving": 0, "redirect": 0, "exclusion": 0}
     for document, link in LINKS:
@@ -197,8 +205,8 @@ def test_the_note_is_not_vacuous():
             instances["resolving"] += 1
         else:
             instances[CLASSIFIED[link.target]] += 1
-    assert instances == {"resolving": 8, "redirect": 9, "exclusion": 12}, instances
-    assert len(LINKS) == 29, len(LINKS)
+    assert instances == {"resolving": 12, "redirect": 12, "exclusion": 20}, instances
+    assert len(LINKS) == 44, len(LINKS)
 
     # The note states all six of those numbers in words. They are read back out here,
     # so the prose cannot drift from the links the way it did on first writing — the
@@ -207,11 +215,63 @@ def test_the_note_is_not_vacuous():
     # numbers are the claim, and where a sentence happens to wrap is not.
     prose = " ".join(NOTE.read_text().split())
     for stated in (
-        "3 targets, over 8 link instances",
-        "5 targets, over 9 instances",
-        "6 targets, over 12 instances",
+        "3 targets, over 12 link instances",
+        "8 targets, over 12 instances",
+        "11 targets, over 20 instances",
     ):
         assert stated in prose, stated
+
+
+def test_the_front_page_states_the_link_counts_these_documents_actually_have():
+    """`README.md` describes this classification, and its numbers went stale too.
+
+    It read *"Twenty-one links across the four documents … at eleven distinct
+    targets … five targets as redirects, six as documents that deliberately did not
+    travel … any of the 29 links in the four"* while there were five documents and
+    44 links. Same defect as the suite total on the same page: published where a
+    reader lands, cross-referenced to the module that enforces it, and compared to
+    it by nothing.
+
+    Recomputed here from the documents rather than restated, so the paragraph is a
+    claim about this repository instead of about the one it was written for. The
+    note beside the records already works this way — `test_the_note_is_not_vacuous`
+    reads its six numbers back — and the front page had no equivalent.
+    """
+    text = " ".join((REPO_ROOT / "README.md").read_text().split())
+
+    outward = [(d, link) for d, link in LINKS if not link.resolves_from(d)]
+    expected = {
+        "outward": len(outward),
+        "documents": len(vendored_records()),
+        "targets": len({link.target for _, link in outward}),
+        "redirects": sum(1 for kind in CLASSIFIED.values() if kind == "redirect"),
+        "exclusions": sum(1 for kind in CLASSIFIED.values() if kind == "exclusion"),
+        "total": len(LINKS),
+    }
+
+    stated = re.search(
+        r"\*\*(?P<outward>\d+)\*\* links across the \*\*(?P<documents>\d+)\*\* documents "
+        r"still point outward, at \*\*(?P<targets>\d+)\*\* distinct targets",
+        text,
+    )
+    assert stated, "README.md no longer states how many links point outward"
+
+    classified = re.search(
+        r"\*\*(?P<redirects>\d+)\*\* targets as redirects, \*\*(?P<exclusions>\d+)\*\* "
+        r"as documents that deliberately did not travel",
+        text,
+    )
+    assert classified, "README.md no longer states how the outward links are classified"
+
+    total = re.search(r"any of the \*\*(?P<total>\d+)\*\* links in the five", text)
+    assert total, "README.md no longer states the total the guard walks"
+
+    published = {
+        key: int(value)
+        for match in (stated, classified, total)
+        for key, value in match.groupdict().items()
+    }
+    assert published == expected, f"README.md publishes {published}; the documents have {expected}"
 
 
 def test_the_two_companions_resolve_by_placement_rather_than_by_edit():

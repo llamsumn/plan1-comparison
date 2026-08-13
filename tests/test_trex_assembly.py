@@ -6,15 +6,10 @@ on the step-0 triple, the primitive count and the evaluation step, so mixing the
 assets into one manifest would make the gate raise, correctly. Nothing here touches
 `manifests/penguin_deformsplat.toml` or the table it publishes.
 
-**What this module is for, and where it deliberately stops.** It drives the
-pre-registered saturation rule on the trex sweep and pins what the rule returned.
-The assembler runs — that is how the rule is reached — but nothing is rendered and
-nothing is committed: there is no `out/trex_comparison_table.md`, and no gap
-fraction is asserted anywhere below even though the assembly computes them.
-Publishing what the rule selected is separate work, and keeping it out is what makes
-running the rule cheap enough to do *before* deciding whether more sweep points are
-needed. The order matters more than the saving: a rule that has already spoken
-cannot be re-scoped to fit runs somebody has by then paid for.
+**What this module is for.** It drives the pre-registered saturation rule on the
+trex sweep, pins what the rule returned, and — since the table was published —
+pins the fractions the selected row actually recovers and the pre-committed
+threshold they were judged against.
 
 The order the tests below were written in is the order that makes the verdict worth
 anything, so it is recorded rather than left to be inferred:
@@ -24,10 +19,17 @@ anything, so it is recorded rather than left to be inferred:
    they failed on the missing files;
 2. the evidence and the manifest landed, and those went green;
 3. **then** the rule was run, once, and
-   `test_the_first_application_of_the_rule_to_trex` records what it said verbatim.
+   `test_the_first_application_of_the_rule_to_trex` records what it said verbatim;
+4. **and only then** was anything rendered. Until that point there was no
+   `out/trex_comparison_table.md`, no gap fraction asserted anywhere here, and no
+   number for the rule's verdict to be argued with — which is what made running the
+   rule cheap enough to do *before* deciding whether more sweep points were needed.
+   A rule that has already spoken cannot be re-scoped to fit runs somebody has by
+   then paid for.
 
 Reversing 2 and 3 — reading the sweep and then writing the assertion — would produce
-exactly the same green suite and would establish nothing at all.
+exactly the same green suite and would establish nothing at all. The same argument
+applies to 3 and 4, which is why they were separate commits rather than one.
 """
 
 from __future__ import annotations
@@ -402,3 +404,140 @@ def test_the_verdict_calls_for_no_continuation_runs(trex_table):
     verdict = trex_table.saturation
     assert verdict.continue_at is None
     assert not verdict.hard_stop_reached
+
+
+# ── what the selected row recovers, and the bar it was judged against ───────
+#: The penguin's three published fractions, as `out/comparison_table.md` prints
+#: them. Present so trex's can be asserted **different** — P3 predicted that in
+#: advance, and a second asset reproducing the first's percentages closely would be
+#: surprising rather than reassuring.
+PENGUIN_FRACTIONS = {"psnr": "63.6%", "ssim": "72.6%", "lpips": "80.4%"}
+
+#: P1's pre-committed thresholds on the PSNR gap closed, from
+#: `evidence/record/trex_comparison_prereg.md` §8. Written as the bands rather than
+#: as the answer, so that the test says which branch was taken instead of merely
+#: pinning a number that happens to sit in one.
+P1_REPRODUCES = 0.50
+P1_FAILS = 0.25
+
+
+def test_the_selected_row_recovers_what_the_published_table_prints(trex_table):
+    """The three fractions, at the precision the table publishes them.
+
+    Asserted through the published table's own formatter rather than against a
+    second copy of the digits, so the front page, the table and this test cannot
+    come to disagree about what was recovered.
+    """
+    from plan1.render import format_fraction
+
+    selected = trex_table.selected_row
+    assert selected is not None and selected.fractions is not None
+    published = {
+        metric: format_fraction(fraction)
+        for metric, fraction in selected.fractions.items()
+    }
+    assert published == {"psnr": "69.2%", "ssim": "69.0%", "lpips": "74.9%"}
+
+
+def test_every_published_fraction_is_exact_rather_than_an_interval(trex_table):
+    """No trex row is a console line, so no cell here carries a rounding interval.
+
+    The penguin's baseline was originally a three-decimal console line and every
+    fraction drawn from it printed a bracket. Trex's baseline arm was run natively
+    into its own full-precision record, which is what the separate baseline-arm run
+    bought, so these cells are points and `format_fraction` prints no bracket. Read
+    off the output, because a bracket appearing here later would mean a row had
+    been rebound to a coarser source.
+    """
+    selected = trex_table.selected_row
+    for metric, fraction in selected.fractions.items():
+        assert fraction.exact, metric
+        assert fraction.low == fraction.high == fraction.value, metric
+
+
+def test_P1_clears_the_bar_that_was_committed_before_the_number_was_read(trex_table):
+    """The prediction, evaluated against the thresholds that were fixed in advance.
+
+    §8 committed three branches on the PSNR gap closed — **> 50%** the penguin
+    result reproduces, **25–50%** equivocal and published as equivocal, **< 25%**
+    fails to reproduce — and set them relative to the penguin's 63.6% *before* any
+    trex fraction had been read. Trex closes 69.2%, which is branch one.
+
+    The bands are asserted, not just the value. A test that pinned 0.6916 alone
+    would still pass if the thresholds moved underneath it, and the thresholds are
+    the half that makes this a prediction rather than a measurement.
+    """
+    psnr = trex_table.selected_row.fractions["psnr"]
+    assert psnr.value > P1_REPRODUCES, (
+        f"PSNR gap closed is {psnr.value:.4f}; §8 pre-committed > {P1_REPRODUCES} "
+        f"as the branch on which the penguin result reproduces"
+    )
+    assert P1_FAILS < P1_REPRODUCES < 1.0, "the thresholds themselves"
+
+
+def test_P3_holds_the_three_fractions_differ_from_the_penguin_s(trex_table):
+    """A close match would have been a reason to doubt the two tables' independence.
+
+    §8 predicted the three would differ, and said so as a check on the apparatus
+    rather than as a hope about the result: two supposedly independent comparisons
+    landing on the same three percentages is the shape that means one of them is
+    reading the other's numbers. They differ, and they also differ in *pattern* —
+    the penguin's three ascend PSNR → SSIM → LPIPS, where trex's first two are
+    within 0.2 points of each other.
+    """
+    from plan1.render import format_fraction
+
+    published = {
+        metric: format_fraction(fraction)
+        for metric, fraction in trex_table.selected_row.fractions.items()
+    }
+    for metric, penguin in PENGUIN_FRACTIONS.items():
+        assert published[metric] != penguin, metric
+
+
+def test_the_rule_selected_a_different_rigidity_from_the_penguin_s(trex_table):
+    """P2 declined to predict this, and the two assets did not agree.
+
+    §8 refused to name an expected turnover point: ρ changes the *character* of
+    trex's deformation rather than only its magnitude, so there was no ground to
+    expect the penguin's ρ = 16 and predicting it would have been decoration. The
+    rule selected ρ = 4. Recorded here because "the selected row is not predicted"
+    is only worth stating while it is also true that the two came out different.
+    """
+    assert trex_table.saturation.selected.rigidity == 4.0
+    assert trex_table.selected_row.label == "imposed, ρ = 4"
+
+
+# ── the caption the pre-registration required ───────────────────────────────
+def test_the_wiring_limitation_reaches_the_published_table_and_not_only_a_comment(
+    trex_table,
+):
+    """§2.1 said *caption*, and a manifest comment is not a caption.
+
+    The pre-registration declared that if the source hashes behind the pre-existing
+    trex rows could not be established, "the limitation goes in the table's caption
+    … rather than being glossed". They came out partial: 6/6 match, on a snapshot
+    taken three days after the sweep, with no inline hashes in the consoles to close
+    the gap. A reader of the table has to meet that, so it is asserted in the
+    assembled notes — where the renderer prints it — rather than only in the file
+    where the rows are bound.
+
+    The word asserted is `BRACKETS`, which is the honest one. `6/6 match` reads as
+    settled the moment the qualifying sentence goes missing, and it would go missing
+    in the flattering direction.
+    """
+    wiring = [note for note in trex_table.notes if "BRACKETS" in note]
+    assert len(wiring) == 1, trex_table.notes
+    for owed in ("6/6", "2026-07-26", "2026-07-29", "no inline source hashes"):
+        assert owed in wiring[0], owed
+
+
+def test_the_penguin_declares_no_limitations_of_its_own(trex_table):
+    """The manifest key is trex's, and the penguin's table is unchanged by it.
+
+    Asserted so that "the penguin table stays byte-identical" has a reason behind
+    it rather than only a diff: the mechanism that puts a caption on the second
+    table is declared per manifest, and the first declares nothing.
+    """
+    assert load_manifest(PENGUIN_MANIFEST).limitations == ()
+    assert load_manifest(MANIFEST).limitations != ()

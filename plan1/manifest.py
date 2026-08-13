@@ -60,6 +60,24 @@ class Manifest:
     #: render-time ``date.today()`` silently rewrote the table every day and made
     #: byte-identical regeneration a claim that held for 24 hours.
     assembled: str
+    #: The pre-registration this table's rules were declared in, as a path a reader
+    #: of the published table can follow. Declared per manifest rather than fixed in
+    #: the renderer because the two assets are governed by two documents: the trex
+    #: table's rules are in its own pre-registration, which *binds to* the penguin's
+    #: for everything it inherits. A renderer that named one document for both would
+    #: send a reader of the second table to a file that does not declare its bands,
+    #: its gate values or its branches.
+    prereg: str = "evidence/record/plan1_prereg.md"
+    #: Limitations this particular comparison owes its reader, declared beside the
+    #: rows they qualify and rendered into the table's own Limitations list.
+    #:
+    #: The assembler derives the other two — the band assumption and the null
+    #: equivalence — because they follow from the row structure. This one does not
+    #: follow from anything readable here: whether the archived source snapshot
+    #: *pins* a run or merely *brackets* it is a fact about when the run happened,
+    #: and it differs per asset. Left to prose it is one edit from vanishing, and it
+    #: would vanish in the flattering direction.
+    limitations: tuple[str, ...] = ()
     roots: Mapping[str, str] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
@@ -93,6 +111,8 @@ def load_manifest(path: Path) -> Manifest:
         rows=rows,
         source=str(path),
         assembled=blob["assembled"],
+        prereg=blob["prereg"],
+        limitations=tuple(blob.get("limitations", ())),
         roots=blob.get("roots", {}),
     )
 
